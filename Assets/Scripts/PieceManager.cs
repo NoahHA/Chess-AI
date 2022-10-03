@@ -1,9 +1,15 @@
 using UnityEngine;
 
+/// <summary>
+/// Singleton class to handle chess piece behaviour
+/// </summary>
 public class PieceManager : MonoBehaviour
 {
+    [Tooltip("Represents the only instance of the singleton")]
     public static PieceManager Instance { get; private set; }
+    [Tooltip("List of chess piece GameObjects")]
     public GameObject[] pieces;
+
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.

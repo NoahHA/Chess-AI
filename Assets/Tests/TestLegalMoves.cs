@@ -6,12 +6,11 @@ using UnityEngine.TestTools;
 
 public class TestLegalMoves
 {
-    // A Test behaves as an ordinary method
     [Test]
     public void onlyPawnsCanMoveAtGameStart()
     {
         //ARRANGE
-        Board.GeneratePosition(Board.StartingPosition);
+        Board.GeneratePosition(Board.startingPosition);
         ChessSquare position = new ChessSquare(1, 1);
         GameObject pawn = Board.GetPieceFromLetter('p');
 

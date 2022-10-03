@@ -3,27 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles behaviour for a tile on the chess board
+/// </summary>
 public class ChessSquare
 {
-    public ChessSquare() { }
-
+    // FIELDS
     private int _row;
     private int _col;
 
-    public ChessSquare(int row, int col)
-    {
-        Row = row;
-        Col = col;
-    }
-
-    public ChessSquare(Vector3 location)
-    {
-        Location = location;
-        ChessSquare position = GetPositionFromLocation(location);
-        Row = position.Row;
-        Col = position.Col;
-    }
-
+    // PROPERTIES
     public int Row
     {
         get { return _row; }
@@ -38,6 +27,7 @@ public class ChessSquare
             }
         }
     }
+
     public int Col
     {
         get { return _col; }
@@ -59,6 +49,30 @@ public class ChessSquare
         private set { }
     }
 
+    // CONSTRUCTORS
+    public ChessSquare() { }
+
+    public ChessSquare(int row, int col)
+    {
+        Row = row;
+        Col = col;
+    }
+
+    public ChessSquare(Vector3 location)
+    {
+        Location = location;
+        ChessSquare position = GetPositionFromLocation(location);
+        Row = position.Row;
+        Col = position.Col;
+    }
+
+    // METHODS
+
+    /// <summary>
+    /// Converts a tile position on the board to a coordinate in world space
+    /// </summary>
+    /// <param name="square">The chess square to convert</param>
+    /// <returns></returns>
     private Vector3 GetLocationFromPosition(ChessSquare square)
     {
         float startingX = -3.5f;
@@ -70,9 +84,14 @@ public class ChessSquare
         return new Vector3(x, y, 0);
     }
 
+    /// <summary>
+    /// Converts a coordinate in world space to a tile position on the board
+    /// </summary>
+    /// <param name="position">The coordinate to convert</param>
+    /// <returns></returns>
     private ChessSquare GetPositionFromLocation(Vector3 position)
     {
-        ChessSquare square = new ChessSquare();
+        var square = new ChessSquare();
         int offsetX = -4;
         int offsetY = 3;
 

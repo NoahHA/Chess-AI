@@ -1,45 +1,54 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
+/// <summary>
+/// Handles overall game behaviour
+/// </summary>
 public class GameController : MonoBehaviour
 {
-    // who's turn it is, false = black, true = white
+    [Tooltip("Who's turn it is, false=black, true=white")]
     public static bool playerTurn = true;
+    [Tooltip("Radius ")]
     private static float radius = 0.1f;
 
+    /// <summary>
+    /// Returns the legal moves for a given piece and board location
+    /// </summary>
+    /// <param name="position">Chess tile that the selected piece is on</param>
+    /// <param name="piece">The selected piece</param>
+    /// <returns></returns>
     public static List<ChessSquare> GetLegalMoves(ChessSquare position, GameObject piece)
     {
         List<ChessSquare> moves = new();
         string pieceName = piece.name;
 
-        if ((pieceName.Contains("b_") && !GameController.playerTurn) || (pieceName.Contains("w_") && GameController.playerTurn))
+        if (Board.ValidPieceClicked(pieceName))
         {
             // temporarily ignore piece so it doesn't collide with itself
             piece.layer = LayerMask.NameToLayer("Ignore");
 
-            if (pieceName.Contains("pawn"))
-                moves.AddRange(GetPawnMoves(position, piece));
+            // Checks for the type of piece and calls the relevant function
+            if (pieceName.Contains("pawn")) moves.AddRange(GetPawnMoves(position, piece));
 
-            else if (pieceName.Contains("rook"))
-                moves.AddRange(GetRookMoves(position));
+            else if (pieceName.Contains("rook")) moves.AddRange(GetRookMoves(position));
 
-            else if (pieceName.Contains("bishop"))
-                moves.AddRange(GetBishopMoves(position));
+            else if (pieceName.Contains("bishop")) moves.AddRange(GetBishopMoves(position));
 
-            else if (pieceName.Contains("queen"))
-                moves.AddRange(GetQueenMoves(position));
+            else if (pieceName.Contains("queen")) moves.AddRange(GetQueenMoves(position));
 
-            else if (pieceName.Contains("king"))
-                moves.AddRange(GetKingMoves(position));
+            else if (pieceName.Contains("king")) moves.AddRange(GetKingMoves(position));
 
-            else if (pieceName.Contains("knight"))
-                moves.AddRange(GetKnightMoves(position));
+            else if (pieceName.Contains("knight")) moves.AddRange(GetKnightMoves(position));
 
             piece.layer = LayerMask.NameToLayer("Default");
         }
 
         return moves;
     }
+
+    // TODO: Overload GetLegalMoves so it can also take in a board position string and a piece name
 
     private static List<ChessSquare> GetPawnMoves(ChessSquare position, GameObject piece)
     {
