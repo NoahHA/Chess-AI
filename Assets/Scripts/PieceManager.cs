@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Singleton class to handle chess piece behaviour
+/// Singleton class to hold chess pieces
 /// </summary>
 public class PieceManager : MonoBehaviour
 {

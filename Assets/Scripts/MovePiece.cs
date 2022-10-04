@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// Handles manual movement of chess pieces
@@ -12,9 +13,17 @@ public class MovePiece : MonoBehaviour
     private Vector3 offset;
     private ChessSquare startingSquare;
     private ChessSquare clickedSquare;
+    private SortingGroup rend;
+
+    private void Start()
+    {
+        rend = GetComponent<SortingGroup>();
+    }
 
     void OnMouseDown()
     {
+        // Puts selected piece on top of all other pieces
+        rend.sortingOrder ++;
         // Gets initial click position and tile
         Vector3 clickPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
         offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(clickPos);
@@ -50,8 +59,20 @@ public class MovePiece : MonoBehaviour
         if (!legalMoves.Any(x => x.Location == clickedSquare.Location))
             transform.position = startingSquare.Location;
 
+        // temporarily ignore piece so it doesn't collide with itself
+        gameObject.layer = LayerMask.NameToLayer("Ignore");
+
+        Collider2D pieceToTake = Board.FindPieceOnSquare(new ChessSquare(transform.position));
+        if (pieceToTake != null)
+            pieceToTake.gameObject.SetActive(false);
+
+        gameObject.layer = LayerMask.NameToLayer("Default");
+
         // If the piece has moved, go to next turn
         if (transform.position != startingSquare.Location)
             GameController.playerTurn = !GameController.playerTurn;
+        
+        // Resets sorting order
+        rend.sortingOrder = 0;
     }
 }

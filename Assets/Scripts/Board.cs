@@ -109,4 +109,63 @@ public static class Board
 
         return PieceManager.Instance.pieces[pieceDict[letter]];
     }
+
+    /// <summary>
+    /// Checks if a piece exists on a given square
+    /// </summary>
+    /// <param name="square">The chess square being checked</param>
+    /// <returns>The piece located on that square, or null if none found</returns>
+    public static Collider2D FindPieceOnSquare(ChessSquare square)
+    {
+        float radius = 0.1f;
+        return Physics2D.OverlapCircle(square.Location, radius, LayerMask.GetMask("Default"));
+    }
+
+    /// <summary>
+    /// Checks if two pieces are on opposite colours
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsEnemyPiece(GameObject mainPiece, GameObject otherPiece)
+    {
+        bool isEnemyForBlack = mainPiece.name.Contains("b_") & otherPiece.name.Contains("w_");
+        bool isEnemyForWhite = mainPiece.name.Contains("w_") & otherPiece.name.Contains("b_");
+
+        return isEnemyForBlack | isEnemyForWhite;
+    }
+
+    /// <summary>
+    /// Checks if two pieces are on opposite colours
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsEnemyPiece(string mainPieceName, GameObject otherPiece)
+    {
+        bool isEnemyForBlack = mainPieceName.Contains("b_") & otherPiece.name.Contains("w_");
+        bool isEnemyForWhite = mainPieceName.Contains("w_") & otherPiece.name.Contains("b_");
+
+        return isEnemyForBlack | isEnemyForWhite;
+    }
+
+    /// <summary>
+    /// Checks if two pieces are on opposite colours
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsEnemyPiece(string mainPieceName, string otherPieceName)
+    {
+        bool isEnemyForBlack = mainPieceName.Contains("b_") & otherPieceName.Contains("w_");
+        bool isEnemyForWhite = mainPieceName.Contains("w_") & otherPieceName.Contains("b_");
+
+        return isEnemyForBlack | isEnemyForWhite;
+    }
+
+    /// <summary>
+    /// Checks if two pieces are on opposite colours
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsEnemyPiece(GameObject mainPiece, string otherPieceName)
+    {
+        bool isEnemyForBlack = mainPiece.name.Contains("b_") & otherPieceName.Contains("w_");
+        bool isEnemyForWhite = mainPiece.name.Contains("w_") & otherPieceName.Contains("b_");
+
+        return isEnemyForBlack | isEnemyForWhite;
+    }
 }

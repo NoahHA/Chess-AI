@@ -10,8 +10,6 @@ public class GameController : MonoBehaviour
 {
     [Tooltip("Who's turn it is, false=black, true=white")]
     public static bool playerTurn = true;
-    [Tooltip("Radius ")]
-    private static float radius = 0.1f;
 
     /// <summary>
     /// Returns the legal moves for a given piece and board location
@@ -31,16 +29,11 @@ public class GameController : MonoBehaviour
 
             // Checks for the type of piece and calls the relevant function
             if (pieceName.Contains("pawn")) moves.AddRange(GetPawnMoves(position, piece));
-
-            else if (pieceName.Contains("rook")) moves.AddRange(GetRookMoves(position));
-
-            else if (pieceName.Contains("bishop")) moves.AddRange(GetBishopMoves(position));
-
-            else if (pieceName.Contains("queen")) moves.AddRange(GetQueenMoves(position));
-
-            else if (pieceName.Contains("king")) moves.AddRange(GetKingMoves(position));
-
-            else if (pieceName.Contains("knight")) moves.AddRange(GetKnightMoves(position));
+            else if (pieceName.Contains("rook")) moves.AddRange(GetRookMoves(position, piece));
+            else if (pieceName.Contains("bishop")) moves.AddRange(GetBishopMoves(position, piece));
+            else if (pieceName.Contains("queen")) moves.AddRange(GetQueenMoves(position, piece));
+            else if (pieceName.Contains("king")) moves.AddRange(GetKingMoves(position, piece));
+            else if (pieceName.Contains("knight")) moves.AddRange(GetKnightMoves(position, piece));
 
             piece.layer = LayerMask.NameToLayer("Default");
         }
@@ -53,24 +46,42 @@ public class GameController : MonoBehaviour
     private static List<ChessSquare> GetPawnMoves(ChessSquare position, GameObject piece)
     {
         List<ChessSquare> pawnMoves = new();
+        // Flag to indicate the something in the way of the pawn
         bool isBlocked = false;
-        // white pieces have +1 direction, black have -1
+        // White pieces have +1 direction, black have -1
         int direction = 1;
         if (piece.name.Contains("b_")) { direction = -1; }
 
+        // Checks for forward moves
         for (int i = 1; i < 3; i++)
         {
             var square = new ChessSquare(position.Row - i * direction, position.Col);
 
-            if ((Physics2D.OverlapCircle(square.Location, radius, LayerMask.GetMask("Default")) == null) && (!isBlocked))
+            // Add square in front of pawn to moves if not blocked
+            if (Board.FindPieceOnSquare(square) == null && !isBlocked)
                 pawnMoves.Add(square);
 
             else { isBlocked = true; }
         }
+
+        // Checks for diagonal moves
+        for (int j = -1; j < 2; j += 2)
+        {
+            var square = new ChessSquare(position.Row - 1 * direction, position.Col + j);
+
+            // Add diagonal square to moves if opponent's piece can be taken there
+            Collider2D diagonalPiece = Board.FindPieceOnSquare(square);
+            if (diagonalPiece != null)
+            {
+                if (Board.IsEnemyPiece(piece, diagonalPiece.gameObject))
+                    pawnMoves.Add(square);
+            }
+        }
+
         return pawnMoves;
     }
 
-    private static List<ChessSquare> GetRookMoves(ChessSquare position)
+    private static List<ChessSquare> GetRookMoves(ChessSquare position, GameObject piece)
     {
         List<ChessSquare> rookMoves = new();
         bool isBlocked = false;
@@ -83,12 +94,24 @@ public class GameController : MonoBehaviour
                 {
                     if (row_dir != 0 && col_dir != 0) { continue; }
                     
-                    var square = new ChessSquare(position.Row + i * row_dir, position.Col + i * col_dir);
+                    var square = new ChessSquare(position.Row + (i * row_dir), position.Col + (i * col_dir));
 
-                    if ((Physics2D.OverlapCircle(square.Location, radius, LayerMask.GetMask("Default")) == null) && (!isBlocked))
-                        rookMoves.Add(square);
+                    if (!isBlocked)
+                    {
+                        // If square is empty
+                        if (Board.FindPieceOnSquare(square) == null)
+                            rookMoves.Add(square);
 
-                    else { isBlocked = true; }
+                        // If square is occupied
+                        else
+                        {
+                            // If square is occupied by an enemy piece
+                            if (Board.IsEnemyPiece(piece, Board.FindPieceOnSquare(square).gameObject))
+                                rookMoves.Add(square);
+
+                            isBlocked = true;
+                        }
+                    }
                 }
                 isBlocked = false;
             }
@@ -96,7 +119,7 @@ public class GameController : MonoBehaviour
         return rookMoves;
     }
     
-    private static List<ChessSquare> GetBishopMoves(ChessSquare position)
+    private static List<ChessSquare> GetBishopMoves(ChessSquare position, GameObject piece)
     {
         List<ChessSquare> bishopMoves = new();
         bool isBlocked = false;
@@ -106,13 +129,25 @@ public class GameController : MonoBehaviour
             for (int col_dir = -1; col_dir < 2; col_dir += 2)
             {
                 for (int i = 1; i < 8; i++)
-                {                    
-                    var square = new ChessSquare(position.Row + i * row_dir, position.Col + i * col_dir);
+                {
+                    var square = new ChessSquare(position.Row + (i * row_dir), position.Col + (i * col_dir));
 
-                    if ((Physics2D.OverlapCircle(square.Location, radius, LayerMask.GetMask("Default")) == null) && (!isBlocked))
-                        bishopMoves.Add(square);
+                    if (!isBlocked)
+                    {
+                        // If square is empty
+                        if (Board.FindPieceOnSquare(square) == null)
+                            bishopMoves.Add(square);
 
-                    else { isBlocked = true; }
+                        // If square is occupied by piece
+                        else
+                        {
+                            // If square is occupied by an enemy piece
+                            if (Board.IsEnemyPiece(piece, Board.FindPieceOnSquare(square).gameObject))
+                                bishopMoves.Add(square);
+                        
+                            isBlocked = true;
+                        }
+                    }
                 }
                 isBlocked = false;
             }
@@ -120,16 +155,16 @@ public class GameController : MonoBehaviour
         return bishopMoves;
     }
 
-    private static List<ChessSquare> GetQueenMoves(ChessSquare position)
+    private static List<ChessSquare> GetQueenMoves(ChessSquare position, GameObject piece)
     {
         List<ChessSquare> queenMoves = new();
-        queenMoves.AddRange(GetBishopMoves(position));
-        queenMoves.AddRange(GetRookMoves(position));
+        queenMoves.AddRange(GetBishopMoves(position, piece));
+        queenMoves.AddRange(GetRookMoves(position, piece));
         
         return queenMoves;
     }
 
-    private static List<ChessSquare> GetKingMoves(ChessSquare position)
+    private static List<ChessSquare> GetKingMoves(ChessSquare position, GameObject piece)
     {
         List<ChessSquare> kingMoves = new();
 
@@ -137,16 +172,21 @@ public class GameController : MonoBehaviour
         {
             for (int j = -1; j < 2; j++)
             {
-                ChessSquare square = new ChessSquare(position.Row + i, position.Col + j);
+                var square = new ChessSquare(position.Row + i, position.Col + j);
 
-                if (Physics2D.OverlapCircle(square.Location, radius, LayerMask.GetMask("Default")) == null)
+                // If square is empty
+                if (Board.FindPieceOnSquare(square) == null)
+                    kingMoves.Add(square);
+
+                // If square is occupied by an enemy piece
+                else if (Board.IsEnemyPiece(piece, Board.FindPieceOnSquare(square).gameObject))
                     kingMoves.Add(square);
             }
         }
         return kingMoves;
     }
     
-    private static List<ChessSquare> GetKnightMoves(ChessSquare position)
+    private static List<ChessSquare> GetKnightMoves(ChessSquare position, GameObject piece)
     {
         List<ChessSquare> knightMoves = new();
 
@@ -154,12 +194,23 @@ public class GameController : MonoBehaviour
         {
             for (int j = -1; j < 2; j += 2)
             {
-                ChessSquare s1 = new ChessSquare(position.Row + i, position.Col + j);
-                ChessSquare s2 = new ChessSquare(position.Row + j, position.Col + i);
+                var s1 = new ChessSquare(position.Row + i, position.Col + j);
+                var s2 = new ChessSquare(position.Row + j, position.Col + i);
 
-                if (Physics2D.OverlapCircle(s1.Location, radius, LayerMask.GetMask("Default")) == null)
+                // If square is empty
+                if (Board.FindPieceOnSquare(s1) == null)
                     knightMoves.Add(s1);
-                if (Physics2D.OverlapCircle(s2.Location, radius, LayerMask.GetMask("Default")) == null)
+
+                // If square is occupied by an enemy piece
+                else if (Board.IsEnemyPiece(piece, Board.FindPieceOnSquare(s1).gameObject))
+                    knightMoves.Add(s1);
+
+                // If square is empty
+                if (Board.FindPieceOnSquare(s2) == null)
+                    knightMoves.Add(s2);
+
+                // If square is occupied by an enemy piece
+                else if (Board.IsEnemyPiece(piece, Board.FindPieceOnSquare(s2).gameObject))
                     knightMoves.Add(s2);
             }
         }
