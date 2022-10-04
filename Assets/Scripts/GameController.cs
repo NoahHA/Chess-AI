@@ -51,9 +51,14 @@ public class GameController : MonoBehaviour
         // White pieces have +1 direction, black have -1
         int direction = 1;
         if (piece.name.Contains("b_")) { direction = -1; }
+        // Max number of forward moves the pawn can take
+        int max_moves = 1;
+
+        if ((position.Row == 6 && direction == 1) || (position.Row == 1 && direction == -1))
+            max_moves++;
 
         // Checks for forward moves
-        for (int i = 1; i < 3; i++)
+        for (int i = 1; i < max_moves + 1; i++)
         {
             var square = new ChessSquare(position.Row - i * direction, position.Col);
 
