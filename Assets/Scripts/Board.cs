@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net.Util;
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -8,7 +9,8 @@ using UnityEngine;
 /// </summary>
 public static class Board
 {
-    public const string startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    //public const string startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    public const string startingPosition = "rnbqkbnr/8/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     /// <summary>
     /// Checks whether a clicked piece is the correct colour for the player who clicked it
@@ -61,7 +63,7 @@ public static class Board
             else
             {
                 GameObject piece = GetPieceFromLetter(letter);
-                var createdPiece = GameObject.Instantiate(piece, currentSquare.Location, piece.transform.rotation);
+                var createdPiece = GameObject.Instantiate(piece, currentSquare.Location, Quaternion.Euler(0, 0, 0));
                 createdPiece.tag = "Piece";
                 if (currentSquare.Col < 7) { currentSquare.Col++; }
             }
@@ -167,5 +169,62 @@ public static class Board
         bool isEnemyForWhite = mainPiece.name.Contains("w_") & otherPieceName.Contains("b_");
 
         return isEnemyForBlack | isEnemyForWhite;
+    }
+
+    /// <summary>
+    /// Checks if two pieces are on opposite colours
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsEnemyPiece(bool playerTurn, string otherPieceName)
+    {
+        bool isEnemyForBlack = !playerTurn & otherPieceName.Contains("w_");
+        bool isEnemyForWhite = playerTurn & otherPieceName.Contains("b_");
+
+        return isEnemyForBlack | isEnemyForWhite;
+    }
+
+    /// <summary>
+    /// Checks if two pieces are on opposite colours
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsEnemyPiece(bool playerTurn, GameObject otherPiece)
+    {
+        bool isEnemyForBlack = !playerTurn & otherPiece.name.Contains("w_");
+        bool isEnemyForWhite = playerTurn & otherPiece.name.Contains("b_");
+
+        return isEnemyForBlack | isEnemyForWhite;
+    }
+
+    /// <summary>
+    /// Flips the board and all the pieces after each turn
+    /// </summary>
+    public static void FlipBoard()
+    {
+        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
+        GameObject[] pieces = GameObject.FindGameObjectsWithTag("Piece");
+        camera.transform.Rotate(0, 0, 180);
+
+        for (int i = 0; i < pieces.Length; i++)
+        {
+            pieces[i].transform.Rotate(0, 0, 180); //camera.transform.rotation;
+        }
+    }
+
+    public static GameObject TakePiece(GameObject playerPiece)
+    {
+        // temporarily ignore piece so it doesn't collide with itself
+        playerPiece.layer = LayerMask.NameToLayer("Ignore");
+
+        Collider2D pieceToTake = FindPieceOnSquare(new ChessSquare(playerPiece.transform.position));
+
+        if (pieceToTake != null)
+        {
+            pieceToTake.gameObject.SetActive(false);
+            playerPiece.layer = LayerMask.NameToLayer("Default");
+            return pieceToTake.gameObject;
+        }
+
+        playerPiece.layer = LayerMask.NameToLayer("Default");
+        return null;
     }
 }

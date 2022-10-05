@@ -42,7 +42,7 @@ public class HighlightSquares : MonoBehaviour
     /// <param name="clickedSquare">The chess tile the player has clicked on</param>
     public void HightLightPossibleMoves(ChessSquare clickedSquare)
     {
-        List<ChessSquare> moves = GameController.GetLegalMoves(clickedSquare, gameObject);
+        List<ChessSquare> moves = GameController.GetLegalPieceMoves(clickedSquare, gameObject, GameController.playerTurn);
 
         // Loops through all legal moves and highlights them
         foreach (ChessSquare move in moves)
