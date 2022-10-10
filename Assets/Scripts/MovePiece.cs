@@ -92,8 +92,5 @@ public class MovePiece : MonoBehaviour
 
         // Resets sorting order
         rend.sortingOrder = 0;
-
-        // Update board FEN string
-        Board.currentPosition = Board.GetCurrentPosition();
     }
 }
