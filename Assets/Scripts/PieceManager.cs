@@ -5,7 +5,6 @@ using UnityEngine;
 /// </summary>
 public class PieceManager : MonoBehaviour
 {
-    [Tooltip("Represents the only instance of the singleton")]
     public static PieceManager Instance { get; private set; }
     [Tooltip("List of chess piece GameObjects")]
     public GameObject[] pieces;

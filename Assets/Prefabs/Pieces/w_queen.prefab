@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -3551785428907839854}
   - component: {fileID: 1854982111624991350}
   - component: {fileID: 7409228823567083090}
+  - component: {fileID: 7510743114667208873}
   m_Layer: 0
   m_Name: w_queen
   m_TagString: Untagged
@@ -151,3 +152,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55606b884a8bf2a4ab394b6933398f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7510743114667208873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4921920200729236169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 599b49b735c41d544a2f2ad5af476682, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hasMoved: 0

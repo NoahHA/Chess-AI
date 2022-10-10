@@ -1,4 +1,3 @@
-Add castling
 When pawn gets to the end let it turn into another piece
 Add en passant
 Add end game screen

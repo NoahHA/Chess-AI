@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4776963349498241452}
   - component: {fileID: 3738387729037423660}
   - component: {fileID: 8670259125477308682}
+  - component: {fileID: -5378379835611589842}
   m_Layer: 0
   m_Name: b_king
   m_TagString: Untagged
@@ -151,3 +152,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55606b884a8bf2a4ab394b6933398f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-5378379835611589842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3675766997131043429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 599b49b735c41d544a2f2ad5af476682, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hasMoved: 0

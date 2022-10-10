@@ -33,8 +33,12 @@ public class GameController : MonoBehaviour
             else if (pieceName.Contains("rook")) moves.AddRange(GetRookMoves(position, turn));
             else if (pieceName.Contains("bishop")) moves.AddRange(GetBishopMoves(position, turn));
             else if (pieceName.Contains("queen")) moves.AddRange(GetQueenMoves(position, turn));
-            else if (pieceName.Contains("king")) moves.AddRange(GetKingMoves(position, turn));
             else if (pieceName.Contains("knight")) moves.AddRange(GetKnightMoves(position, turn));
+            else if (pieceName.Contains("king"))
+            {
+                moves.AddRange(GetKingMoves(position, turn));
+                moves.AddRange(GetCastlingMoves(turn));
+            }
 
             piece.layer = LayerMask.NameToLayer("Default");
         }
@@ -70,11 +74,16 @@ public class GameController : MonoBehaviour
             else if (piece.name.Contains("queen"))
                 movesDict.Add(piece, GetQueenMoves(position, turn));
 
-            else if (piece.name.Contains("king"))
-                movesDict.Add(piece, GetKingMoves(position, turn));
 
             else if (piece.name.Contains("knight"))
                 movesDict.Add(piece, GetKnightMoves(position, turn));
+
+            else if (piece.name.Contains("king"))
+            {
+                var kingMoves = GetKingMoves(position, turn);
+                kingMoves.AddRange(GetCastlingMoves(turn));
+                movesDict.Add(piece, kingMoves);
+            }
         }
         return movesDict;
     }
@@ -311,6 +320,57 @@ public class GameController : MonoBehaviour
             }
         }
         return kingMoves;
+    }
+
+    private static List<ChessSquare> GetCastlingMoves(bool turn)
+    {
+        List<ChessSquare> castlingMoves = new();
+        ChessSquare kingPosition = FindKing(turn);
+        GameObject kingPiece = GameObject.Find("b_king(Clone)");
+        if (turn) kingPiece = GameObject.Find("w_king(Clone)");
+        var kingMoved = kingPiece.GetComponent<HasPieceMoved>();
+
+        // If the king has already moved, don't add any moves
+        if (kingMoved.hasMoved)
+            return castlingMoves;
+
+        // If king is in the correct position
+        if (kingPosition.Col == 4 && ((turn && kingPosition.Row == 7) || (!turn && kingPosition.Row == 0)))
+        {
+            var closeCastlePosition = new ChessSquare(kingPosition.Row, kingPosition.Col + 3);
+            var farCastlePosition = new ChessSquare(kingPosition.Row, kingPosition.Col - 4);
+
+            GameObject closeCastlePiece = Board.FindPieceOnSquare(closeCastlePosition).gameObject;
+            bool closeCastleMoved = closeCastlePiece.GetComponent<HasPieceMoved>().hasMoved;
+
+            GameObject farCastlePiece = Board.FindPieceOnSquare(farCastlePosition).gameObject;
+            bool farCastleMoved = farCastlePiece.GetComponent<HasPieceMoved>().hasMoved;
+
+            // temporarily ignore pieces for linecast
+            kingPiece.layer = LayerMask.NameToLayer("Ignore");
+            closeCastlePiece.layer = LayerMask.NameToLayer("Ignore");
+            farCastlePiece.layer = LayerMask.NameToLayer("Ignore");
+
+            // If nothing between king and castle and castle hasn't moved
+            if (!closeCastleMoved && !Physics2D.Linecast(kingPosition.Location, closeCastlePiece.transform.position, LayerMask.GetMask("Default")))
+            {
+                var square = new ChessSquare(kingPosition.Row, kingPosition.Col + 2);
+                castlingMoves.Add(square);
+            }
+
+            // If nothing between king and castle and castle hasn't moved
+            if (!farCastleMoved && !Physics2D.Linecast(kingPosition.Location, farCastlePiece.transform.position, LayerMask.GetMask("Default")))
+            {
+                var square = new ChessSquare(kingPosition.Row, kingPosition.Col - 2);
+                castlingMoves.Add(square);
+            }
+
+            // unignore pieces
+            kingPiece.layer = LayerMask.NameToLayer("Default");
+            closeCastlePiece.layer = LayerMask.NameToLayer("Default");
+            farCastlePiece.layer = LayerMask.NameToLayer("Default");
+        }
+        return castlingMoves;
     }
     
     private static List<ChessSquare> GetKnightMoves(ChessSquare position, bool turn)

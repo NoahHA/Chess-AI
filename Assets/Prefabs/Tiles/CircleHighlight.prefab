@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 481863497604018401}
   - component: {fileID: 481863497604018406}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CircleHighlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}

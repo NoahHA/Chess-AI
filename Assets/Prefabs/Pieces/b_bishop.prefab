@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 537074462172092881}
   - component: {fileID: 4450215744480475342}
   - component: {fileID: 627549347865159500}
+  - component: {fileID: 2188446664884637474}
   m_Layer: 0
   m_Name: b_bishop
   m_TagString: Untagged
@@ -151,3 +152,16 @@ SortingGroup:
   m_SortingLayerID: -75543817
   m_SortingLayer: 2
   m_SortingOrder: 0
+--- !u!114 &2188446664884637474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619536108876946407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 599b49b735c41d544a2f2ad5af476682, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hasMoved: 0
