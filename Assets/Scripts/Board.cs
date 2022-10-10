@@ -1,5 +1,4 @@
-﻿using log4net.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -9,13 +8,89 @@ using UnityEngine;
 /// </summary>
 public static class Board
 {
+    [Tooltip("The FEN string for the starting position of a standard chess game.")]
     //public const string startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    public const string startingPosition = "rnbqkbnr/8/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    public const string startingPosition = "rnbqkbnr/8/8/8/8/8/8/RNBQKBNR";
+    [Tooltip("The FEN string for the current game state.")]
+    public static string currentPosition;
 
     /// <summary>
-    /// Checks whether a clicked piece is the correct colour for the player who clicked it
+    /// Finds the FEN string representing the current board state.
     /// </summary>
-    /// <param name="piece">The chess piece that was clicked</param>
+    /// <returns>The Current Position as a FEN string.</returns>
+    public static string GetCurrentPosition()
+    {
+        var currentSquare = new ChessSquare();
+        string currentPosition = "";
+
+        for (int i = 0; i < 8; i++)
+        {
+            int numBlankSpaces = 0;
+
+            for (int j = 0; j < 8; j++)
+            {
+                currentSquare.Row = i;
+                currentSquare.Col = j;
+
+                Collider2D pieceOnSquare = FindPieceOnSquare(currentSquare);
+
+                // If no piece on square, add a blank space to string
+                if (pieceOnSquare == null)
+                    numBlankSpaces++;
+
+                // Add blank spaces before adding a new value to current position
+                if (numBlankSpaces != 0)
+                {
+                    if (pieceOnSquare != null || currentSquare.Col == 7)
+                        currentPosition += numBlankSpaces.ToString();
+                }
+
+                // If there is a piece on the square, add it to the string and reset blank spaces
+                if (pieceOnSquare != null)
+                {
+                    currentPosition += PieceNameToFEN(pieceOnSquare.gameObject.name);
+                    numBlankSpaces = 0;
+                }
+
+                // If at the end of a line, add a slash and reset blank spaces
+                if (currentSquare.Col == 7)
+                {
+                    currentPosition += '/';
+                    numBlankSpaces = 0;
+                }
+            }
+        }
+        return currentPosition;
+    }
+
+    private static char PieceNameToFEN(string name)
+    {
+        // Removes the "(clone)" text from the piece name
+        name = name.Replace("(Clone)", "");
+
+        // Dictionary connecting piece names to FEN string representations
+        var nameToFENDict = new Dictionary<string, char>
+        {
+            { "b_pawn", 'p' },
+            { "b_rook", 'r' },
+            { "b_knight", 'n' },
+            { "b_bishop", 'b' },
+            { "b_queen", 'q' },
+            { "b_king", 'k' },
+            { "w_pawn", 'P' },
+            { "w_rook", 'R' },
+            { "w_knight", 'N' },
+            { "w_bishop", 'B' },
+            { "w_queen", 'Q' },
+            { "w_king", 'K' }
+        };
+        return nameToFENDict[name];
+    }
+
+    /// <summary>
+    /// Checks whether a clicked piece is the correct colour for the player who clicked it.
+    /// </summary>
+    /// <param name="piece">The chess piece that was clicked.</param>
     /// <returns></returns>
     public static bool ValidPieceClicked(GameObject piece)
     {
@@ -25,9 +100,9 @@ public static class Board
     }
 
     /// <summary>
-    /// Checks whether a given piece is the correct colour for the current turn
+    /// Checks whether a given piece is the correct colour for the current turn.
     /// </summary>
-    /// <param name="piecename">The name of the piece to check</param>
+    /// <param name="piecename">The name of the piece to check.</param>
     /// <returns></returns>
     public static bool ValidPieceClicked(string piecename)
     {
@@ -48,10 +123,17 @@ public static class Board
         // loops through the string
         foreach (char letter in position)
         {
+            // DELETE THESE
+            int col = currentSquare.Col;
+            int row = currentSquare.Row;
+
             // Digits represent skipped spaces
             if (char.IsDigit(letter))
-                currentSquare.Col += (int)char.GetNumericValue(letter) - 1;
-            
+                if (currentSquare.Col == 0)
+                    currentSquare.Col += (int)char.GetNumericValue(letter) - 1;
+                else
+                    currentSquare.Col += (int)char.GetNumericValue(letter);
+
             // slashes represent ends of rows
             else if (letter.Equals('/'))
             {
@@ -65,8 +147,13 @@ public static class Board
                 GameObject piece = GetPieceFromLetter(letter);
                 var createdPiece = GameObject.Instantiate(piece, currentSquare.Location, Quaternion.Euler(0, 0, 0));
                 createdPiece.tag = "Piece";
+                
                 if (currentSquare.Col < 7) { currentSquare.Col++; }
             }
+
+            // DELETE THESE
+            col = currentSquare.Col;
+            row = currentSquare.Row;
         };
     }
 
@@ -196,7 +283,7 @@ public static class Board
     }
 
     /// <summary>
-    /// Flips the board and all the pieces after each turn
+    /// Flips the board and all the pieces after each turn.
     /// </summary>
     public static void FlipBoard()
     {
@@ -210,6 +297,11 @@ public static class Board
         }
     }
 
+    /// <summary>
+    /// Checks if an enemy piece is on the same square, and if it is then takes it.
+    /// </summary>
+    /// <param name="playerPiece"></param>
+    /// <returns></returns>
     public static GameObject TakePiece(GameObject playerPiece)
     {
         // temporarily ignore piece so it doesn't collide with itself

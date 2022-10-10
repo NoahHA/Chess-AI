@@ -108,7 +108,7 @@ public class GameController : MonoBehaviour
     /// <summary>
     /// Checks whether the player is currently in check
     /// </summary>
-    /// <param name="kingPosition">Chess square that the player's king is in</param>
+    /// <param name="turn">true if white is playing, false if black is playing</param>
     /// <returns></returns>
     public static bool IsInCheck(bool turn)
     {
@@ -121,13 +121,48 @@ public class GameController : MonoBehaviour
             foreach (ChessSquare move in opponentMoves[piece])
             {
                 if (move.Row == kingPosition.Row && move.Col == kingPosition.Col)
-                {
-                    Debug.Log($"{piece}: {move.Row}, {move.Col}");
                     return true;
-                }
             }
         }
         return false;
+    }
+
+    /// <summary>
+    /// Checks whether the player has been checkmated
+    /// </summary>
+    /// <param name="turn">true if white is playing, false if black is playing</param>
+    /// <returns></returns>
+    public static bool IsInCheckmate(bool turn)
+    {
+        var playerMoves = GetLegalMoves(turn);
+
+        // Find any move that will not put the player in check
+        foreach (GameObject piece in playerMoves.Keys)
+        {
+            foreach (ChessSquare move in playerMoves[piece])
+            {
+                var startingPos = piece.transform.position;
+
+                // Move the piece
+                piece.transform.position = move.Location;
+
+                // Take any takeable pieces
+                GameObject takenPiece = Board.TakePiece(piece);
+
+                // Check if player is in check
+                bool inCheck = IsInCheck(turn);
+
+                // Untake the piece
+                if (takenPiece != null) takenPiece.SetActive(true);
+
+                // Undo move
+                piece.transform.position = startingPos;
+
+                if (!inCheck)
+                    return false;
+            }
+        }
+        return true;
     }
 
     private static List<ChessSquare> GetPawnMoves(ChessSquare position, bool turn)

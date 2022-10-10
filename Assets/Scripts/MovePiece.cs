@@ -25,9 +25,9 @@ public class MovePiece : MonoBehaviour
         GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
         GameObject[] pieces = PieceManager.Instance.pieces;
 
-        // Reset rotations
+        // Reset camera rotation
         camera.transform.eulerAngles = new Vector3(0, 0, 0);
-
+        // Reset piece rotations
         foreach (GameObject piece in pieces)
             piece.transform.eulerAngles = new Vector3(0, 0, 0);
     }
@@ -70,20 +70,30 @@ public class MovePiece : MonoBehaviour
         GameObject takenPiece = Board.TakePiece(gameObject);
 
         // If the new square is illegal or the player is now in check, move the piece back to where it started
-        if (!LegalMoves.Any(x => x.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
+        if (!LegalMoves.Any(move => move.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
         {
             transform.position = startingSquare.Location;
+            // Untake the piece
             if (takenPiece != null) takenPiece.SetActive(true);
+
         }
 
         // If the piece has moved, go to next turn and flip the board
-        if (transform.position != startingSquare.Location)
+        else if (startingSquare.Location != transform.position)
         {
             GameController.playerTurn = !GameController.playerTurn;
+            
+            if (GameController.IsInCheckmate(GameController.playerTurn))
+                Debug.Log("Game over!");
+            
             Board.FlipBoard();
+
         }
 
         // Resets sorting order
         rend.sortingOrder = 0;
+
+        // Update board FEN string
+        Board.currentPosition = Board.GetCurrentPosition();
     }
 }
