@@ -5,5 +5,5 @@ using UnityEngine;
 /// </summary>
 public class InitialiseBoard : MonoBehaviour
 {
-    void Start() => Board.GeneratePosition(Board.startingPosition);
+    private void Start() => Board.GeneratePosition(Board.startingPosition);
 }

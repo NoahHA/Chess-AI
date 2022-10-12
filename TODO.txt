@@ -1,4 +1,4 @@
-When pawn gets to the end let it turn into another piece
 Add en passant
-Add end game screen
-Add start menu
+Change piece manager so it holds the gameobjects, not the prefabs, then I can remove the corrections at the start
+Create an ML Agents AI to play against
+Clean up the move piece class

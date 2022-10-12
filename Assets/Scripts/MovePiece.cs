@@ -1,40 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 using System;
-using UnityEditor.Experimental.GraphView;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 /// <summary>
-/// Handles manual movement of chess pieces
+/// Handles manual movement of chess pieces.
 /// </summary>
 [RequireComponent(typeof(BoxCollider2D))]
 public class MovePiece : MonoBehaviour
 {
+    private GameObject checkmateOverlay;
+
     private Vector3 offset;
+
     private ChessSquare startingSquare;
+
     private ChessSquare clickedSquare;
+
     private SortingGroup rend;
-    [Tooltip("The current legal moves for the selected piece")]
-    List<ChessSquare> LegalMoves { get; set; }
+
+    private List<ChessSquare> LegalMoves { get; set; }
 
     private void Start()
     {
         rend = GetComponent<SortingGroup>();
-
-        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-        GameObject[] pieces = PieceManager.Instance.pieces;
-
-        // Reset camera rotation
-        camera.transform.eulerAngles = new Vector3(0, 0, 0);
-        // Reset piece rotations
-        foreach (GameObject piece in pieces)
-            piece.transform.eulerAngles = new Vector3(0, 0, 0);
+        checkmateOverlay = GameObject.FindGameObjectWithTag("Checkmate");
     }
 
-    void OnMouseDown()
+    private void OnMouseDown()
     {
         // Puts selected piece on top of all other pieces
         rend.sortingOrder++;
@@ -50,7 +44,7 @@ public class MovePiece : MonoBehaviour
         LegalMoves.Add(startingSquare);
     }
 
-    void OnMouseDrag()
+    private void OnMouseDrag()
     {
         // Checks if the clicked piece is the right colour
         if (Board.ValidPieceClicked(gameObject))
@@ -72,12 +66,13 @@ public class MovePiece : MonoBehaviour
     {
         GameObject takenPiece = Board.TakePiece(gameObject);
 
-        // If the new square is illegal or the player is now in check, move the piece back to where it started
+        // If the new square is illegal or the player is now in check, move the piece back to where
+        // it started
         if (!LegalMoves.Any(move => move.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
         {
             transform.position = startingSquare.Location;
             // Untake the piece
-            if (takenPiece != null) 
+            if (takenPiece != null)
                 takenPiece.SetActive(true);
         }
 
@@ -88,7 +83,7 @@ public class MovePiece : MonoBehaviour
             if (gameObject.name.Contains("king"))
             {
                 ChessSquare kingSquare = GameController.FindKing(GameController.playerTurn);
-                
+
                 if (Math.Abs(kingSquare.Col - startingSquare.Col) == 2)
                 {
                     // If player castled queenside
@@ -111,14 +106,30 @@ public class MovePiece : MonoBehaviour
             var pieceMoved = gameObject.GetComponent<HasPieceMoved>();
             pieceMoved.hasMoved = true;
 
+            // If pawn has gotten to the end, turn it into a queen
+            if (gameObject.name.Contains("pawn"))
+            {
+                var pawnSquare = new ChessSquare(transform.position);
+                if (pawnSquare.Row == 0 || pawnSquare.Row == 7)
+                {
+                    // letter defines whether queen is white or black
+                    char letter = 'q';
+                    if (GameController.playerTurn) letter = 'Q';
+
+                    GameObject queenPiece = Board.GetPieceFromLetter(letter);
+                    Instantiate(queenPiece, pawnSquare.Location, gameObject.transform.rotation);
+                    gameObject.SetActive(false);
+                }
+            }
+            // Change turns
             GameController.playerTurn = !GameController.playerTurn;
-            
+
+            // If player is in checkmate, activate the checkmate overlay
             if (GameController.IsInCheckmate(GameController.playerTurn))
-                Debug.Log("Game over!");
-            
+                checkmateOverlay.transform.Find("CheckmateText").gameObject.SetActive(true);
+
             Board.FlipBoard();
         }
-
 
         // Resets sorting order
         rend.sortingOrder = 0;

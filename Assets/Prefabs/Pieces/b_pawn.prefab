@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 4922402818517525544}
   m_Layer: 0
   m_Name: b_pawn
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

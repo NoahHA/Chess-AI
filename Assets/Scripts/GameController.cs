@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// Handles overall game behaviour
@@ -15,9 +12,10 @@ public class GameController : MonoBehaviour
     /// <summary>
     /// Returns the legal moves for a given piece and board location
     /// </summary>
-    /// <param name="position">Chess tile that the selected piece is on</param>
-    /// <param name="piece">The selected piece</param>
-    /// <returns></returns>
+    /// <param name="position"> Chess tile that the selected piece is on </param>
+    /// <param name="piece"> The selected piece </param>
+    /// <param name="turn"> The player whos turn it is: true=white, false=black </param>
+    /// <returns> </returns>
     public static List<ChessSquare> GetLegalPieceMoves(ChessSquare position, GameObject piece, bool turn)
     {
         List<ChessSquare> moves = new();
@@ -51,8 +49,10 @@ public class GameController : MonoBehaviour
     /// <summary>
     /// Finds all legal moves for a given player to make that turn
     /// </summary>
-    /// <param name="turn">Who's turn it is, white=1, black=0</param>
-    /// <returns>Dictionary containing the GameObject and a list of move locations for each piece</returns>
+    /// <param name="turn"> Who's turn it is, white=1, black=0 </param>
+    /// <returns>
+    /// Dictionary containing the GameObject and a list of move locations for each piece
+    /// </returns>
     public static Dictionary<GameObject, List<ChessSquare>> GetLegalMoves(bool turn)
     {
         List<GameObject> playerPieces = GetPlayerPieces(turn);
@@ -62,22 +62,16 @@ public class GameController : MonoBehaviour
         {
             var position = new ChessSquare(piece.gameObject.transform.position);
 
-            if (piece.name.Contains("pawn")) 
+            if (piece.name.Contains("pawn"))
                 movesDict.Add(piece, GetPawnMoves(position, turn));
-
             else if (piece.name.Contains("rook"))
                 movesDict.Add(piece, GetRookMoves(position, turn));
-
             else if (piece.name.Contains("bishop"))
                 movesDict.Add(piece, GetBishopMoves(position, turn));
-
             else if (piece.name.Contains("queen"))
                 movesDict.Add(piece, GetQueenMoves(position, turn));
-
-
             else if (piece.name.Contains("knight"))
                 movesDict.Add(piece, GetKnightMoves(position, turn));
-
             else if (piece.name.Contains("king"))
             {
                 var kingMoves = GetKingMoves(position, turn);
@@ -89,36 +83,10 @@ public class GameController : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets a list of the pieces a player has on the board
-    /// </summary>
-    /// <param name="player"></param>
-    /// <returns>An array of GameObjects for each player piece</returns>
-    /// <exception cref="NotImplementedException"></exception>
-    private static List<GameObject> GetPlayerPieces(bool player)
-    {
-        List<GameObject> playerPieces = new();
-
-        // Loops through all GameObjects
-        foreach (GameObject gameObj in GameObject.FindObjectsOfType<GameObject>())
-        {
-            // If object is a piece and is active i.e. still on the board
-            if (gameObj.activeSelf && gameObj.tag == "Piece")
-            {
-                // If piece is the right colour
-                if ((gameObj.name.Contains("b_") && !player) || (gameObj.name.Contains("w_") && player))
-                {
-                    playerPieces.Add(gameObj);
-                }
-            }
-        }
-        return playerPieces;
-    }
-
-    /// <summary>
     /// Checks whether the player is currently in check
     /// </summary>
-    /// <param name="turn">true if white is playing, false if black is playing</param>
-    /// <returns></returns>
+    /// <param name="turn"> true if white is playing, false if black is playing </param>
+    /// <returns> </returns>
     public static bool IsInCheck(bool turn)
     {
         var opponentMoves = GetLegalMoves(!turn);
@@ -139,8 +107,8 @@ public class GameController : MonoBehaviour
     /// <summary>
     /// Checks whether the player has been checkmated
     /// </summary>
-    /// <param name="turn">true if white is playing, false if black is playing</param>
-    /// <returns></returns>
+    /// <param name="turn"> true if white is playing, false if black is playing </param>
+    /// <returns> </returns>
     public static bool IsInCheckmate(bool turn)
     {
         var playerMoves = GetLegalMoves(turn);
@@ -152,26 +120,59 @@ public class GameController : MonoBehaviour
             {
                 var startingPos = piece.transform.position;
 
-                // Move the piece
-                piece.transform.position = move.Location;
-
-                // Take any takeable pieces
-                GameObject takenPiece = Board.TakePiece(piece);
-
-                // Check if player is in check
-                bool inCheck = IsInCheck(turn);
-
-                // Untake the piece
-                if (takenPiece != null) takenPiece.SetActive(true);
-
-                // Undo move
-                piece.transform.position = startingPos;
+                piece.transform.position = move.Location; // Move the piece
+                GameObject takenPiece = Board.TakePiece(piece); // Take any takeable pieces
+                bool inCheck = IsInCheck(turn); // Check if player is in check
+                if (takenPiece != null) takenPiece.SetActive(true); // Untake the piece
+                piece.transform.position = startingPos; // Undo move
 
                 if (!inCheck)
                     return false;
             }
         }
         return true;
+    }
+
+    /// <summary>
+    /// Finds the location of a given player's king
+    /// </summary>
+    /// <param name="turn"> Which player to look for: white=1, black=0 </param>
+    /// <returns> The chess square that the player's king is on </returns>
+    public static ChessSquare FindKing(bool turn)
+    {
+        GameObject king;
+
+        if (turn) king = GameObject.Find("w_king(Clone)");
+        else king = GameObject.Find("b_king(Clone)");
+
+        var kingPosition = new ChessSquare(king.transform.position);
+
+        return kingPosition;
+    }
+
+    /// <summary>
+    /// Gets a list of the pieces a player has on the board
+    /// </summary>
+    /// <param name="player"> </param>
+    /// <returns> An array of GameObjects for each player piece </returns>
+    private static List<GameObject> GetPlayerPieces(bool player)
+    {
+        List<GameObject> playerPieces = new();
+
+        // Loops through all GameObjects
+        foreach (GameObject gameObj in GameObject.FindObjectsOfType<GameObject>())
+        {
+            // If object is a piece and is active i.e. still on the board
+            if (gameObj.activeSelf && gameObj.tag == "Piece")
+            {
+                // If piece is the right colour
+                if ((gameObj.name.Contains("b_") && !player) || (gameObj.name.Contains("w_") && player))
+                {
+                    playerPieces.Add(gameObj);
+                }
+            }
+        }
+        return playerPieces;
     }
 
     private static List<ChessSquare> GetPawnMoves(ChessSquare position, bool turn)
@@ -196,7 +197,6 @@ public class GameController : MonoBehaviour
             // Add square in front of pawn to moves if not blocked
             if (Board.FindPieceOnSquare(square) == null && !isBlocked)
                 pawnMoves.Add(square);
-
             else { isBlocked = true; }
         }
 
@@ -229,7 +229,7 @@ public class GameController : MonoBehaviour
                 for (int i = 1; i < 8; i++)
                 {
                     if (row_dir != 0 && col_dir != 0) { continue; }
-                    
+
                     var square = new ChessSquare(position.Row + (i * row_dir), position.Col + (i * col_dir));
 
                     if (!isBlocked)
@@ -254,7 +254,7 @@ public class GameController : MonoBehaviour
         }
         return rookMoves;
     }
-    
+
     private static List<ChessSquare> GetBishopMoves(ChessSquare position, bool turn)
     {
         List<ChessSquare> bishopMoves = new();
@@ -280,7 +280,7 @@ public class GameController : MonoBehaviour
                             // If square is occupied by an enemy piece
                             if (Board.IsEnemyPiece(turn, Board.FindPieceOnSquare(square).gameObject))
                                 bishopMoves.Add(square);
-                        
+
                             isBlocked = true;
                         }
                     }
@@ -296,7 +296,7 @@ public class GameController : MonoBehaviour
         List<ChessSquare> queenMoves = new();
         queenMoves.AddRange(GetBishopMoves(position, turn));
         queenMoves.AddRange(GetRookMoves(position, turn));
-        
+
         return queenMoves;
     }
 
@@ -340,39 +340,62 @@ public class GameController : MonoBehaviour
             var closeCastlePosition = new ChessSquare(kingPosition.Row, kingPosition.Col + 3);
             var farCastlePosition = new ChessSquare(kingPosition.Row, kingPosition.Col - 4);
 
-            GameObject closeCastlePiece = Board.FindPieceOnSquare(closeCastlePosition).gameObject;
-            bool closeCastleMoved = closeCastlePiece.GetComponent<HasPieceMoved>().hasMoved;
+            Collider2D closeCastlePiece = Board.FindPieceOnSquare(closeCastlePosition);
+            Collider2D farCastlePiece = Board.FindPieceOnSquare(farCastlePosition);
 
-            GameObject farCastlePiece = Board.FindPieceOnSquare(farCastlePosition).gameObject;
-            bool farCastleMoved = farCastlePiece.GetComponent<HasPieceMoved>().hasMoved;
-
-            // temporarily ignore pieces for linecast
+            // temporarily ignore piece for linecast
             kingPiece.layer = LayerMask.NameToLayer("Ignore");
-            closeCastlePiece.layer = LayerMask.NameToLayer("Ignore");
-            farCastlePiece.layer = LayerMask.NameToLayer("Ignore");
 
-            // If nothing between king and castle and castle hasn't moved
-            if (!closeCastleMoved && !Physics2D.Linecast(kingPosition.Location, closeCastlePiece.transform.position, LayerMask.GetMask("Default")))
+            // If kingside castle is in its starting position
+            if (closeCastlePiece != null)
             {
-                var square = new ChessSquare(kingPosition.Row, kingPosition.Col + 2);
-                castlingMoves.Add(square);
+                if (closeCastlePiece.gameObject.name.Contains("rook"))
+                {
+                    bool closeCastleMoved = closeCastlePiece.gameObject.GetComponent<HasPieceMoved>().hasMoved;
+
+                    // temporarily ignore piece for linecast
+                    closeCastlePiece.gameObject.layer = LayerMask.NameToLayer("Ignore");
+
+                    // If nothing between king and castle and castle hasn't moved
+                    if (!closeCastleMoved && !Physics2D.Linecast(kingPosition.Location, closeCastlePiece.gameObject.transform.position, LayerMask.GetMask("Default")))
+                    {
+                        var square = new ChessSquare(kingPosition.Row, kingPosition.Col + 2);
+                        castlingMoves.Add(square);
+                    }
+
+                    // Unignore piece
+                    closeCastlePiece.gameObject.layer = LayerMask.NameToLayer("Default");
+                }
             }
 
-            // If nothing between king and castle and castle hasn't moved
-            if (!farCastleMoved && !Physics2D.Linecast(kingPosition.Location, farCastlePiece.transform.position, LayerMask.GetMask("Default")))
+            // If queenside castle is in its starting position
+            if (farCastlePiece != null)
             {
-                var square = new ChessSquare(kingPosition.Row, kingPosition.Col - 2);
-                castlingMoves.Add(square);
+                if (farCastlePiece.gameObject.name.Contains("rook"))
+                {
+                    bool farCastleMoved = farCastlePiece.GetComponent<HasPieceMoved>().hasMoved;
+
+                    // temporarily ignore piece for linecast
+                    farCastlePiece.gameObject.layer = LayerMask.NameToLayer("Ignore");
+
+                    // If nothing between king and castle and castle hasn't moved
+                    if (!farCastleMoved && !Physics2D.Linecast(kingPosition.Location, farCastlePiece.gameObject.transform.position, LayerMask.GetMask("Default")))
+                    {
+                        var square = new ChessSquare(kingPosition.Row, kingPosition.Col - 2);
+                        castlingMoves.Add(square);
+                    }
+
+                    // Unignore piece
+                    farCastlePiece.gameObject.layer = LayerMask.NameToLayer("Default");
+                }
             }
 
-            // unignore pieces
+            // Unignore piece
             kingPiece.layer = LayerMask.NameToLayer("Default");
-            closeCastlePiece.layer = LayerMask.NameToLayer("Default");
-            farCastlePiece.layer = LayerMask.NameToLayer("Default");
         }
         return castlingMoves;
     }
-    
+
     private static List<ChessSquare> GetKnightMoves(ChessSquare position, bool turn)
     {
         List<ChessSquare> knightMoves = new();
@@ -402,22 +425,5 @@ public class GameController : MonoBehaviour
             }
         }
         return knightMoves;
-    }
-
-    /// <summary>
-    /// Finds the location of a given player's king
-    /// </summary>
-    /// <param name="turn">Which player to look for: white=1, black=0</param>
-    /// <returns>The chess square that the player's king is on</returns>
-    public static ChessSquare FindKing(bool turn)
-    {
-        GameObject king;
-
-        if (turn) king = GameObject.Find("w_king(Clone)");
-        else king = GameObject.Find("b_king(Clone)");
-
-        var kingPosition = new ChessSquare(king.transform.position);
-
-        return kingPosition;
     }
 }

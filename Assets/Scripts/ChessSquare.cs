@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -10,7 +8,26 @@ public class ChessSquare
 {
     // FIELDS
     private int _row;
+
     private int _col;
+
+    // CONSTRUCTORS
+    public ChessSquare()
+    { }
+
+    public ChessSquare(int row, int col)
+    {
+        Row = row;
+        Col = col;
+    }
+
+    public ChessSquare(Vector3 location)
+    {
+        Location = location;
+        ChessSquare position = GetPositionFromLocation(location);
+        Row = position.Row;
+        Col = position.Col;
+    }
 
     // PROPERTIES
     public int Row
@@ -49,30 +66,13 @@ public class ChessSquare
         private set { }
     }
 
-    // CONSTRUCTORS
-    public ChessSquare() { }
-
-    public ChessSquare(int row, int col)
-    {
-        Row = row;
-        Col = col;
-    }
-
-    public ChessSquare(Vector3 location)
-    {
-        Location = location;
-        ChessSquare position = GetPositionFromLocation(location);
-        Row = position.Row;
-        Col = position.Col;
-    }
-
     // METHODS
 
     /// <summary>
     /// Converts a tile position on the board to a coordinate in world space
     /// </summary>
-    /// <param name="square">The chess square to convert</param>
-    /// <returns></returns>
+    /// <param name="square"> The chess square to convert </param>
+    /// <returns> </returns>
     private Vector3 GetLocationFromPosition(ChessSquare square)
     {
         float startingX = -3.5f;
@@ -87,8 +87,8 @@ public class ChessSquare
     /// <summary>
     /// Converts a coordinate in world space to a tile position on the board
     /// </summary>
-    /// <param name="position">The coordinate to convert</param>
-    /// <returns></returns>
+    /// <param name="position"> The coordinate to convert </param>
+    /// <returns> </returns>
     private ChessSquare GetPositionFromLocation(Vector3 position)
     {
         var square = new ChessSquare();

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -5,9 +6,10 @@ using UnityEngine;
 /// </summary>
 public class PieceManager : MonoBehaviour
 {
-    public static PieceManager Instance { get; private set; }
     [Tooltip("List of chess piece GameObjects")]
-    public GameObject[] pieces;
+    public List<GameObject> pieces;
+
+    public static PieceManager Instance { get; private set; }
 
     private void Awake()
     {

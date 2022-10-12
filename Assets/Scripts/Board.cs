@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 /// <summary>
@@ -9,14 +8,13 @@ using UnityEngine;
 public static class Board
 {
     [Tooltip("The FEN string for the starting position of a standard chess game.")]
-    //public const string startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    public const string startingPosition = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R";
+    public const string startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     /// <summary>
     /// Checks whether a clicked piece is the correct colour for the player who clicked it.
     /// </summary>
-    /// <param name="piece">The chess piece that was clicked.</param>
-    /// <returns></returns>
+    /// <param name="piece"> The chess piece that was clicked. </param>
+    /// <returns> </returns>
     public static bool ValidPieceClicked(GameObject piece)
     {
         bool validWhiteClick = piece.name.Contains("w_") & GameController.playerTurn;
@@ -27,8 +25,8 @@ public static class Board
     /// <summary>
     /// Checks whether a given piece is the correct colour for the current turn.
     /// </summary>
-    /// <param name="piecename">The name of the piece to check.</param>
-    /// <returns></returns>
+    /// <param name="piecename"> The name of the piece to check. </param>
+    /// <returns> </returns>
     public static bool ValidPieceClicked(string piecename)
     {
         bool validWhiteClick = piecename.Contains("w_") & GameController.playerTurn;
@@ -39,7 +37,7 @@ public static class Board
     /// <summary>
     /// Converts a chess FEN string to an actual board state
     /// </summary>
-    /// <param name="position">FEN string</param>
+    /// <param name="position"> FEN string </param>
     public static void GeneratePosition(string position)
     {
         ClearBoard();
@@ -48,10 +46,6 @@ public static class Board
         // loops through the string
         foreach (char letter in position)
         {
-            // DELETE THESE
-            int col = currentSquare.Col;
-            int row = currentSquare.Row;
-
             // Digits represent skipped spaces
             if (char.IsDigit(letter))
                 if (currentSquare.Col == 0)
@@ -71,14 +65,9 @@ public static class Board
             {
                 GameObject piece = GetPieceFromLetter(letter);
                 var createdPiece = GameObject.Instantiate(piece, currentSquare.Location, Quaternion.Euler(0, 0, 0));
-                createdPiece.tag = "Piece";
-                
+
                 if (currentSquare.Col < 7) { currentSquare.Col++; }
             }
-
-            // DELETE THESE
-            col = currentSquare.Col;
-            row = currentSquare.Row;
         };
     }
 
@@ -96,9 +85,11 @@ public static class Board
     /// <summary>
     /// Converts a letter in a FEN string to the appropriate chess piece object
     /// </summary>
-    /// <param name="letter">Letter from a FEN string representing a chess piece, uppercase=white, lowercase=black</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
+    /// <param name="letter">
+    /// Letter from a FEN string representing a chess piece, uppercase=white, lowercase=black
+    /// </param>
+    /// <returns> </returns>
+    /// <exception cref="ArgumentException"> </exception>
     public static GameObject GetPieceFromLetter(char letter)
     {
         // Dictionary connecting piece names to their index in the pieces array
@@ -118,7 +109,7 @@ public static class Board
             { 'K', 11 }
         };
 
-        if (!pieceDict.ContainsKey(letter)) 
+        if (!pieceDict.ContainsKey(letter))
             throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
 
         return PieceManager.Instance.pieces[pieceDict[letter]];
@@ -127,8 +118,8 @@ public static class Board
     /// <summary>
     /// Checks if a piece exists on a given square
     /// </summary>
-    /// <param name="square">The chess square being checked</param>
-    /// <returns>The piece located on that square, or null if none found</returns>
+    /// <param name="square"> The chess square being checked </param>
+    /// <returns> The piece located on that square, or null if none found </returns>
     public static Collider2D FindPieceOnSquare(ChessSquare square)
     {
         float radius = 0.1f;
@@ -138,7 +129,7 @@ public static class Board
     /// <summary>
     /// Checks if two pieces are on opposite colours
     /// </summary>
-    /// <returns></returns>
+    /// <returns> </returns>
     public static bool IsEnemyPiece(GameObject mainPiece, GameObject otherPiece)
     {
         bool isEnemyForBlack = mainPiece.name.Contains("b_") & otherPiece.name.Contains("w_");
@@ -150,7 +141,7 @@ public static class Board
     /// <summary>
     /// Checks if two pieces are on opposite colours
     /// </summary>
-    /// <returns></returns>
+    /// <returns> </returns>
     public static bool IsEnemyPiece(string mainPieceName, GameObject otherPiece)
     {
         bool isEnemyForBlack = mainPieceName.Contains("b_") & otherPiece.name.Contains("w_");
@@ -162,7 +153,7 @@ public static class Board
     /// <summary>
     /// Checks if two pieces are on opposite colours
     /// </summary>
-    /// <returns></returns>
+    /// <returns> </returns>
     public static bool IsEnemyPiece(string mainPieceName, string otherPieceName)
     {
         bool isEnemyForBlack = mainPieceName.Contains("b_") & otherPieceName.Contains("w_");
@@ -174,7 +165,7 @@ public static class Board
     /// <summary>
     /// Checks if two pieces are on opposite colours
     /// </summary>
-    /// <returns></returns>
+    /// <returns> </returns>
     public static bool IsEnemyPiece(GameObject mainPiece, string otherPieceName)
     {
         bool isEnemyForBlack = mainPiece.name.Contains("b_") & otherPieceName.Contains("w_");
@@ -186,7 +177,7 @@ public static class Board
     /// <summary>
     /// Checks if two pieces are on opposite colours
     /// </summary>
-    /// <returns></returns>
+    /// <returns> </returns>
     public static bool IsEnemyPiece(bool playerTurn, string otherPieceName)
     {
         bool isEnemyForBlack = !playerTurn & otherPieceName.Contains("w_");
@@ -198,7 +189,7 @@ public static class Board
     /// <summary>
     /// Checks if two pieces are on opposite colours
     /// </summary>
-    /// <returns></returns>
+    /// <returns> </returns>
     public static bool IsEnemyPiece(bool playerTurn, GameObject otherPiece)
     {
         bool isEnemyForBlack = !playerTurn & otherPiece.name.Contains("w_");
@@ -213,20 +204,20 @@ public static class Board
     public static void FlipBoard()
     {
         GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-        GameObject[] pieces = GameObject.FindGameObjectsWithTag("Piece");
         camera.transform.Rotate(0, 0, 180);
+        GameObject[] pieces = GameObject.FindGameObjectsWithTag("Piece");
 
         for (int i = 0; i < pieces.Length; i++)
         {
-            pieces[i].transform.Rotate(0, 0, 180); //camera.transform.rotation;
+            pieces[i].transform.Rotate(0, 0, 180);
         }
     }
 
     /// <summary>
     /// Checks if an enemy piece is on the same square, and if it is then takes it.
     /// </summary>
-    /// <param name="playerPiece"></param>
-    /// <returns></returns>
+    /// <param name="playerPiece"> </param>
+    /// <returns> </returns>
     public static GameObject TakePiece(GameObject playerPiece)
     {
         // temporarily ignore piece so it doesn't collide with itself
