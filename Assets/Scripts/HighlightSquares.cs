@@ -29,7 +29,7 @@ public class HighlightSquares : MonoBehaviour
     /// <param name="clickedSquare"> The chess tile the player has clicked on </param>
     public void HighLightCurrentSquare(ChessSquare clickedSquare)
     {
-        var tile = Instantiate(this.tileHighlight, clickedSquare.Location, this.tileHighlight.transform.rotation);
+        var tile = Instantiate(tileHighlight, clickedSquare.Location, tileHighlight.transform.rotation);
         tile.tag = "Highlight";
     }
 
@@ -46,7 +46,7 @@ public class HighlightSquares : MonoBehaviour
         {
             if (move.Row <= 7 && move.Row >= 0 && move.Col <= 7 && move.Col >= 0)
             {
-                var tile = Instantiate(this.circleHighlight, move.Location, this.circleHighlight.transform.rotation);
+                var tile = Instantiate(circleHighlight, move.Location, circleHighlight.transform.rotation);
                 tile.tag = "Highlight";
             }
         }

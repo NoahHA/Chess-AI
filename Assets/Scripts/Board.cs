@@ -235,4 +235,35 @@ public static class Board
         playerPiece.layer = LayerMask.NameToLayer("Default");
         return null;
     }
+
+    public static void Castle(ChessSquare kingSquare, ChessSquare startingSquare, bool turn)
+    {
+        // If player castled queenside
+        var newCastlePosition = new ChessSquare(kingSquare.Row, kingSquare.Col + 1);
+        var castlePosition = new ChessSquare(startingSquare.Row, startingSquare.Col - 4);
+
+        // If player castled kingside
+        if (kingSquare.Col > startingSquare.Col)
+        {
+            newCastlePosition = new ChessSquare(kingSquare.Row, kingSquare.Col - 1);
+            castlePosition = new ChessSquare(startingSquare.Row, startingSquare.Col + 3);
+        }
+
+        GameObject castlePiece = FindPieceOnSquare(castlePosition).gameObject;
+        castlePiece.transform.position = newCastlePosition.Location;
+    }
+
+    public static void QueenPawn(GameObject pawn, bool turn)
+    {
+        // Letter defines whether queen is white or black
+        char letter = 'q';
+        if (turn) letter = 'Q';
+
+        // Create a queen piece
+        GameObject queenPiece = GetPieceFromLetter(letter);
+        GameObject.Instantiate(queenPiece, pawn.transform.position, pawn.transform.rotation);
+
+        // Deactivate the pawn
+        pawn.SetActive(false);
+    }
 }

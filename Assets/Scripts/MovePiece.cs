@@ -64,42 +64,28 @@ public class MovePiece : MonoBehaviour
 
     private void OnMouseUp()
     {
-        GameObject takenPiece = Board.TakePiece(gameObject);
-
-        // If the new square is illegal or the player is now in check, move the piece back to where
-        // it started
-        if (!LegalMoves.Any(move => move.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
+        // If the piece has moved
+        if (startingSquare.Location != transform.position)
         {
-            transform.position = startingSquare.Location;
-            // Untake the piece
-            if (takenPiece != null)
-                takenPiece.SetActive(true);
-        }
+            GameObject takenPiece = Board.TakePiece(gameObject);
 
-        // If the piece has moved, go to next turn and flip the board
-        else if (startingSquare.Location != transform.position)
-        {
-            // If player has castled, move the castle to the right spot
+            // If the new square is illegal or the player is now in check, move the piece back to
+            // where it started
+            if (!LegalMoves.Any(move => move.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
+            {
+                transform.position = startingSquare.Location;
+                // Untake the piece
+                if (takenPiece != null)
+                    takenPiece.SetActive(true);
+            }
+
+            // If player has castled
             if (gameObject.name.Contains("king"))
             {
                 ChessSquare kingSquare = GameController.FindKing(GameController.playerTurn);
 
                 if (Math.Abs(kingSquare.Col - startingSquare.Col) == 2)
-                {
-                    // If player castled queenside
-                    var newCastlePosition = new ChessSquare(kingSquare.Row, kingSquare.Col + 1);
-                    var castlePosition = new ChessSquare(startingSquare.Row, startingSquare.Col - 4);
-
-                    // If player castled kingside
-                    if (kingSquare.Col > startingSquare.Col)
-                    {
-                        newCastlePosition = new ChessSquare(kingSquare.Row, kingSquare.Col - 1);
-                        castlePosition = new ChessSquare(startingSquare.Row, startingSquare.Col + 3);
-                    }
-
-                    GameObject castlePiece = Board.FindPieceOnSquare(castlePosition).gameObject;
-                    castlePiece.transform.position = newCastlePosition.Location;
-                }
+                    Board.Castle(kingSquare, startingSquare, GameController.playerTurn);
             }
 
             // Set pieceMoved to true
@@ -111,16 +97,9 @@ public class MovePiece : MonoBehaviour
             {
                 var pawnSquare = new ChessSquare(transform.position);
                 if (pawnSquare.Row == 0 || pawnSquare.Row == 7)
-                {
-                    // letter defines whether queen is white or black
-                    char letter = 'q';
-                    if (GameController.playerTurn) letter = 'Q';
-
-                    GameObject queenPiece = Board.GetPieceFromLetter(letter);
-                    Instantiate(queenPiece, pawnSquare.Location, gameObject.transform.rotation);
-                    gameObject.SetActive(false);
-                }
+                    Board.QueenPawn(gameObject, GameController.playerTurn);
             }
+
             // Change turns
             GameController.playerTurn = !GameController.playerTurn;
 

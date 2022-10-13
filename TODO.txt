@@ -1,4 +1,14 @@
 Add en passant
-Change piece manager so it holds the gameobjects, not the prefabs, then I can remove the corrections at the start
+	Need to start saving the previous move
+	In getpawnmoves:
+		If the previous move was a pawn double move
+		And if the current pawn is next to the previous move's pawn
+		Add a move to the position one behind where the previous move's pawn is
+	In onmousedown:
+		If the pawn moved diagonally and there was no takepiece
+		Then take the piece behind where the pawn ended up
 Create an ML Agents AI to play against
-Clean up the move piece class
+Highlight takeable pieces in yellow
+Maybe highlight the last move
+Doesn't let you drag when you already clicked on a piece
+Checkmate doesn't always work
