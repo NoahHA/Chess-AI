@@ -81,7 +81,6 @@ public class MovePiece : MonoBehaviour
         {
             // Update FEN string
             Board.currentPosition = Board.GetCurrentPosition();
-            Debug.Log(Board.currentPosition);
 
             // If player has castled
             if (gameObject.name.Contains("king"))

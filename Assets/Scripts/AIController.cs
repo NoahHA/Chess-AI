@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,17 +5,20 @@ public class AIController : MonoBehaviour
 {
     public float Minimax(int depth, bool maximizingPlayer, bool player)
     {
+        // Get the FEN string for the current position
+        string currentPosition = Board.GetCurrentPosition();
+
         if (GameController.IsInCheckmate(!player))
         {
-            return 1f;
+            return Mathf.Infinity;
         }
         else if (GameController.IsInCheckmate(player))
         {
-            return -1f;
+            return -Mathf.Infinity;
         }
         else if (depth == 0)
         {
-            return EvaluatePosition();
+            return EvaluatePosition(currentPosition, maximizingPlayer);
         }
 
         if (maximizingPlayer)
@@ -57,8 +59,18 @@ public class AIController : MonoBehaviour
         }
     }
 
-    private float EvaluatePosition()
+    private float EvaluatePosition(string currentPosition, bool player)
     {
-        throw new NotImplementedException();
+        float positionValue = 0f;
+
+        foreach (char letter in currentPosition)
+        {
+            if ((char.IsUpper(letter) && player) || (char.IsLower(letter) && !player))
+                positionValue += Board.GetPieceValue(letter);
+            else
+                positionValue -= Board.GetPieceValue(letter);
+        }
+
+        return positionValue;
     }
 }

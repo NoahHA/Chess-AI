@@ -141,7 +141,7 @@ public static class Board
     /// <param name="letter">
     /// Letter from a FEN string representing a chess piece, uppercase=white, lowercase=black
     /// </param>
-    /// <returns> </returns>
+    /// <returns> A chess piece GameObject </returns>
     /// <exception cref="ArgumentException"> </exception>
     public static GameObject GetPieceFromLetter(char letter)
     {
@@ -166,6 +166,33 @@ public static class Board
             throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
 
         return PieceManager.Instance.pieces[pieceDict[letter]];
+    }
+
+    /// <summary>
+    /// Gets the value of a piece from it's FEN string representation
+    /// </summary>
+    /// <param name="letter">
+    /// Letter from a FEN string representing a chess piece, uppercase=white, lowercase=black
+    /// </param>
+    /// <returns> An integer value </returns>
+    /// <exception cref="Exception"> </exception>
+    public static int GetPieceValue(char letter)
+    {
+        var pieceValueDict = new Dictionary<char, int>
+        {
+            { 'p', 1 },
+            { 'r', 5 },
+            { 'n', 3 },
+            { 'b', 3 },
+            { 'q', 9 },
+        };
+
+        if (pieceValueDict.ContainsKey(letter))
+            return pieceValueDict[Char.ToLower(letter)];
+        else
+            return 0;
+
+        throw new Exception("Invalid piece");
     }
 
     /// <summary>
