@@ -9,4 +9,9 @@ Add en passant
 		Then take the piece behind where the pawn ended up
 Create an ML Agents AI to play against
 Maybe highlight the last move
-Checkmate doesn't always work
+
+MiniMax:
+	Need to implement evaluate position function
+	Need to save currentPosition after each turn and then 
+		generate that position after minimax is called to reset the position
+	Need to implement alpha-beta pruning
