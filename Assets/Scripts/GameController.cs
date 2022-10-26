@@ -40,11 +40,10 @@ public class GameController : MonoBehaviour
 
             piece.layer = LayerMask.NameToLayer("Default");
         }
-
+        // Filters out illegal moves
+        moves = FilterMoves(moves);
         return moves;
     }
-
-    // TODO: Overload GetLegalPieceMoves so it can also take in a board position string and a piece name
 
     /// <summary>
     /// Finds all legal moves for a given player to make that turn
@@ -79,7 +78,40 @@ public class GameController : MonoBehaviour
                 movesDict.Add(piece, kingMoves);
             }
         }
+        // filters out illegal moves
+        movesDict = FilterMoves(movesDict);
         return movesDict;
+    }
+
+    /// <summary>
+    /// Filters out illegal moves from the list of available moves.
+    /// </summary>
+    /// <param name="movesDict"> The dictionary containing the legal moves for this turn. </param>
+    /// <returns> A filtered version of movesDict </returns>
+    public static Dictionary<GameObject, List<ChessSquare>> FilterMoves(Dictionary<GameObject, List<ChessSquare>> movesDict)
+    {
+        List<GameObject> keys = new List<GameObject>(movesDict.Keys);
+
+        foreach (GameObject piece in keys)
+        {
+            List<ChessSquare> moves = movesDict[piece];
+            moves.RemoveAll(move => move.Row > 7 || move.Row < 0 || move.Col > 7 || move.Col < 0);
+            movesDict[piece] = moves;
+        }
+
+        return movesDict;
+    }
+
+    /// <summary>
+    /// Filters out illegal moves from the list of available moves.
+    /// </summary>
+    /// <param name="movesDict"> The list containing the legal moves for this turn. </param>
+    /// <returns> A filtered version of movesList </returns>
+    public static List<ChessSquare> FilterMoves(List<ChessSquare> movesList)
+    {
+        movesList.RemoveAll(move => move.Row > 7 || move.Row < 0 || move.Col > 7 || move.Col < 0);
+
+        return movesList;
     }
 
     /// <summary>
@@ -97,8 +129,10 @@ public class GameController : MonoBehaviour
         {
             foreach (ChessSquare move in opponentMoves[piece])
             {
-                if (move.Row == kingPosition.Row && move.Col == kingPosition.Col)
+                if (move.Location == kingPosition.Location)
+                {
                     return true;
+                }
             }
         }
         return false;
@@ -119,15 +153,22 @@ public class GameController : MonoBehaviour
             foreach (ChessSquare move in playerMoves[piece])
             {
                 var startingPos = piece.transform.position;
-
                 piece.transform.position = move.Location; // Move the piece
+
                 GameObject takenPiece = Board.TakePiece(piece); // Take any takeable pieces
                 bool inCheck = IsInCheck(turn); // Check if player is in check
-                if (takenPiece != null) takenPiece.SetActive(true); // Untake the piece
+
+                if (takenPiece != null)
+                {
+                    takenPiece.SetActive(true); // Untake the piece
+                }
+
                 piece.transform.position = startingPos; // Undo move
 
                 if (!inCheck)
+                {
                     return false;
+                }
             }
         }
         return true;

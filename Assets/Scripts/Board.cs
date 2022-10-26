@@ -8,7 +8,7 @@ using UnityEngine;
 public static class Board
 {
     [Tooltip("The FEN string for the starting position of a standard chess game.")]
-    public const string startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    public const string startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/8/RNBQKBNR"; // public const string startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     /// <summary>
     /// Checks whether a clicked piece is the correct colour for the player who clicked it.

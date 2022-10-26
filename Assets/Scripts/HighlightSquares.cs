@@ -12,6 +12,9 @@ public class HighlightSquares : MonoBehaviour
     [Tooltip("Highlight for possible moves for currently selected piece")]
     public GameObject circleHighlight;
 
+    [Tooltip("Highlight for enemy pieces that can be taken")]
+    public GameObject takeablePieceHighlight;
+
     /// <summary>
     /// Removes all highlighted tiles to reset the board
     /// </summary>
@@ -30,7 +33,6 @@ public class HighlightSquares : MonoBehaviour
     public void HighLightCurrentSquare(ChessSquare clickedSquare)
     {
         var tile = Instantiate(tileHighlight, clickedSquare.Location, tileHighlight.transform.rotation);
-        tile.tag = "Highlight";
     }
 
     /// <summary>
@@ -46,18 +48,26 @@ public class HighlightSquares : MonoBehaviour
         {
             if (move.Row <= 7 && move.Row >= 0 && move.Col <= 7 && move.Col >= 0)
             {
-                var tile = Instantiate(circleHighlight, move.Location, circleHighlight.transform.rotation);
-                tile.tag = "Highlight";
+                Collider2D pieceOnSquare = Board.FindPieceOnSquare(move);
+                if (Board.FindPieceOnSquare(move) != null)
+                {
+                    if (Board.IsEnemyPiece(GameController.playerTurn, pieceOnSquare.gameObject))
+                        Instantiate(takeablePieceHighlight, move.Location, circleHighlight.transform.rotation);
+                }
+                else
+                    Instantiate(circleHighlight, move.Location, circleHighlight.transform.rotation);
             }
         }
     }
 
+    /// <summary>
+    /// If clicked piece is valid, highlight the piece's tile and the possible moves.
+    /// </summary>
     private void OnMouseDown()
     {
-        // If clicked piece is valid, highlight the piece's tile and the possible moves
         ClearTiles();
 
-        if (Board.ValidPieceClicked(gameObject))
+        if (Board.ValidPieceClicked(gameObject) && GameObject.FindGameObjectWithTag("Highlight") == null)
         {
             var mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
             var clickedSquare = new ChessSquare(Camera.main.ScreenToWorldPoint(mousePos));

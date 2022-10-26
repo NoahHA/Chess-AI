@@ -140,6 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileHighlight: {fileID: 3348318481398810697, guid: 4e3c18e417a6e1645840f531c58c126f, type: 3}
   circleHighlight: {fileID: 481863497604018407, guid: 46f2f0af683ea1847b77ef3bccc3c3f0, type: 3}
+  takeablePieceHighlight: {fileID: 3348318481398810697, guid: 6c1952c6557bf7a43a98e3d2aa48975d, type: 3}
 --- !u!114 &-3494514785897857041
 MonoBehaviour:
   m_ObjectHideFlags: 0

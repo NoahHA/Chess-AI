@@ -64,21 +64,21 @@ public class MovePiece : MonoBehaviour
 
     private void OnMouseUp()
     {
-        // If the piece has moved
-        if (startingSquare.Location != transform.position)
+        GameObject takenPiece = Board.TakePiece(gameObject);
+
+        // If the new square is illegal or the player is now in check, move the piece back to where
+        // it started
+        if (!LegalMoves.Any(move => move.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
         {
-            GameObject takenPiece = Board.TakePiece(gameObject);
+            transform.position = startingSquare.Location;
+            // Untake the piece
+            if (takenPiece != null)
+                takenPiece.SetActive(true);
+        }
 
-            // If the new square is illegal or the player is now in check, move the piece back to
-            // where it started
-            if (!LegalMoves.Any(move => move.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
-            {
-                transform.position = startingSquare.Location;
-                // Untake the piece
-                if (takenPiece != null)
-                    takenPiece.SetActive(true);
-            }
-
+        // If the piece has moved
+        else if (startingSquare.Location != transform.position)
+        {
             // If player has castled
             if (gameObject.name.Contains("king"))
             {

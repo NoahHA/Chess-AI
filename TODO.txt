@@ -8,7 +8,5 @@ Add en passant
 		If the pawn moved diagonally and there was no takepiece
 		Then take the piece behind where the pawn ended up
 Create an ML Agents AI to play against
-Highlight takeable pieces in yellow
 Maybe highlight the last move
-Doesn't let you drag when you already clicked on a piece
 Checkmate doesn't always work
