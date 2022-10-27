@@ -81,6 +81,7 @@ public class MovePiece : MonoBehaviour
         {
             // Update FEN string
             Board.currentPosition = Board.GetCurrentPosition();
+            //Board.GeneratePosition(Board.currentPosition);
 
             // If player has castled
             if (gameObject.name.Contains("king"))
@@ -110,7 +111,14 @@ public class MovePiece : MonoBehaviour
             if (GameController.IsInCheckmate(GameController.playerTurn))
                 checkmateOverlay.transform.Find("CheckmateText").gameObject.SetActive(true);
 
-            Board.FlipBoard();
+            //Board.FlipBoard();
+
+            var AI = new AIController();
+            (Move bestMove, float value) = AI.Minimax(2);
+            bestMove.MakeMove();
+
+            // Change turns
+            GameController.playerTurn = !GameController.playerTurn;
         }
 
         // Resets sorting order

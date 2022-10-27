@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIController : MonoBehaviour
+public class AIController
 {
-    public Tuple<Move, float> Minimax(int depth, bool maximizingPlayer)
+    public Tuple<Move, float> Minimax(int depth, bool maximizingPlayer = true)
     {
         // Get the FEN string for the current position
         string currentPosition = Board.GetCurrentPosition();
@@ -12,43 +12,47 @@ public class AIController : MonoBehaviour
         float maxValue;
         Move bestMove = new Move();
 
-        if (GameController.IsInCheckmate(!maximizingPlayer))
+        // if white is in checkmate
+        if (GameController.IsInCheckmate(true))
         {
             return Tuple.Create(bestMove, Mathf.Infinity);
         }
-        else if (GameController.IsInCheckmate(maximizingPlayer))
+        // if black is in checkmate
+        else if (GameController.IsInCheckmate(false))
         {
             return Tuple.Create(bestMove, -Mathf.Infinity);
         }
         else if (depth == 0)
         {
-            return Tuple.Create(bestMove, EvaluatePosition(currentPosition, maximizingPlayer));
+            return Tuple.Create(bestMove, EvaluatePosition(currentPosition, !maximizingPlayer));
         }
 
         if (maximizingPlayer)
         {
             maxValue = -Mathf.Infinity;
-            List<Move> legalMoves = GameController.GetLegalMoves(maximizingPlayer);
+            List<Move> legalMoves = GameController.GetLegalMoves(false);
 
             foreach (Move move in legalMoves)
             {
                 move.MakeMove();
 
-                (Move newMove, float newValue) = Minimax(depth - 1, false);
+                (Move _, float newValue) = Minimax(depth - 1, false);
 
                 if (newValue > maxValue)
                 {
                     maxValue = newValue;
-                    bestMove = newMove;
+                    bestMove = move;
                 }
-            }
 
+                move.UnmakeMove();
+            }
+            //Board.GeneratePosition(Board.currentPosition);
             return Tuple.Create(bestMove, maxValue);
         }
         else
         {
             maxValue = Mathf.Infinity;
-            List<Move> legalMoves = GameController.GetLegalMoves(maximizingPlayer);
+            List<Move> legalMoves = GameController.GetLegalMoves(true);
 
             foreach (Move move in legalMoves)
             {
@@ -61,8 +65,10 @@ public class AIController : MonoBehaviour
                     maxValue = newValue;
                     bestMove = newMove;
                 }
-            }
 
+                move.UnmakeMove();
+            }
+            //Board.GeneratePosition(Board.currentPosition);
             return Tuple.Create(bestMove, maxValue);
         }
     }

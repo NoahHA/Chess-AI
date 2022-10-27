@@ -178,6 +178,7 @@ public static class Board
     /// <exception cref="Exception"> </exception>
     public static int GetPieceValue(char letter)
     {
+        letter = Char.ToLower(letter);
         var pieceValueDict = new Dictionary<char, int>
         {
             { 'p', 1 },
@@ -188,7 +189,7 @@ public static class Board
         };
 
         if (pieceValueDict.ContainsKey(letter))
-            return pieceValueDict[Char.ToLower(letter)];
+            return pieceValueDict[letter];
         else
             return 0;
 
