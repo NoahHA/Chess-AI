@@ -11,6 +11,10 @@ public class PieceManager : MonoBehaviour
 
     public static PieceManager Instance { get; private set; }
 
+    public void TestFUnctionBUtton()
+    {
+    }
+
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.

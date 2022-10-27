@@ -10,6 +10,8 @@ using UnityEngine.Rendering;
 [RequireComponent(typeof(BoxCollider2D))]
 public class MovePiece : MonoBehaviour
 {
+    public bool AIMode;
+
     private GameObject checkmateOverlay;
 
     private Vector3 offset;
@@ -64,6 +66,7 @@ public class MovePiece : MonoBehaviour
 
     private void OnMouseUp()
     {
+        AIMode = FindObjectOfType<ActivateAIMode>().AIMode;
         GameObject takenPiece = Board.TakePiece(gameObject);
 
         // If the new square is illegal or the player is now in check, move the piece back to where
@@ -81,7 +84,6 @@ public class MovePiece : MonoBehaviour
         {
             // Update FEN string
             Board.currentPosition = Board.GetCurrentPosition();
-            //Board.GeneratePosition(Board.currentPosition);
 
             // If player has castled
             if (gameObject.name.Contains("king"))
@@ -111,14 +113,19 @@ public class MovePiece : MonoBehaviour
             if (GameController.IsInCheckmate(GameController.playerTurn))
                 checkmateOverlay.transform.Find("CheckmateText").gameObject.SetActive(true);
 
-            //Board.FlipBoard();
+            // If playing a human
+            if (!AIMode)
+                Board.FlipBoard();
+            // If playing the computer
+            else
+            {
+                var AI = new AIController();
+                (Move bestMove, float value) = AI.Minimax(2);
+                bestMove.MakeMove();
 
-            var AI = new AIController();
-            (Move bestMove, float value) = AI.Minimax(2);
-            bestMove.MakeMove();
-
-            // Change turns
-            GameController.playerTurn = !GameController.playerTurn;
+                // Change turns
+                GameController.playerTurn = !GameController.playerTurn;
+            }
         }
 
         // Resets sorting order
