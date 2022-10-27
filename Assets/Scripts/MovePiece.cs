@@ -20,7 +20,7 @@ public class MovePiece : MonoBehaviour
 
     private SortingGroup rend;
 
-    private List<ChessSquare> LegalMoves { get; set; }
+    private List<Move> LegalMoves { get; set; }
 
     private void Start()
     {
@@ -41,7 +41,7 @@ public class MovePiece : MonoBehaviour
 
         // Gets the legal moves for that piece
         LegalMoves = GameController.GetLegalPieceMoves(startingSquare, gameObject, GameController.playerTurn);
-        LegalMoves.Add(startingSquare);
+        LegalMoves.Add(new Move(gameObject, startingSquare));
     }
 
     private void OnMouseDrag()
@@ -68,7 +68,7 @@ public class MovePiece : MonoBehaviour
 
         // If the new square is illegal or the player is now in check, move the piece back to where
         // it started
-        if (!LegalMoves.Any(move => move.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
+        if (!LegalMoves.Any(move => move.Square.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
         {
             transform.position = startingSquare.Location;
             // Untake the piece

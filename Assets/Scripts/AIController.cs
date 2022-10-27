@@ -1,61 +1,69 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AIController : MonoBehaviour
 {
-    public float Minimax(int depth, bool maximizingPlayer, bool player)
+    public Tuple<Move, float> Minimax(int depth, bool maximizingPlayer)
     {
         // Get the FEN string for the current position
         string currentPosition = Board.GetCurrentPosition();
 
-        if (GameController.IsInCheckmate(!player))
+        float maxValue;
+        Move bestMove = new Move();
+
+        if (GameController.IsInCheckmate(!maximizingPlayer))
         {
-            return Mathf.Infinity;
+            return Tuple.Create(bestMove, Mathf.Infinity);
         }
-        else if (GameController.IsInCheckmate(player))
+        else if (GameController.IsInCheckmate(maximizingPlayer))
         {
-            return -Mathf.Infinity;
+            return Tuple.Create(bestMove, -Mathf.Infinity);
         }
         else if (depth == 0)
         {
-            return EvaluatePosition(currentPosition, maximizingPlayer);
+            return Tuple.Create(bestMove, EvaluatePosition(currentPosition, maximizingPlayer));
         }
 
         if (maximizingPlayer)
         {
-            float value = -Mathf.Infinity;
-            Dictionary<GameObject, List<ChessSquare>> legalMoves = GameController.GetLegalMoves(maximizingPlayer);
+            maxValue = -Mathf.Infinity;
+            List<Move> legalMoves = GameController.GetLegalMoves(maximizingPlayer);
 
-            foreach (GameObject piece in legalMoves.Keys)
+            foreach (Move move in legalMoves)
             {
-                foreach (ChessSquare move in legalMoves[piece])
-                {
-                    piece.transform.position = move.Location; // Move the piece
-                    Board.TakePiece(piece); // Take any takeable pieces
+                move.MakeMove();
 
-                    value = Mathf.Max(value, Minimax(depth - 1, false, player));
+                (Move newMove, float newValue) = Minimax(depth - 1, false);
+
+                if (newValue > maxValue)
+                {
+                    maxValue = newValue;
+                    bestMove = newMove;
                 }
             }
 
-            return value;
+            return Tuple.Create(bestMove, maxValue);
         }
         else
         {
-            float value = Mathf.Infinity;
-            Dictionary<GameObject, List<ChessSquare>> legalMoves = GameController.GetLegalMoves(maximizingPlayer);
+            maxValue = Mathf.Infinity;
+            List<Move> legalMoves = GameController.GetLegalMoves(maximizingPlayer);
 
-            foreach (GameObject piece in legalMoves.Keys)
+            foreach (Move move in legalMoves)
             {
-                foreach (ChessSquare move in legalMoves[piece])
-                {
-                    piece.transform.position = move.Location; // Move the piece
-                    Board.TakePiece(piece); // Take any takeable pieces
+                move.MakeMove();
 
-                    value = Mathf.Max(value, Minimax(depth - 1, true, player));
+                (Move newMove, float newValue) = Minimax(depth - 1, true);
+
+                if (newValue < maxValue)
+                {
+                    maxValue = newValue;
+                    bestMove = newMove;
                 }
             }
 
-            return value;
+            return Tuple.Create(bestMove, maxValue);
         }
     }
 

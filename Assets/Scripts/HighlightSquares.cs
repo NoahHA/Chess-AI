@@ -41,22 +41,21 @@ public class HighlightSquares : MonoBehaviour
     /// <param name="clickedSquare"> The chess tile the player has clicked on </param>
     public void HightLightPossibleMoves(ChessSquare clickedSquare)
     {
-        List<ChessSquare> moves = GameController.GetLegalPieceMoves(clickedSquare, gameObject, GameController.playerTurn);
+        List<Move> moves = GameController.GetLegalPieceMoves(clickedSquare, gameObject, GameController.playerTurn);
 
         // Loops through all legal moves and highlights them
-        foreach (ChessSquare move in moves)
+        foreach (Move move in moves)
         {
-            if (move.Row <= 7 && move.Row >= 0 && move.Col <= 7 && move.Col >= 0)
+            Collider2D pieceOnSquare = Board.FindPieceOnSquare(move.Square);
+
+            // Highlight differently if there's a takeable enemy piece
+            if (Board.FindPieceOnSquare(move.Square) != null)
             {
-                Collider2D pieceOnSquare = Board.FindPieceOnSquare(move);
-                if (Board.FindPieceOnSquare(move) != null)
-                {
-                    if (Board.IsEnemyPiece(GameController.playerTurn, pieceOnSquare.gameObject))
-                        Instantiate(takeablePieceHighlight, move.Location, circleHighlight.transform.rotation);
-                }
-                else
-                    Instantiate(circleHighlight, move.Location, circleHighlight.transform.rotation);
+                if (Board.IsEnemyPiece(GameController.playerTurn, pieceOnSquare.gameObject))
+                    Instantiate(takeablePieceHighlight, move.Square.Location, circleHighlight.transform.rotation);
             }
+            else
+                Instantiate(circleHighlight, move.Square.Location, circleHighlight.transform.rotation);
         }
     }
 

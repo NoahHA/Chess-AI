@@ -19,3 +19,5 @@ MiniMax:
 To make it more efficient maybe store the game state as a 2D array of chars where each char represents
 	the piece, then make moves in the 2D array and have a function to convert between the array and the
 	actual board / a fen string and the array.
+
+Add stalemate
