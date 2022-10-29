@@ -306,7 +306,8 @@ public static class Board
 
         Collider2D pieceToTake = FindPieceOnSquare(new ChessSquare(playerPiece.transform.position));
 
-        if (pieceToTake != null)
+        // If there is a piece to take and it's not the king
+        if (pieceToTake != null && !pieceToTake.gameObject.name.Contains("king"))
         {
             pieceToTake.gameObject.SetActive(false);
             playerPiece.layer = LayerMask.NameToLayer("Default");

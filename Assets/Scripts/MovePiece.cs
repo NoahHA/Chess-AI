@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 
 /// <summary>
@@ -69,8 +70,7 @@ public class MovePiece : MonoBehaviour
         AIMode = FindObjectOfType<ActivateAIMode>().AIMode;
         GameObject takenPiece = Board.TakePiece(gameObject);
 
-        // If the new square is illegal or the player is now in check, move the piece back to where
-        // it started
+        // If the new square is illegal or the player is now in check, move the piece back to where it started
         if (!LegalMoves.Any(move => move.Square.Location == clickedSquare.Location) || GameController.IsInCheck(GameController.playerTurn))
         {
             transform.position = startingSquare.Location;
@@ -113,22 +113,24 @@ public class MovePiece : MonoBehaviour
             if (GameController.IsInCheckmate(GameController.playerTurn))
                 checkmateOverlay.transform.Find("CheckmateText").gameObject.SetActive(true);
 
-            // If playing a human
+            // If playing a human, flip the board
             if (!AIMode)
                 Board.FlipBoard();
+
             // If playing the computer
             else
             {
-                var AI = new AIController();
-                (Move bestMove, float value) = AI.Minimax(2);
+                UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+                (Move bestMove, float value) = AIController.Minimax(3);
                 bestMove.MakeMove();
 
                 // Change turns
                 GameController.playerTurn = !GameController.playerTurn;
             }
+
         }
 
-        // Resets sorting order
+        // Reset sorting order
         rend.sortingOrder = 0;
     }
 }
