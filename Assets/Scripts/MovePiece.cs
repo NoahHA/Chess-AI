@@ -121,7 +121,7 @@ public class MovePiece : MonoBehaviour
             else
             {
                 UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-                (Move bestMove, float value) = AIController.Minimax(3);
+                (Move bestMove, float value) = AIController.Minimax(2);
                 bestMove.MakeMove();
 
                 // Change turns

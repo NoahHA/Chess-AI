@@ -10,14 +10,14 @@ Add en passant
 Create an ML Agents AI to play against
 Maybe highlight the last move
 
-MiniMax:
-	Need to implement evaluate position function
-	Need to save currentPosition after each turn and then 
-		generate that position after minimax is called to reset the position
-	Need to implement alpha-beta pruning
-
 To make it more efficient maybe store the game state as a 2D array of chars where each char represents
 	the piece, then make moves in the 2D array and have a function to convert between the array and the
 	actual board / a fen string and the array.
 
 Add stalemate
+
+Add draw after repeat moves
+
+Make it so AI can't make moves that put it in check
+
+Fix bug where screen freezes after making a move and before AI picks what to do

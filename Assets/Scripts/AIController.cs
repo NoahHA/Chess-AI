@@ -2,8 +2,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class to handle the AI logic and methods
+/// </summary>
 public static class AIController
 {
+    /// <summary>
+    /// Calculates the best move to make based on minimax algorithm with alpha-beta pruning
+    /// </summary>
+    /// <param name="depth">The number of moves to look ahead by</param>
+    /// <returns>A tuple containing the best move and the calculated value of that move</returns>
     public static Tuple<Move, float> Minimax(int depth, float alpha = -Mathf.Infinity, float beta = Mathf.Infinity, bool maximizingPlayer = true)
     {
         // Get the FEN string for the current position
