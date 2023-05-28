@@ -34,14 +34,14 @@ public class BoardState
     }
 
     /// <summary>
-    /// Converts a chess FEN string to an actual board state
+    /// Converts a chess FEN string to a board state.
     /// </summary>
-    /// <param name="position"> FEN string </param>
-    public static List<Piece> GenerateBoardState(string Fen)
+    /// <param name="FEN">FEN string</param>
+    public static List<Piece> GenerateBoardState(string FEN)
     {
         List<Piece> state = new List<Piece>();
 
-        foreach (char c in Fen)
+        foreach (char c in FEN)
         {
             if (char.IsDigit(c))
             {
@@ -49,6 +49,10 @@ public class BoardState
                 {
                     state.Add(new Piece());
                 }
+            }
+            else if (char.IsLetter(c))
+            {
+                state.Add(Piece.GetPieceFromLetter(c));
             }
         }
 
