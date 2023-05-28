@@ -24,13 +24,13 @@ public class BoardState
     public static bool operator ==(BoardState obj1, BoardState obj2)
     {
         return obj1.Turn == obj2.Turn
-                    && obj1.State == obj2.State;
+                    && obj1.FEN == obj2.FEN;
     }
 
     public static bool operator !=(BoardState obj1, BoardState obj2)
     {
         return !(obj1.Turn == obj2.Turn
-                    && obj1.State == obj2.State);
+                    && obj1.FEN == obj2.FEN);
     }
 
     /// <summary>
@@ -66,12 +66,12 @@ public class BoardState
         {
             BoardState boardState = (BoardState)obj;
             return Turn == boardState.Turn
-                    && State.SequenceEqual(boardState.State);
+                    && FEN == boardState.FEN;
         }
     }
 
     public override int GetHashCode()
     {
-        return State.GetHashCode();
+        return FEN.GetHashCode() ^ Turn.GetHashCode();
     }
 }
