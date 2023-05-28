@@ -20,13 +20,12 @@ public enum PieceColour
 
 public class Piece
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
+    public PieceType Type;
+    public PieceColour Colour;
 
-    // Update is called once per frame
-    void Update()
+    public Piece(PieceType type, PieceColour colour)
     {
+        Type = type;
+        Colour = colour;
     }
 }
