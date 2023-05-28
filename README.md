@@ -1,3 +1,3 @@
 # Chess-AI
 
-Chess game made in Unity, will eventually feature an AI opponent
+Chess game made in Unity, features an AI opponent using the MiniMax algorithm.
