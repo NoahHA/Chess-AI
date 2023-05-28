@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum PieceType
 {
+    None,
     Pawn,
     Knight,
     Bishop,
@@ -12,18 +13,19 @@ public enum PieceType
     King
 }
 
-public enum PieceColour
+public enum Colour
 {
     White,
-    Black
+    Black,
+    None
 }
 
-public class Piece
+public struct Piece
 {
     public PieceType Type;
-    public PieceColour Colour;
+    public Colour Colour;
 
-    public Piece(PieceType type, PieceColour colour)
+    public Piece(PieceType type = PieceType.None, Colour colour = Colour.None)
     {
         Type = type;
         Colour = colour;
