@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -75,5 +76,25 @@ public class TestBoardState
         expectedState.State[63] = new Piece(PieceType.Rook, Colour.Black);
 
         Assert.AreEqual(boardState, expectedState.State);
+    }
+
+    [Test]
+    public void TestGenerateBoardStateFenTooLong()
+    {
+        // Arrange
+        string Fen = "8/8/8/8/9/8/8/8";
+
+        // Assert
+        Assert.Throws<ArgumentException>(() => BoardState.GenerateBoardState(Fen));
+    }
+
+    [Test]
+    public void TestGenerateBoardStateInvalidFen()
+    {
+        // Arrange
+        string Fen = "8/7T/8/8/8/8/8/8";
+
+        // Assert
+        Assert.Throws<ArgumentException>(() => BoardState.GenerateBoardState(Fen));
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +55,11 @@ public class BoardState
             {
                 state.Add(Piece.GetPieceFromLetter(c));
             }
+        }
+
+        if (state.Count != 64)
+        {
+            throw new ArgumentException();
         }
 
         return state;
