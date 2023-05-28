@@ -6,20 +6,16 @@ using UnityEngine.TestTools;
 
 public class TestBoardState
 {
-    // A Test behaves as an ordinary method
     [Test]
-    public void NewTestScriptSimplePasses()
+    public void TestGenerateFenEmptyBoard()
     {
-        // Use the Assert class to test conditions
-    }
+        // Arrange
+        string Fen = "8/8/8/8/8/8/8/8";
 
-    // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-    // `yield return null;` to skip a frame.
-    [UnityTest]
-    public IEnumerator NewTestScriptWithEnumeratorPasses()
-    {
-        // Use the Assert class to test conditions.
-        // Use yield to skip a frame.
-        yield return null;
+        // Act
+        List<Piece> boardState = BoardState.GenerateBoardState(Fen);
+
+        // Assert
+        Assert.AreEqual(boardState, new BoardState().State);
     }
 }
