@@ -97,4 +97,18 @@ public class TestBoardState
         // Assert
         Assert.Throws<ArgumentException>(() => BoardState.GenerateBoardState(Fen));
     }
+
+    [Test]
+    public void TestBoardStateValueEquality()
+    {
+        // Arrange
+        string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+
+        // Act
+        var boardState1 = new BoardState(Colour.Black, Fen);
+        var boardState2 = new BoardState(Colour.Black, Fen);
+
+        // Assert
+        Assert.AreEqual(boardState1, boardState2);
+    }
 }

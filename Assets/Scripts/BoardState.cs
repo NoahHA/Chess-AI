@@ -1,9 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 public class BoardState
 {
@@ -11,15 +7,12 @@ public class BoardState
     public string FEN;
     public Colour Turn;
 
-    public BoardState(Colour turn = Colour.White)
+    public BoardState(Colour turn = Colour.White,
+        string fen = "8/8/8/8/8/8/8/8")
     {
         Turn = turn;
-        State = new List<Piece>();
-
-        for (int i = 0; i < 64; i++)
-        {
-            State.Add(new Piece(PieceType.None, Colour.White));
-        }
+        FEN = fen;
+        State = BoardState.GenerateBoardState(fen);
     }
 
     public static bool operator ==(BoardState obj1, BoardState obj2)
