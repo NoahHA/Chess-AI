@@ -1,0 +1,77 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+public class BoardState
+{
+    public List<Piece> State;
+    public string FEN;
+    public Colour Turn;
+
+    public BoardState(Colour turn = Colour.White)
+    {
+        Turn = turn;
+        State = new List<Piece>();
+
+        for (int i = 0; i < 64; i++)
+        {
+            State.Add(new Piece(PieceType.None, Colour.White));
+        }
+    }
+
+    public static bool operator ==(BoardState obj1, BoardState obj2)
+    {
+        return obj1.Turn == obj2.Turn
+                    && obj1.State == obj2.State;
+    }
+
+    public static bool operator !=(BoardState obj1, BoardState obj2)
+    {
+        return !(obj1.Turn == obj2.Turn
+                    && obj1.State == obj2.State);
+    }
+
+    /// <summary>
+    /// Converts a chess FEN string to an actual board state
+    /// </summary>
+    /// <param name="position"> FEN string </param>
+    public static List<Piece> GenerateBoardState(string Fen)
+    {
+        List<Piece> state = new List<Piece>();
+
+        foreach (char c in Fen)
+        {
+            if (char.IsDigit(c))
+            {
+                for (int i = 0; i < (int)char.GetNumericValue(c); i++)
+                {
+                    state.Add(new Piece());
+                }
+            }
+        }
+
+        return state;
+    }
+
+    public override bool Equals(object obj)
+    {
+        //Check for null and compare run-time types.
+        if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+        {
+            return false;
+        }
+        else
+        {
+            BoardState boardState = (BoardState)obj;
+            return Turn == boardState.Turn
+                    && State.SequenceEqual(boardState.State);
+        }
+    }
+
+    public override int GetHashCode()
+    {
+        return State.GetHashCode();
+    }
+}
