@@ -7,7 +7,7 @@ using UnityEngine.TestTools;
 public class TestBoardState
 {
     [Test]
-    public void TestGenerateFenEmptyBoard()
+    public void TestGenerateBoardStateEmptyBoard()
     {
         // Arrange
         string Fen = "8/8/8/8/8/8/8/8";
@@ -20,7 +20,7 @@ public class TestBoardState
     }
 
     [Test]
-    public void TestGenerateFenSimplePosition()
+    public void TestGenerateBoardStateSimplePosition()
     {
         // Arrange
         string Fen = "8/p7/8/8/8/7P/8/8";
@@ -36,7 +36,7 @@ public class TestBoardState
     }
 
     [Test]
-    public void TestGenerateFenStartingPosition()
+    public void TestGenerateBoardStateStartingPosition()
     {
         // Arrange
         string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
