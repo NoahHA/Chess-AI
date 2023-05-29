@@ -4,4 +4,5 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
+    [SerializeField] public Dictionary<char, GameObject> pieces;
 }
