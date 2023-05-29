@@ -1,34 +1,44 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
+using UnityEngine;
 
 /// <summary>
 /// Defines the state of a board, including the positions of every piece and who's turn it is.
 /// </summary>
 public class BoardState
 {
+    [Tooltip("A 64 element array containing the piece present on every square of the board.")]
     public Piece[] State;
 
     private string _fen;
 
+    [Tooltip("A FEN string representing the current state of the board.")]
     public string FEN
     {
         get => _fen;
         set
         {
             _fen = value;
-            State = GenerateBoardState();
+            State = GeneratePieceList();
         }
     }
 
+    [Tooltip("An enum representing who's turn it is currently.")]
     public PieceColour Turn;
 
-    public BoardState(PieceColour turn = PieceColour.None,
-        string fen = "8/8/8/8/8/8/8/8")
+    public BoardState(string fen = "8/8/8/8/8/8/8/8")
+    {
+        Turn = PieceColour.None;
+        FEN = fen;
+        State = GeneratePieceList();
+    }
+
+    public BoardState(PieceColour turn, string fen = "8/8/8/8/8/8/8/8")
     {
         Turn = turn;
         FEN = fen;
-        State = GenerateBoardState();
+        State = GeneratePieceList();
     }
 
     public static bool operator ==(BoardState obj1, BoardState obj2)
@@ -47,7 +57,7 @@ public class BoardState
     /// Converts a chess FEN string to a board state.
     /// </summary>
     /// <param name="FEN">FEN string</param>
-    private Piece[] GenerateBoardState()
+    private Piece[] GeneratePieceList()
     {
         Piece[] state = new Piece[64];
         int counter = 0;
@@ -60,7 +70,7 @@ public class BoardState
             }
             else if (char.IsLetter(c))
             {
-                state[counter] = Piece.GetPieceFromLetter(c);
+                state[counter] = new Piece(c);
                 counter++;
             }
         }

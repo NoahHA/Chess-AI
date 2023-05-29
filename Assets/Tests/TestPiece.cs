@@ -14,7 +14,7 @@ public class TestPiece
         char letter = 'n';
 
         // Act
-        Piece piece = Piece.GetPieceFromLetter(letter);
+        var piece = new Piece(letter);
 
         // Assert
         Assert.AreEqual(new Piece(PieceType.Knight, PieceColour.White), piece);
@@ -27,7 +27,7 @@ public class TestPiece
         char letter = 'P';
 
         // Act
-        Piece piece = Piece.GetPieceFromLetter(letter);
+        var piece = new Piece(letter);
 
         // Assert
         Assert.AreEqual(new Piece(PieceType.Pawn, PieceColour.Black), piece);
@@ -40,6 +40,6 @@ public class TestPiece
         char letter = 'L';
 
         // Assert
-        Assert.Throws<ArgumentException>(() => Piece.GetPieceFromLetter(letter));
+        Assert.Throws<ArgumentException>(() => new Piece(letter));
     }
 }

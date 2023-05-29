@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// The type of chess piece being represented.
+/// </summary>
 public enum PieceType
 {
     Pawn,
@@ -13,6 +16,9 @@ public enum PieceType
     King
 }
 
+/// <summary>
+/// Which side a piece or player is on.
+/// </summary>
 public enum PieceColour
 {
     White,
@@ -20,6 +26,9 @@ public enum PieceColour
     None
 }
 
+/// <summary>
+/// Represents a Chess piece.
+/// </summary>
 public struct Piece
 {
     public PieceType Type;
@@ -31,18 +40,12 @@ public struct Piece
         Colour = colour;
     }
 
-    public override string ToString()
-    {
-        return Colour.ToString() + " " + Type.ToString();
-    }
-
     /// <summary>
-    /// Converts a letter in a FEN string to a Piece object.
+    /// Generate a Piece object based on a FEN string letter.
     /// </summary>
-    /// <param name="letter">The FEN string letter describing the piece.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException">Invalid letter.</exception>
-    public static Piece GetPieceFromLetter(char letter)
+    /// <param name="letter">A letter from a FEN string.</param>
+    /// <exception cref="ArgumentException"></exception>
+    public Piece(char letter)
     {
         // Dictionary connecting piece names to their type
         var pieceDict = new Dictionary<char, PieceType>
@@ -58,13 +61,16 @@ public struct Piece
         if (!pieceDict.ContainsKey(Char.ToLower(letter)))
             throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
 
-        Piece piece = new Piece(pieceDict[Char.ToLower(letter)], PieceColour.White);
+        (Type, Colour) = (pieceDict[Char.ToLower(letter)], PieceColour.White);
 
         if (Char.IsUpper(letter))
         {
-            piece.Colour = PieceColour.Black;
+            Colour = PieceColour.Black;
         }
+    }
 
-        return piece;
+    public override string ToString()
+    {
+        return Colour.ToString() + " " + Type.ToString();
     }
 }

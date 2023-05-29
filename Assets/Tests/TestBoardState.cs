@@ -43,7 +43,7 @@ public class TestBoardState
         string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
         // Act
-        BoardState boardState = new BoardState(PieceColour.None, Fen);
+        BoardState boardState = new BoardState(Fen);
 
         // Assert
         BoardState expectedState = new BoardState();
@@ -58,7 +58,7 @@ public class TestBoardState
         string Fen = "8/8/8/8/9/8/8/8";
 
         // Assert
-        Assert.Throws<ArgumentException>(() => new BoardState(PieceColour.None, Fen));
+        Assert.Throws<ArgumentException>(() => new BoardState(Fen));
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class TestBoardState
         string Fen = "8/7T/8/8/8/8/8/8";
 
         // Assert
-        Assert.Throws<ArgumentException>(() => new BoardState(PieceColour.None, Fen));
+        Assert.Throws<ArgumentException>(() => new BoardState(Fen));
     }
 
     [Test]
