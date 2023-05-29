@@ -87,7 +87,7 @@ public class BoardState
             }
 
             // End of board
-            if (i == 63)
+            if (i == 63 && counter != 0)
             {
                 tempFen += (counter++).ToString();
             }
