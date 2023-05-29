@@ -29,12 +29,11 @@ public class TestBoardState
         // Act
         Piece[] boardState = BoardState.GenerateBoardState(Fen);
         Debug.Log(boardState[47]);
+
         // Assert
         BoardState expectedState = new BoardState();
         expectedState.State[8] = new Piece(PieceType.Pawn, PieceColour.White);
         expectedState.State[47] = new Piece(PieceType.Pawn, PieceColour.Black);
-        Debug.Log(new Piece(PieceType.Pawn, PieceColour.Black));
-        Debug.Log(expectedState.State[47]);
         Assert.AreEqual(expectedState.State, boardState);
     }
 
