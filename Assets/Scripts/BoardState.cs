@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 
+/// <summary>
+/// Defines the state of a board, including the positions of every piece and who's turn it is.
+/// </summary>
 public class BoardState
 {
     public Piece[] State;
@@ -14,7 +17,7 @@ public class BoardState
         set
         {
             _fen = value;
-            State = GenerateBoardState(_fen);
+            State = GenerateBoardState();
         }
     }
 
@@ -25,7 +28,7 @@ public class BoardState
     {
         Turn = turn;
         FEN = fen;
-        State = GenerateBoardState(FEN);
+        State = GenerateBoardState();
     }
 
     public static bool operator ==(BoardState obj1, BoardState obj2)
@@ -44,7 +47,7 @@ public class BoardState
     /// Converts a chess FEN string to a board state.
     /// </summary>
     /// <param name="FEN">FEN string</param>
-    public static Piece[] GenerateBoardState(string FEN)
+    private Piece[] GenerateBoardState()
     {
         Piece[] state = new Piece[64];
         int counter = 0;

@@ -14,10 +14,10 @@ public class TestBoardState
         string Fen = "8/8/8/8/8/8/8/8";
 
         // Act
-        Piece[] boardState = BoardState.GenerateBoardState(Fen);
+        BoardState boardState = new BoardState(PieceColour.None, Fen);
 
         // Assert
-        Assert.AreEqual(new BoardState().State, boardState);
+        Assert.AreEqual(new BoardState().State, boardState.State);
     }
 
     [Test]
@@ -27,14 +27,13 @@ public class TestBoardState
         string Fen = "8/p7/8/8/8/7P/8/8";
 
         // Act
-        Piece[] boardState = BoardState.GenerateBoardState(Fen);
-        Debug.Log(boardState[47]);
+        BoardState boardState = new BoardState(PieceColour.None, Fen);
 
         // Assert
         BoardState expectedState = new BoardState();
         expectedState.State[8] = new Piece(PieceType.Pawn, PieceColour.White);
         expectedState.State[47] = new Piece(PieceType.Pawn, PieceColour.Black);
-        Assert.AreEqual(expectedState.State, boardState);
+        Assert.AreEqual(expectedState.State, boardState.State);
     }
 
     [Test]
@@ -44,12 +43,12 @@ public class TestBoardState
         string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
         // Act
-        Piece[] boardState = BoardState.GenerateBoardState(Fen);
+        BoardState boardState = new BoardState(PieceColour.None, Fen);
 
         // Assert
         BoardState expectedState = new BoardState();
         expectedState.SetBoardToStartingPosition();
-        Assert.AreEqual(expectedState.State, boardState);
+        Assert.AreEqual(expectedState.State, boardState.State);
     }
 
     [Test]
@@ -59,7 +58,7 @@ public class TestBoardState
         string Fen = "8/8/8/8/9/8/8/8";
 
         // Assert
-        Assert.Throws<ArgumentException>(() => BoardState.GenerateBoardState(Fen));
+        Assert.Throws<ArgumentException>(() => new BoardState(PieceColour.None, Fen));
     }
 
     [Test]
@@ -69,7 +68,7 @@ public class TestBoardState
         string Fen = "8/7T/8/8/8/8/8/8";
 
         // Assert
-        Assert.Throws<ArgumentException>(() => BoardState.GenerateBoardState(Fen));
+        Assert.Throws<ArgumentException>(() => new BoardState(PieceColour.None, Fen));
     }
 
     [Test]
