@@ -8,8 +8,18 @@ using UnityEngine;
 /// </summary>
 public class BoardState
 {
+    private Piece[] _state = new Piece[64];
+
     [Tooltip("A 64 element array containing the piece present on every square of the board.")]
-    public Piece[] State;
+    public Piece[] State
+    {
+        get => _state;
+        set
+        {
+            _state = value;
+            GenerateFenFromPieces();
+        }
+    }
 
     private string _fen;
 
@@ -20,7 +30,7 @@ public class BoardState
         set
         {
             _fen = value;
-            State = GeneratePieceList();
+            GeneratePiecesFromFen();
         }
     }
 
@@ -29,16 +39,74 @@ public class BoardState
 
     public BoardState(string fen = "8/8/8/8/8/8/8/8")
     {
-        Turn = PieceColour.None;
-        FEN = fen;
-        State = GeneratePieceList();
+        (Turn, FEN) = (PieceColour.None, fen);
+        GeneratePiecesFromFen();
+    }
+
+    public BoardState(PieceColour turn, Piece[] state)
+    {
+        (Turn, State) = (turn, state);
+        GenerateFenFromPieces();
+    }
+
+    private void GenerateFenFromPieces()
+    {
+        int counter = 0;
+        string tempFen = "";
+
+        for (int i = 0; i < 64; i++)
+        {
+            // End of row
+            if (i % 8 == 0 && i != 0)
+            {
+                if (counter != 0)
+                {
+                    tempFen += counter.ToString();
+                    counter = 0;
+                }
+
+                tempFen += '/';
+            }
+
+            // Empty square
+            if (State[i].Type == PieceType.None)
+            {
+                counter++;
+            }
+
+            // Piece
+            else
+            {
+                if (counter != 0)
+                {
+                    tempFen += counter.ToString();
+                    counter = 0;
+                }
+
+                tempFen += State[i].Letter;
+            }
+
+            // End of board
+            if (i == 63)
+            {
+                tempFen += (counter++).ToString();
+            }
+        }
+
+        FEN = tempFen;
+    }
+
+    public BoardState(Piece[] state)
+    {
+        (Turn, State) = (PieceColour.None, state);
+        GenerateFenFromPieces();
     }
 
     public BoardState(PieceColour turn, string fen = "8/8/8/8/8/8/8/8")
     {
         Turn = turn;
         FEN = fen;
-        State = GeneratePieceList();
+        GeneratePiecesFromFen();
     }
 
     public static bool operator ==(BoardState obj1, BoardState obj2)
@@ -57,9 +125,8 @@ public class BoardState
     /// Converts a chess FEN string to a board state.
     /// </summary>
     /// <param name="FEN">FEN string</param>
-    private Piece[] GeneratePieceList()
+    private void GeneratePiecesFromFen()
     {
-        Piece[] state = new Piece[64];
         int counter = 0;
 
         foreach (char c in FEN)
@@ -70,7 +137,7 @@ public class BoardState
             }
             else if (char.IsLetter(c))
             {
-                state[counter] = new Piece(c);
+                State[counter] = new Piece(c);
                 counter++;
             }
         }
@@ -79,8 +146,6 @@ public class BoardState
         {
             throw new ArgumentException($"FEN string is incorrect length: should be 64 but was {counter}", nameof(FEN));
         }
-
-        return state;
     }
 
     public void SetBoardToStartingPosition()

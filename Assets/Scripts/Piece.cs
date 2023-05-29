@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 /// <summary>
@@ -8,6 +9,7 @@ using UnityEngine;
 /// </summary>
 public enum PieceType
 {
+    None, // Default value
     Pawn,
     Knight,
     Bishop,
@@ -21,9 +23,9 @@ public enum PieceType
 /// </summary>
 public enum PieceColour
 {
+    None, // Default value
     White,
-    Black,
-    None
+    Black
 }
 
 /// <summary>
@@ -33,22 +35,10 @@ public struct Piece
 {
     public PieceType Type;
     public PieceColour Colour;
+    public char Letter;
 
-    public Piece(PieceType type, PieceColour colour)
-    {
-        Type = type;
-        Colour = colour;
-    }
-
-    /// <summary>
-    /// Generate a Piece object based on a FEN string letter.
-    /// </summary>
-    /// <param name="letter">A letter from a FEN string.</param>
-    /// <exception cref="ArgumentException"></exception>
-    public Piece(char letter)
-    {
-        // Dictionary connecting piece names to their type
-        var pieceDict = new Dictionary<char, PieceType>
+    // Dictionary connecting piece names to their type
+    private Dictionary<char, PieceType> PieceDict => new()
         {
             { 'p', PieceType.Pawn },
             { 'r', PieceType.Rook },
@@ -58,10 +48,45 @@ public struct Piece
             { 'k', PieceType.King },
         };
 
-        if (!pieceDict.ContainsKey(Char.ToLower(letter)))
+    private Dictionary<PieceType, Char> LetterDict => new()
+        {
+            { PieceType.Pawn, 'p' },
+            { PieceType.Rook, 'r' },
+            { PieceType.Knight, 'n' },
+            { PieceType.Bishop, 'b' },
+            { PieceType.Queen, 'q' },
+            { PieceType.King, 'k' },
+        };
+
+    public Piece(PieceType type = PieceType.None, PieceColour colour = PieceColour.None)
+    {
+        (Type, Colour, Letter) = (type, colour, '1');
+
+        if (type != PieceType.None)
+        {
+            Letter = LetterDict[type];
+
+            if (Colour == PieceColour.Black)
+            {
+                Letter = Char.ToUpper(Letter);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Generate a Piece object based on a FEN string letter.
+    /// </summary>
+    /// <param name="letter">A letter from a FEN string.</param>
+    /// <exception cref="ArgumentException"></exception>
+    public Piece(char letter)
+    {
+        (Type, Colour) = (PieceType.Pawn, PieceColour.None);
+        Letter = letter;
+
+        if (!PieceDict.ContainsKey(Char.ToLower(letter)))
             throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
 
-        (Type, Colour) = (pieceDict[Char.ToLower(letter)], PieceColour.White);
+        (Type, Colour) = (PieceDict[Char.ToLower(letter)], PieceColour.White);
 
         if (Char.IsUpper(letter))
         {
@@ -71,6 +96,11 @@ public struct Piece
 
     public override string ToString()
     {
+        if (Type == PieceType.None || Colour == PieceColour.None)
+        {
+            return "Empty Square";
+        }
+
         return Colour.ToString() + " " + Type.ToString();
     }
 }

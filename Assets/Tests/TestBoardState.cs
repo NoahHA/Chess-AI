@@ -84,4 +84,35 @@ public class TestBoardState
         // Assert
         Assert.AreEqual(boardState1, boardState2);
     }
+
+    [Test]
+    public void TestGenerateFenFromPiecesSimple()
+    {
+        // Arrange
+        Piece[] pieces = new Piece[64];
+        pieces[3] = new Piece(PieceType.Queen, PieceColour.Black);
+
+        // Act
+        BoardState boardState = new BoardState(pieces);
+
+        // Assert
+        string expectedFen = "3Q4/8/8/8/8/8/8/8";
+        Assert.AreEqual(expectedFen, boardState.FEN);
+    }
+
+    [Test]
+    public void TestGenerateFenFromPiecesStartingPosition()
+    {
+        // Arrange
+        var tempBoardState = new BoardState();
+        tempBoardState.SetBoardToStartingPosition();
+        Piece[] pieces = tempBoardState.State;
+
+        // Act
+        var boardState = new BoardState(pieces);
+
+        // Assert
+        string expectedFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+        Assert.AreEqual(expectedFen, boardState.FEN);
+    }
 }
