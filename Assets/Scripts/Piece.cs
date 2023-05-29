@@ -5,7 +5,6 @@ using UnityEngine;
 
 public enum PieceType
 {
-    None,
     Pawn,
     Knight,
     Bishop,
@@ -14,7 +13,7 @@ public enum PieceType
     King
 }
 
-public enum Colour
+public enum PieceColour
 {
     White,
     Black,
@@ -24,18 +23,27 @@ public enum Colour
 public struct Piece
 {
     public PieceType Type;
-    public Colour Colour;
+    public PieceColour Colour;
 
-    public Piece(PieceType type = PieceType.None, Colour colour = Colour.None)
+    public Piece(PieceType type, PieceColour colour)
     {
         Type = type;
         Colour = colour;
     }
 
+    public override string ToString()
+    {
+        return Colour.ToString() + " " + Type.ToString();
+    }
+
+    /// <summary>
+    /// Converts a letter in a FEN string to a Piece object.
+    /// </summary>
+    /// <param name="letter">The FEN string letter describing the piece.</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException">Invalid letter.</exception>
     public static Piece GetPieceFromLetter(char letter)
     {
-        Piece piece = new Piece();
-
         // Dictionary connecting piece names to their type
         var pieceDict = new Dictionary<char, PieceType>
         {
@@ -50,15 +58,11 @@ public struct Piece
         if (!pieceDict.ContainsKey(Char.ToLower(letter)))
             throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
 
-        piece.Type = pieceDict[Char.ToLower(letter)];
+        Piece piece = new Piece(pieceDict[Char.ToLower(letter)], PieceColour.White);
 
         if (Char.IsUpper(letter))
         {
-            piece.Colour = Colour.Black;
-        }
-        else
-        {
-            piece.Colour = Colour.White;
+            piece.Colour = PieceColour.Black;
         }
 
         return piece;
