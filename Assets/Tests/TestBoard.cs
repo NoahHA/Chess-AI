@@ -1,36 +1,32 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
+using System;
 
-public class TestBoardState
+public class TestBoard
 {
     [Test]
-    public void TestGenerateBoardStateEmptyBoard()
+    public void TestGenerateBoardEmptyBoard()
     {
         // Arrange
         string Fen = "8/8/8/8/8/8/8/8";
 
         // Act
-        BoardState boardState = new BoardState(PieceColour.None, Fen);
+        var boardState = new Board(Fen);
 
         // Assert
-        Assert.AreEqual(new BoardState().State, boardState.State);
+        Assert.AreEqual(new Board().State, boardState.State);
     }
 
     [Test]
-    public void TestGenerateBoardStateSimplePosition()
+    public void TestGenerateBoardSimplePosition()
     {
         // Arrange
         string Fen = "8/p7/8/8/8/7P/8/8";
 
         // Act
-        BoardState boardState = new BoardState(PieceColour.None, Fen);
+        var boardState = new Board(Fen);
 
         // Assert
-        BoardState expectedState = new BoardState();
+        var expectedState = new Board();
         expectedState.State[8] = new Piece(PieceType.Pawn, PieceColour.White);
         expectedState.State[47] = new Piece(PieceType.Pawn, PieceColour.Black);
         Assert.AreEqual(expectedState.State, boardState.State);
@@ -43,46 +39,48 @@ public class TestBoardState
         string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
         // Act
-        BoardState boardState = new BoardState(Fen);
+        var boardState = new Board(Fen);
 
         // Assert
-        BoardState expectedState = new BoardState();
+        var expectedState = new Board();
         expectedState.SetBoardToStartingPosition();
         Assert.AreEqual(expectedState.State, boardState.State);
     }
 
     [Test]
-    public void TestGenerateBoardStateFenTooLong()
+    public void TestGenerateBoardFenTooLong()
     {
         // Arrange
         string Fen = "8/8/8/8/9/8/8/8";
 
         // Assert
-        Assert.Throws<ArgumentException>(() => new BoardState(Fen));
+        Assert.Throws<ArgumentException>(() => new Board(Fen));
     }
 
     [Test]
-    public void TestGenerateBoardStateInvalidFen()
+    public void TestGenerateBoardInvalidFen()
     {
         // Arrange
         string Fen = "8/7T/8/8/8/8/8/8";
 
         // Assert
-        Assert.Throws<ArgumentException>(() => new BoardState(Fen));
+        Assert.Throws<ArgumentException>(() => new Board(Fen));
     }
 
     [Test]
-    public void TestBoardStateValueEquality()
+    public void TestBoardValueEquality()
     {
         // Arrange
         string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
         // Act
-        var boardState1 = new BoardState(PieceColour.Black, Fen);
-        var boardState2 = new BoardState(PieceColour.Black, Fen);
+        var boardState1 = new Board(PieceColour.Black, Fen);
+        var boardState2 = new Board(PieceColour.Black, Fen);
+        var boardState3 = new Board(PieceColour.White, Fen);
 
         // Assert
         Assert.AreEqual(boardState1, boardState2);
+        Assert.AreNotEqual(boardState1, boardState3);
     }
 
     [Test]
@@ -93,7 +91,7 @@ public class TestBoardState
         pieces[3] = new Piece(PieceType.Queen, PieceColour.Black);
 
         // Act
-        BoardState boardState = new BoardState(pieces);
+        var boardState = new Board(pieces);
 
         // Assert
         string expectedFen = "3Q4/8/8/8/8/8/8/8";
@@ -104,12 +102,12 @@ public class TestBoardState
     public void TestGenerateFenFromPiecesStartingPosition()
     {
         // Arrange
-        var tempBoardState = new BoardState();
-        tempBoardState.SetBoardToStartingPosition();
-        Piece[] pieces = tempBoardState.State;
+        var tempBoard = new Board();
+        tempBoard.SetBoardToStartingPosition();
+        Piece[] pieces = tempBoard.State;
 
         // Act
-        var boardState = new BoardState(pieces);
+        var boardState = new Board(pieces);
 
         // Assert
         string expectedFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
