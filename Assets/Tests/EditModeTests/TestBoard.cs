@@ -6,7 +6,7 @@ namespace Tests.EditModeTests
     public class TestBoard
     {
         [Test]
-        public void TestGenerateBoardEmptyBoard()
+        public void TestGenerateEmptyBoard()
         {
             // Arrange
             string Fen = "8/8/8/8/8/8/8/8";
@@ -19,7 +19,7 @@ namespace Tests.EditModeTests
         }
 
         [Test]
-        public void TestGenerateBoardSimplePosition()
+        public void TestGenerateSimplePosition()
         {
             // Arrange
             string Fen = "8/p7/8/8/8/7P/8/8";

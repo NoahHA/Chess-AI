@@ -6,39 +6,46 @@ namespace Tests.EditModeTests
     public class TestPiece
     {
         [Test]
-        public void TestGetPieceFromLetterWhitePiece()
+        [TestCase('p', PieceType.Pawn)]
+        [TestCase('n', PieceType.Knight)]
+        [TestCase('b', PieceType.Bishop)]
+        [TestCase('r', PieceType.Rook)]
+        [TestCase('q', PieceType.Queen)]
+        [TestCase('k', PieceType.King)]
+        public void TestGetWhitePieceFromLetter(char letter, PieceType expectedPieceType)
         {
-            // Arrange
-            char letter = 'n';
-
             // Act
             var piece = new Piece(letter);
 
             // Assert
-            Assert.AreEqual(new Piece(PieceType.Knight, PieceColour.White), piece);
+            Piece expectedPiece = new Piece(expectedPieceType, PieceColour.White);
+            Assert.AreEqual(expectedPiece, piece);
         }
 
         [Test]
-        public void TestGetPieceFromLetterBlackPiece()
+        [TestCase('P', PieceType.Pawn)]
+        [TestCase('N', PieceType.Knight)]
+        [TestCase('B', PieceType.Bishop)]
+        [TestCase('R', PieceType.Rook)]
+        [TestCase('Q', PieceType.Queen)]
+        [TestCase('K', PieceType.King)]
+        public void TestGetBlackPieceFromLetter(char letter, PieceType expectedPieceType)
         {
-            // Arrange
-            char letter = 'P';
-
             // Act
             var piece = new Piece(letter);
 
             // Assert
-            Assert.AreEqual(new Piece(PieceType.Pawn, PieceColour.Black), piece);
-            Assert.AreEqual(new Piece(PieceType.Pawn, PieceColour.Black), piece);
-            Assert.AreNotEqual(new Piece(PieceType.Queen, PieceColour.White), piece);
+            Piece expectedPiece = new Piece(expectedPieceType, PieceColour.Black);
+            Assert.AreEqual(expectedPiece, piece);
         }
 
         [Test]
-        public void TestGetPieceFromLetterInvalidPiece()
+        [TestCase('L')]
+        [TestCase('c')]
+        [TestCase(' ')]
+        [TestCase('-')]
+        public void TestGetPieceFromLetterInvalidPiece(char letter)
         {
-            // Arrange
-            char letter = 'L';
-
             // Assert
             Assert.Throws<ArgumentException>(() => new Piece(letter));
         }
