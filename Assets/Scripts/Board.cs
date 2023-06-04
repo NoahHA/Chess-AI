@@ -8,48 +8,34 @@ using UnityEngine;
 /// </summary>
 public class Board
 {
-    private Piece[] _state = new Piece[64];
-
     [Tooltip("A 64 element array containing the piece present on every square of the board.")]
-    public Piece[] State
-    {
-        get => _state;
-        set
-        {
-            _state = value;
-            GenerateFenFromPieces();
-        }
-    }
-
-    private string _fen;
+    private Piece[] _state = new Piece[64];
 
     [Tooltip("A FEN string representing the current state of the board.")]
     public string FEN
     {
-        get => _fen;
+        get => GenerateFenFromState(_state);
         set
         {
-            _fen = value;
-            GeneratePiecesFromFen();
+            _state = GenerateStateFromFen(value);
         }
     }
 
     [Tooltip("An enum representing who's turn it is currently.")]
     public PieceColour Turn;
 
-    public Board(string fen = "8/8/8/8/8/8/8/8")
+    public Board(PieceColour turn = PieceColour.None, string fen = "8/8/8/8/8/8/8/8")
     {
         (Turn, FEN) = (PieceColour.None, fen);
-        GeneratePiecesFromFen();
     }
 
-    public Board(PieceColour turn, Piece[] state)
+    public void PlacePiece(Piece piece, ChessSquare position)
     {
-        (Turn, State) = (turn, state);
-        GenerateFenFromPieces();
+        int stateIndex = (position.Row - 1) * 8 + (position.Col - 1);
+        _state[stateIndex] = piece;
     }
 
-    private void GenerateFenFromPieces()
+    public static string GenerateFenFromState(Piece[] state)
     {
         int counter = 0;
         string tempFen = "";
@@ -69,7 +55,7 @@ public class Board
             }
 
             // Empty square
-            if (State[i].Type == PieceType.None)
+            if (state[i].Type == PieceType.None)
             {
                 counter++;
             }
@@ -83,7 +69,7 @@ public class Board
                     counter = 0;
                 }
 
-                tempFen += State[i].Letter;
+                tempFen += state[i].Letter;
             }
 
             // End of board
@@ -93,20 +79,7 @@ public class Board
             }
         }
 
-        FEN = tempFen;
-    }
-
-    public Board(Piece[] state)
-    {
-        (Turn, State) = (PieceColour.None, state);
-        GenerateFenFromPieces();
-    }
-
-    public Board(PieceColour turn, string fen = "8/8/8/8/8/8/8/8")
-    {
-        Turn = turn;
-        FEN = fen;
-        GeneratePiecesFromFen();
+        return tempFen;
     }
 
     public static bool operator ==(Board obj1, Board obj2)
@@ -125,11 +98,12 @@ public class Board
     /// Converts a chess FEN string to a board state.
     /// </summary>
     /// <param name="FEN">FEN string</param>
-    private void GeneratePiecesFromFen()
+    public static Piece[] GenerateStateFromFen(string fen)
     {
         int counter = 0;
+        Piece[] state = new Piece[64];
 
-        foreach (char c in FEN)
+        foreach (char c in fen)
         {
             if (char.IsDigit(c))
             {
@@ -137,7 +111,7 @@ public class Board
             }
             else if (char.IsLetter(c))
             {
-                State[counter] = new Piece(c);
+                state[counter] = new Piece(c);
                 counter++;
             }
         }
@@ -146,6 +120,8 @@ public class Board
         {
             throw new ArgumentException($"FEN string is incorrect length: should be 64 but was {counter}", nameof(FEN));
         }
+
+        return state;
     }
 
     public void SetBoardToStartingPosition()
@@ -171,5 +147,10 @@ public class Board
     public override int GetHashCode()
     {
         return FEN.GetHashCode() ^ Turn.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return Turn.ToString() + " - " + FEN;
     }
 }

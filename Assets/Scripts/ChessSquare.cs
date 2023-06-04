@@ -69,4 +69,9 @@ public class ChessSquare
         Col = (int)(screenPosition.x / 3.5f);
         Row = (int)(screenPosition.y / 3.5f);
     }
+
+    public override string ToString()
+    {
+        return SquareName;
+    }
 }
