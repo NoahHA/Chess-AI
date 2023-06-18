@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 /// <summary>
@@ -73,6 +71,12 @@ public struct Piece
         }
     }
 
+    public string GetPrefabName()
+    {
+        char colourLetter = Char.ToLower(Colour.ToString()[0]);
+        return colourLetter + "_" + Type.ToString().ToLower();
+    }
+
     /// <summary>
     /// Generate a Piece object based on a FEN string letter.
     /// </summary>
@@ -80,8 +84,7 @@ public struct Piece
     /// <exception cref="ArgumentException"></exception>
     public Piece(char letter)
     {
-        (Type, Colour) = (PieceType.Pawn, PieceColour.None);
-        Letter = letter;
+        (Type, Colour, Letter) = (PieceType.Pawn, PieceColour.None, letter);
 
         if (!PieceDict.ContainsKey(Char.ToLower(letter)))
             throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));

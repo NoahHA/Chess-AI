@@ -26,7 +26,7 @@ public class Board
 
     public Board(PieceColour turn = PieceColour.None, string fen = "8/8/8/8/8/8/8/8")
     {
-        (Turn, FEN) = (PieceColour.None, fen);
+        (Turn, FEN) = (turn, fen);
     }
 
     public void PlacePiece(Piece piece, ChessSquare position)
@@ -84,8 +84,7 @@ public class Board
 
     public static bool operator ==(Board obj1, Board obj2)
     {
-        return obj1.Turn == obj2.Turn
-                    && obj1.FEN == obj2.FEN;
+        return (obj1.Turn, obj1.FEN) == (obj2.Turn, obj2.FEN);
     }
 
     public static bool operator !=(Board obj1, Board obj2)
@@ -139,8 +138,49 @@ public class Board
         else
         {
             Board boardState = (Board)obj;
-            return Turn == boardState.Turn
-                    && FEN == boardState.FEN;
+            return (Turn, FEN) == (boardState.Turn, boardState.FEN);
+        }
+    }
+
+    /// <summary>
+    /// Updates the board to reflect the pieces on the screen.
+    /// </summary>
+    /// <param name="expectedBoard"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    public void UpdateBoardFromScreen(GameObject[] pieces)
+    {
+        ClearBoard();
+
+        foreach (GameObject pieceObject in pieces)
+        {
+            Piece piece = pieceObject.GetComponent<PieceID>().Piece;
+            var square = new ChessSquare(pieceObject.transform.position);
+            PlacePiece(piece, square);
+        }
+    }
+
+    private void ClearBoard()
+    {
+        _state = new Piece[64];
+    }
+
+    /// <summary>
+    /// Updates the screen based on the given board state.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public void UpdateScreenFromBoard()
+    {
+        GameController.ClearScreen();
+
+        for (int i = 0; i < 64; i++)
+        {
+            Piece piece = _state[i];
+            var position = new ChessSquare(i);
+
+            if (piece.Type != PieceType.None && piece.Colour != PieceColour.None)
+            {
+                GameObject.Instantiate(Resources.Load("Pieces/" + piece.GetPrefabName()), position.ScreenPosition, Quaternion.identity);
+            }
         }
     }
 

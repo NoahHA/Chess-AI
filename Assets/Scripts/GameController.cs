@@ -1,18 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+public static class GameController
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public static GameObject[] Pieces => GameObject.FindGameObjectsWithTag("Piece");
 
-    // Update is called once per frame
-    void Update()
+    public static void ClearScreen()
     {
-        
+        foreach (GameObject piece in Pieces)
+        {
+            GameObject.Destroy(piece);
+        }
     }
 }
