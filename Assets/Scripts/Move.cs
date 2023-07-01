@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class Move
 {
-    public ChessSquare StartSquare;
-    public ChessSquare EndSquare;
+    public Square StartSquare;
+    public Square EndSquare;
 
-    public Move(ChessSquare startSquare, ChessSquare endSquare)
+    public Move(Square startSquare, Square endSquare)
     {
         (StartSquare, EndSquare) = (startSquare, endSquare);
     }
 
     public Move(string startSquare, string endSquare)
     {
-        (StartSquare, EndSquare) = (new ChessSquare(startSquare), new ChessSquare(endSquare));
+        (StartSquare, EndSquare) = (new Square(startSquare), new Square(endSquare));
     }
 }

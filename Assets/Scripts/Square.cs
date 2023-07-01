@@ -1,13 +1,13 @@
 using UnityEngine;
 using System;
 
-public class ChessSquare
+public class Square
 {
     private int _col;
     private int _row;
 
     [Tooltip("The name of the square in chess notation e.g. 'e4'")]
-    public String SquareName => ((Char)(Col + 96)).ToString() + Row.ToString();
+    public String Name => ((Char)(Col + 96)).ToString() + Row.ToString();
 
     public int Col
     {
@@ -44,24 +44,24 @@ public class ChessSquare
     [Tooltip("The position of the chess square on the screen.")]
     public Vector3 ScreenPosition => new Vector3(Col, Row, 0);
 
-    public ChessSquare(int col, int row)
+    public Square(int col, int row)
     {
         (Col, Row) = (col, row);
     }
 
-    public ChessSquare(int index)
+    public Square(int index)
     {
         Col = (index + 1) % 8 != 0 ? (index + 1) % 8 : 8;
         Row = (int)Math.Ceiling((index + 1) / 8f);
     }
 
-    public ChessSquare(String square)
+    public Square(String square)
     {
         Col = (int)square[0] - 96;
         Row = (int)Char.GetNumericValue(square[1]);
     }
 
-    public ChessSquare(Vector3 screenPosition)
+    public Square(Vector3 screenPosition)
     {
         Col = (int)(screenPosition.x);
         Row = (int)(screenPosition.y);
@@ -69,6 +69,6 @@ public class ChessSquare
 
     public override string ToString()
     {
-        return SquareName;
+        return Name;
     }
 }

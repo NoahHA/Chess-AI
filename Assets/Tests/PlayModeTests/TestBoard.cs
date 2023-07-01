@@ -6,28 +6,22 @@ using UnityEngine.TestTools;
 
 namespace Tests.PlayModeTests
 {
-    public class TestGameController
+    public class TestBoard
     {
         private float waitTime = 0.1f;
-
-        [SetUp]
-        public void Setup()
-        {
-            GameController.ClearScreen();
-        }
 
         [UnityTest]
         public IEnumerator TestClearScreen()
         {
             var board = new Board();
-            board.PlacePiece(new Piece('p'), new ChessSquare("e2"));
+            board.PlacePiece(new Piece('p'), new Square("e2"));
             board.UpdateScreenFromBoard();
-            Assert.IsNotNull(GameController.Pieces);
+            Assert.IsNotEmpty(BoardHelper.GetPieces());
 
-            GameController.ClearScreen();
-            yield return new WaitForFixedUpdate();
+            BoardHelper.ClearScreen();
+            yield return null;
 
-            Assert.IsEmpty(GameController.Pieces);
+            Assert.IsEmpty(BoardHelper.GetPieces());
         }
 
         [UnityTest]
@@ -35,14 +29,15 @@ namespace Tests.PlayModeTests
             [Values('q', 'R')] char pieceName,
             [Values("a1", "f8")] string piecePosition)
         {
+            BoardHelper.ClearScreen();
             var board = new Board();
-            board.PlacePiece(new Piece(pieceName), new ChessSquare(piecePosition));
+            board.PlacePiece(new Piece(pieceName), new Square(piecePosition));
 
             board.UpdateScreenFromBoard();
-            yield return new WaitForSeconds(waitTime);
+            yield return null;
 
             var expectedBoard = new Board();
-            expectedBoard.UpdateBoardFromScreen(GameController.Pieces);
+            expectedBoard.UpdateBoardFromScreen(BoardHelper.GetPieces());
             Assert.AreEqual(expectedBoard, board);
         }
     }

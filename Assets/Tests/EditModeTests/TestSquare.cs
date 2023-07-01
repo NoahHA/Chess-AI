@@ -17,8 +17,8 @@ namespace Tests.EditModeTests
         [TestCase(8, 8, "h8")]
         public void TestCreateValidChessSquareFromRowCol(int col, int row, string expectedSquareName)
         {
-            var square = new ChessSquare(col, row);
-            Assert.AreEqual(expectedSquareName, square.SquareName);
+            var square = new Square(col, row);
+            Assert.AreEqual(expectedSquareName, square.Name);
         }
 
         [Test]
@@ -34,7 +34,7 @@ namespace Tests.EditModeTests
         [TestCase(15, -15)]
         public void TestCreateInvalidChessSquareFromRowCol(int col, int row)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new ChessSquare(col, row));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Square(col, row));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace Tests.EditModeTests
         [TestCase("h8", 8, 8)]
         public void TestCreateValidChessSquareFromString(string chessSquareName, int expectedCol, int expectedRow)
         {
-            var square = new ChessSquare(chessSquareName);
+            var square = new Square(chessSquareName);
 
             Assert.AreEqual(expectedCol, square.Col);
             Assert.AreEqual(expectedRow, square.Row);
@@ -58,7 +58,7 @@ namespace Tests.EditModeTests
         [TestCase(50, 3, 7)]
         public void TestCreateChessSquareFromIndex(int index, int expectedCol, int expectedRow)
         {
-            var square = new ChessSquare(index);
+            var square = new Square(index);
 
             Assert.AreEqual(expectedCol, square.Col);
             Assert.AreEqual(expectedRow, square.Row);

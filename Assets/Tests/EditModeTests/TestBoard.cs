@@ -20,8 +20,8 @@ namespace Tests.EditModeTests
             var board = new Board(fen: Fen);
 
             var expectedBoard = new Board();
-            expectedBoard.PlacePiece(new Piece('p'), new ChessSquare("a2"));
-            expectedBoard.PlacePiece(new Piece('P'), new ChessSquare("h6"));
+            expectedBoard.PlacePiece(new Piece('p'), new Square("a2"));
+            expectedBoard.PlacePiece(new Piece('P'), new Square("h6"));
 
             Assert.AreEqual(expectedBoard, board);
         }

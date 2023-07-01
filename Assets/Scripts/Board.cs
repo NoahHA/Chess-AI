@@ -29,7 +29,7 @@ public class Board
         (Turn, FEN) = (turn, fen);
     }
 
-    public void PlacePiece(Piece piece, ChessSquare position)
+    public void PlacePiece(Piece piece, Square position)
     {
         int stateIndex = (position.Row - 1) * 8 + (position.Col - 1);
         _state[stateIndex] = piece;
@@ -154,7 +154,7 @@ public class Board
         foreach (GameObject pieceObject in pieces)
         {
             Piece piece = pieceObject.GetComponent<PieceID>().Piece;
-            var square = new ChessSquare(pieceObject.transform.position);
+            var square = new Square(pieceObject.transform.position);
             PlacePiece(piece, square);
         }
     }
@@ -170,12 +170,12 @@ public class Board
     /// <exception cref="NotImplementedException"></exception>
     public void UpdateScreenFromBoard()
     {
-        GameController.ClearScreen();
+        BoardHelper.ClearScreen();
 
         for (int i = 0; i < 64; i++)
         {
             Piece piece = _state[i];
-            var position = new ChessSquare(i);
+            var position = new Square(i);
 
             if (piece.Type != PieceType.None && piece.Colour != PieceColour.None)
             {
