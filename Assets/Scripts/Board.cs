@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using UnityEngine;
 
 /// <summary>
@@ -179,7 +177,11 @@ public class Board
 
             if (piece.Type != PieceType.None && piece.Colour != PieceColour.None)
             {
-                GameObject.Instantiate(Resources.Load("Pieces/" + piece.GetPrefabName()), position.ScreenPosition, Quaternion.identity);
+                GameObject Piece = (GameObject)GameObject.Instantiate(
+                    Resources.Load("Pieces/" + piece.GetPrefabName()), position.ScreenPosition, Quaternion.identity
+                );
+
+                Piece.transform.parent = GameObject.Find("Board/Pieces").transform;
             }
         }
     }
