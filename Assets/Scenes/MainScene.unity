@@ -1371,6 +1371,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3146736653804480542, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: tileHighlight
+      value: 
+      objectReference: {fileID: 3348318481398810697, guid: 4e3c18e417a6e1645840f531c58c126f, type: 3}
+    - target: {fileID: 3146736653804480542, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: circleHighlight
+      value: 
+      objectReference: {fileID: 481863497604018407, guid: 46f2f0af683ea1847b77ef3bccc3c3f0, type: 3}
+    - target: {fileID: 3146736653804480542, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: takeablePieceHighlight
+      value: 
+      objectReference: {fileID: 3348318481398810697, guid: 6c1952c6557bf7a43a98e3d2aa48975d, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -10,11 +10,27 @@ public static class BoardHelper
         return GameObject.FindGameObjectsWithTag("Piece");
     }
 
+    public static GameObject[] GetTiles()
+    {
+        return GameObject.FindGameObjectsWithTag("Highlight");
+    }
+
     public static void ClearScreen()
     {
-        foreach (GameObject piece in GetPieces())
+        foreach (var piece in GetPieces())
         {
             GameObject.Destroy(piece);
+        }
+    }
+
+    /// <summary>
+    /// Removes all highlighted tiles to reset the board
+    /// </summary>
+    public static void ClearTiles()
+    {
+        foreach (var tile in GetTiles())
+        {
+            GameObject.Destroy(tile);
         }
     }
 }

@@ -5,9 +5,9 @@ using UnityEngine.Rendering;
 public class ClickPiece : MonoBehaviour
 {
     private PieceID pieceID;
-    private Square startingSquare;
     private Square curSquare;
     private SortingGroup rend;
+    private Square startingSquare;
 
     public void Start()
     {
@@ -23,7 +23,6 @@ public class ClickPiece : MonoBehaviour
             // Puts selected piece on top of all other pieces
             rend.sortingOrder++;
 
-            // Stores initial piece location
             startingSquare = new Square(transform.position);
 
             // Trigger a piece clicked event
@@ -36,8 +35,14 @@ public class ClickPiece : MonoBehaviour
         // Checks if the clicked piece is the right colour
         if (GameController.Instance.Board.Turn == pieceID.Piece.Colour)
         {
-            // Trigger a piece dragged event
-            PlayerController.onPieceDragged?.Invoke(gameObject);
+            SnapPieceToSquare(gameObject);
+
+            // If piece has moved to a new square
+            if (transform.position != startingSquare.ScreenPosition)
+            {
+                // Trigger a piece dragged event
+                PlayerController.onPieceMoved?.Invoke(gameObject);
+            }
         }
     }
 
@@ -46,9 +51,10 @@ public class ClickPiece : MonoBehaviour
         // Checks if the clicked piece is the right colour
         if (GameController.Instance.Board.Turn == pieceID.Piece.Colour)
         {
+            // Reset sorting order
             rend.sortingOrder = 0;
 
-            // Trigger a piece dragged event
+            // Trigger a piece placed event
             PlayerController.onPiecePlaced?.Invoke(gameObject);
         }
     }
@@ -61,15 +67,5 @@ public class ClickPiece : MonoBehaviour
 
         // Snaps piece into the centre of the square
         piece.transform.position = curSquare.ScreenPosition;
-    }
-
-    public void OnEnable()
-    {
-        PlayerController.onPieceDragged += SnapPieceToSquare;
-    }
-
-    public void OnDisable()
-    {
-        PlayerController.onPieceDragged -= SnapPieceToSquare;
     }
 }

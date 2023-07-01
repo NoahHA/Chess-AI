@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6409012665584060957}
   - component: {fileID: 1086586390103728571}
   m_Layer: 3
-  m_Name: YellowTile
+  m_Name: TileHighlight
   m_TagString: Highlight
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52,7 +52,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1020b89d528896e448fffaf58f7c74b9, type: 2}
+  - {fileID: 2100000, guid: 3310d2d480833e84286c88ddec40b6b1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
