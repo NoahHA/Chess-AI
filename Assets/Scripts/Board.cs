@@ -143,13 +143,12 @@ public class Board
     /// <summary>
     /// Updates the board to reflect the pieces on the screen.
     /// </summary>
-    /// <param name="expectedBoard"></param>
     /// <exception cref="NotImplementedException"></exception>
-    public void UpdateBoardFromScreen(GameObject[] pieces)
+    public void UpdateBoardFromScreen()
     {
         ClearBoard();
 
-        foreach (GameObject pieceObject in pieces)
+        foreach (GameObject pieceObject in BoardHelper.GetPieces())
         {
             Piece piece = pieceObject.GetComponent<PieceID>().Piece;
             var square = new Square(pieceObject.transform.position);

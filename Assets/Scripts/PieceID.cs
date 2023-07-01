@@ -9,7 +9,7 @@ public class PieceID : MonoBehaviour
     [SerializeField] private PieceColour colour;
     public Piece Piece { get; private set; }
 
-    private void Awake()
+    public void Awake()
     {
         Piece = new Piece(type, colour);
     }

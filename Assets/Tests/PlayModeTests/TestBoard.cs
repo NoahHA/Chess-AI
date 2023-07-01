@@ -35,7 +35,7 @@ namespace Tests.PlayModeTests
             yield return null;
 
             var expectedBoard = new Board();
-            expectedBoard.UpdateBoardFromScreen(BoardHelper.GetPieces());
+            expectedBoard.UpdateBoardFromScreen();
             Assert.AreEqual(expectedBoard, board);
         }
     }
