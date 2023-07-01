@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 95590857}
   - component: {fileID: 95590858}
-  - component: {fileID: 95590860}
+  - component: {fileID: 95590859}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -209,7 +209,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &95590860
+--- !u!114 &95590859
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -1,9 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class BoardHelper : MonoBehaviour
+public static class BoardHelper
 {
     public static GameObject[] GetPieces()
     {

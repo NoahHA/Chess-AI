@@ -8,8 +8,6 @@ namespace Tests.PlayModeTests
 {
     public class TestBoard
     {
-        private float waitTime = 0.1f;
-
         [UnityTest]
         public IEnumerator TestClearScreen()
         {
