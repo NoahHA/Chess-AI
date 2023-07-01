@@ -1,15 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PieceID : MonoBehaviour
+/// <summary>
+/// A script to attach to piece prefabs to identify what type of piece they are.
+/// </summary>
+public class PieceID
 {
     [SerializeField] private PieceType type;
     [SerializeField] private PieceColour colour;
-    public Piece Piece { get; private set; }
-
-    private void Awake()
-    {
-        Piece = new Piece(type, colour);
-    }
+    public Piece Piece => new Piece(type, colour);
 }

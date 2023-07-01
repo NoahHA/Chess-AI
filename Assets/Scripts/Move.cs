@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Represents a chess move.
+/// </summary>
 public class Move
 {
     public Square StartSquare;

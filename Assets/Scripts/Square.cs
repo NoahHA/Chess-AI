@@ -1,6 +1,9 @@
 using UnityEngine;
 using System;
 
+/// <summary>
+/// Represents a chess square.
+/// </summary>
 public class Square
 {
     private int _col;

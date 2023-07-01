@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Some static helper functions for board operations.
+/// </summary>
 public static class BoardHelper
 {
     public static GameObject[] GetPieces()
