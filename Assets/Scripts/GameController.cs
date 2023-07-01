@@ -5,12 +5,27 @@ using UnityEngine;
 /// </summary>
 public class GameController : MonoBehaviour
 {
-    public Board board = new Board(turn: PieceColour.White);
+    private static GameController _instance;
+
+    public static GameController Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = GameObject.FindObjectOfType<GameController>();
+            }
+
+            return _instance;
+        }
+    }
+
+    public Board Board = new Board(turn: PieceColour.White);
 
     private void Start()
     {
-        board.SetBoardToStartingPosition();
-        board.UpdateScreenFromBoard();
+        Board.SetBoardToStartingPosition();
+        Board.UpdateScreenFromBoard();
     }
 
     private void Update()
