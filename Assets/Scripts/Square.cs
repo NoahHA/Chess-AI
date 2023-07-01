@@ -66,8 +66,9 @@ public class Square
 
     public Square(Vector3 screenPosition)
     {
-        Col = (int)(screenPosition.x);
-        Row = (int)(screenPosition.y);
+        // Round the values to the nearest integer
+        Col = (int)(screenPosition.x + 0.5);
+        Row = (int)(screenPosition.y + 0.5);
     }
 
     public override string ToString()
