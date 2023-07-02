@@ -78,4 +78,16 @@ public class Square
     {
         return Name;
     }
+
+    /// <summary>
+    /// Check if a square is valid before attempting to create it.
+    /// </summary>
+    /// <param name="col"></param>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public static bool IsValidSquare(int col, int row)
+    {
+        return col >= 1 && col <= 8 && row >= 1 && row <= 8;
+    }
 }
