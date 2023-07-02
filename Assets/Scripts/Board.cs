@@ -239,7 +239,7 @@ public class Board
         int direction = (Turn == PieceColour.White) ? 1 : -1;
 
         // Max number of forward moves the pawn can take
-        int maxMoves = ((square.Row == 7 && direction == 1) || (square.Row == 2 && direction == -1)) ? 2 : 1;
+        int maxMoves = ((square.Row == 2 && direction == 1) || (square.Row == 7 && direction == -1)) ? 2 : 1;
 
         // Checks for forward moves
         for (int i = 1; i < maxMoves + 1; i++)
