@@ -200,7 +200,7 @@ public class Board
                 return FindLegalPawnMoves(square);
 
             case PieceType.Rook:
-                return FindLegalPawnMoves(square);
+                return FindLegalRookMoves(square);
 
             case PieceType.Queen:
                 return FindLegalPawnMoves(square);
@@ -228,7 +228,7 @@ public class Board
         return piece.Colour == Turn ? false : true;
     }
 
-    private List<Move> FindLegalPawnMoves(Square square)
+    private List<Move> FindLegalPawnMoves(Square startSquare)
     {
         List<Move> moves = new();
 
@@ -239,17 +239,22 @@ public class Board
         int direction = (Turn == PieceColour.White) ? 1 : -1;
 
         // Max number of forward moves the pawn can take
-        int maxMoves = ((square.Row == 2 && direction == 1) || (square.Row == 7 && direction == -1)) ? 2 : 1;
+        int maxMoves = ((startSquare.Row == 2 && direction == 1) || (startSquare.Row == 7 && direction == -1)) ? 2 : 1;
 
         // Checks for forward moves
         for (int i = 1; i < maxMoves + 1; i++)
         {
-            var newSquare = new Square(square.Col, square.Row + i * direction);
+            // Prevents invalid moves
+            if (!Square.IsValidSquare(startSquare.Col, startSquare.Row + i * direction))
+            {
+                continue;
+            }
+            var newSquare = new Square(startSquare.Col, startSquare.Row + i * direction);
 
             // Add square in front of pawn to moves if not blocked
             if (FindPieceOnSquare(newSquare) == null && !isBlocked)
             {
-                moves.Add(new Move(square, newSquare));
+                moves.Add(new Move(startSquare, newSquare));
             }
             else
             {
@@ -260,17 +265,71 @@ public class Board
         // Checks for diagonal moves
         for (int j = -1; j < 2; j += 2)
         {
-            var newSquare = new Square(square.Col + j, square.Row + direction);
+            // Prevents invalid moves
+            if (!Square.IsValidSquare(startSquare.Col + j, startSquare.Row + direction))
+            {
+                continue;
+            }
+            var newSquare = new Square(startSquare.Col + j, startSquare.Row + direction);
 
             // Add diagonal square to moves if opponent's piece can be taken there
             Piece diagonalPiece = FindPieceOnSquare(newSquare);
 
-            if (diagonalPiece != null && (diagonalPiece.Colour != FindPieceOnSquare(square).Colour))
+            if (diagonalPiece != null && (diagonalPiece.Colour != FindPieceOnSquare(startSquare).Colour))
             {
-                moves.Add(new Move(square, newSquare));
+                moves.Add(new Move(startSquare, newSquare));
             }
         }
 
+        return moves;
+    }
+
+    private List<Move> FindLegalRookMoves(Square startSquare)
+    {
+        // loop over both directions, then loop from start col to
+        List<Move> moves = new();
+        bool isBlocked = false;
+
+        for (int rowDir = -1; rowDir < 2; rowDir++)
+        {
+            for (int colDir = -1; colDir < 2; colDir++)
+            {
+                for (int i = 1; i < 8; i++)
+                {
+                    // Prevents diagonal or invalid moves
+                    if (rowDir != 0 && colDir != 0 || !Square.IsValidSquare(startSquare.Col + (i * colDir), startSquare.Row + (i * rowDir)))
+                    {
+                        continue;
+                    }
+
+                    var newSquare = new Square(startSquare.Col + (i * colDir), startSquare.Row + (i * rowDir));
+                    Piece newSquarePiece = FindPieceOnSquare(newSquare);
+
+                    if (!isBlocked)
+                    {
+                        // If square is empty
+                        if (newSquarePiece == null)
+                        {
+                            moves.Add(new Move(startSquare, newSquare));
+                        }
+
+                        // If square is occupied by an enemy piece
+                        else if (IsEnemyPiece(newSquarePiece))
+                        {
+                            moves.Add(new Move(startSquare, newSquare));
+                            isBlocked = true;
+                        }
+
+                        // If square is occupied by friendly piece
+                        else
+                        {
+                            isBlocked = true;
+                        }
+                    }
+                }
+                isBlocked = false;
+            }
+        }
         return moves;
     }
 
