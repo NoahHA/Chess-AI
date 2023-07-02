@@ -33,6 +33,16 @@ public class Board
     }
 
     /// <summary>
+    /// Checks if a given move is legal.
+    /// </summary>
+    /// <param name="move"></param>
+    /// <returns>Whether the move is a legal move.</returns>
+    public bool IsLegalMove(Move move)
+    {
+        return FindLegalMoves(move.StartSquare).Contains(move);
+    }
+
+    /// <summary>
     /// Makes a move.
     /// </summary>
     /// <param name="move"></param>
@@ -40,7 +50,7 @@ public class Board
     /// <exception cref="InvalidOperationException">Indicates an invalid move.</exception>
     public Piece MakeMove(Move move)
     {
-        if (FindLegalMoves(move.StartSquare).Contains(move))
+        if (IsLegalMove(move))
         {
             Piece piece = FindPieceOnSquare(move.StartSquare);
             Piece takenPiece = _state[move.StartSquare.Index];
