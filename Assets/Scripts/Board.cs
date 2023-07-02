@@ -203,7 +203,7 @@ public class Board
                 return FindLegalRookMoves(square);
 
             case PieceType.Queen:
-                return FindLegalPawnMoves(square);
+                return FindLegalQueenMoves(square);
 
             case PieceType.King:
                 return FindLegalKingMoves(square);
@@ -435,6 +435,14 @@ public class Board
                 isBlocked = false;
             }
         }
+        return moves;
+    }
+
+    private List<Move> FindLegalQueenMoves(Square startSquare)
+    {
+        List<Move> moves = FindLegalBishopMoves(startSquare);
+        moves.AddRange(FindLegalRookMoves(startSquare));
+
         return moves;
     }
 
