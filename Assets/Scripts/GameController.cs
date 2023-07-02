@@ -22,13 +22,13 @@ public class GameController : MonoBehaviour
 
     public Board Board = new Board(turn: PieceColour.White);
 
-    private void Start()
+    public void Start()
     {
         Board.SetBoardToStartingPosition();
         Board.UpdateScreenFromBoard();
     }
 
-    private void Update()
+    public void Update()
     {
     }
 }

@@ -2,12 +2,19 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
 namespace Tests.PlayModeTests
 {
     public class TestBoard
     {
+        [SetUp]
+        public void SetupTest()
+        {
+            SceneManager.LoadScene("MainScene");
+        }
+
         [UnityTest]
         public IEnumerator TestClearScreen()
         {

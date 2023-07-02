@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// Defines the state of a board, including the positions of every piece and who's turn it is.
@@ -13,16 +15,13 @@ public class Board
     public string FEN
     {
         get => GenerateFenFromState(_state);
-        set
-        {
-            _state = GenerateStateFromFen(value);
-        }
+        set => _state = GenerateStateFromFen(value);
     }
 
     [Tooltip("An enum representing who's turn it is currently.")]
     public PieceColour Turn;
 
-    public Board(PieceColour turn = PieceColour.None, string fen = "8/8/8/8/8/8/8/8")
+    public Board(PieceColour turn = PieceColour.White, string fen = "8/8/8/8/8/8/8/8")
     {
         (Turn, FEN) = (turn, fen);
     }
@@ -53,7 +52,7 @@ public class Board
             }
 
             // Empty square
-            if (state[i].Type == PieceType.None)
+            if (state[i] == null)
             {
                 counter++;
             }
@@ -171,18 +170,108 @@ public class Board
 
         for (int i = 0; i < 64; i++)
         {
-            Piece piece = _state[i];
             var position = new Square(i);
+            Piece piece = FindPieceOnSquare(position);
 
-            if (piece.Type != PieceType.None && piece.Colour != PieceColour.None)
+            if (piece != null)
             {
-                GameObject Piece = (GameObject)GameObject.Instantiate(
+                GameObject pieceGameObject = (GameObject)GameObject.Instantiate(
                     Resources.Load("Pieces/" + piece.GetPrefabName()), position.ScreenPosition, Quaternion.identity
                 );
 
-                Piece.transform.parent = GameObject.Find("Board/Pieces").transform;
+                pieceGameObject.transform.parent = GameObject.Find("Board/Pieces").transform;
             }
         }
+    }
+
+    public List<Move> FindLegalMoves(Square square)
+    {
+        Piece piece = FindPieceOnSquare(square);
+
+        switch (piece.Type)
+        {
+            case PieceType.Pawn:
+                return FindLegalPawnMoves(square);
+
+            case PieceType.Knight:
+                return FindLegalPawnMoves(square);
+
+            case PieceType.Bishop:
+                return FindLegalPawnMoves(square);
+
+            case PieceType.Rook:
+                return FindLegalPawnMoves(square);
+
+            case PieceType.Queen:
+                return FindLegalPawnMoves(square);
+
+            case PieceType.King:
+                return FindLegalPawnMoves(square);
+
+            default:
+                return null;
+        }
+    }
+
+    /// <summary>
+    /// Finds the piece occupying a square, or null if no piece is there.
+    /// </summary>
+    /// <param name="square">The square to check.</param>
+    /// <returns></returns>
+    public Piece FindPieceOnSquare(Square square)
+    {
+        return _state[square.Index];
+    }
+
+    public bool IsEnemyPiece(Piece piece)
+    {
+        return piece.Colour == Turn ? false : true;
+    }
+
+    private List<Move> FindLegalPawnMoves(Square square)
+    {
+        List<Move> moves = new();
+
+        // Flag to indicate something in the way of the pawn
+        bool isBlocked = false;
+
+        // White pieces have +1 direction, black have -1
+        int direction = (Turn == PieceColour.White) ? 1 : -1;
+
+        // Max number of forward moves the pawn can take
+        int maxMoves = ((square.Row == 7 && direction == 1) || (square.Row == 2 && direction == -1)) ? 2 : 1;
+
+        // Checks for forward moves
+        for (int i = 1; i < maxMoves + 1; i++)
+        {
+            var newSquare = new Square(square.Col, square.Row + i * direction);
+
+            // Add square in front of pawn to moves if not blocked
+            if (FindPieceOnSquare(newSquare) == null && !isBlocked)
+            {
+                moves.Add(new Move(square, newSquare));
+            }
+            else
+            {
+                isBlocked = true;
+            }
+        }
+
+        // Checks for diagonal moves
+        for (int j = -1; j < 2; j += 2)
+        {
+            var newSquare = new Square(square.Col + j, square.Row + direction);
+
+            // Add diagonal square to moves if opponent's piece can be taken there
+            Piece diagonalPiece = FindPieceOnSquare(newSquare);
+
+            if (diagonalPiece != null && (diagonalPiece.Colour != FindPieceOnSquare(square).Colour))
+            {
+                moves.Add(new Move(square, newSquare));
+            }
+        }
+
+        return moves;
     }
 
     public override int GetHashCode()

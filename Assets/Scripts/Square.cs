@@ -12,6 +12,9 @@ public class Square
     [Tooltip("The name of the square in chess notation e.g. 'e4'")]
     public String Name => ((Char)(Col + 96)).ToString() + Row.ToString();
 
+    [Tooltip("The index of the board square, ranges from 0-63")]
+    public int Index => (Col - 1) + (Row - 1) * 8;
+
     public int Col
     {
         get { return _col; }

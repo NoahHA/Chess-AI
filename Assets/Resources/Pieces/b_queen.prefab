@@ -66,15 +66,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2619536108876946407, guid: 0ea27abaa7d0a0248a1c21258805b59f, type: 3}
       propertyPath: m_Name
-      value: b_pawn 1
+      value: b_queen
       objectReference: {fileID: 0}
     - target: {fileID: 5616954094506374569, guid: 0ea27abaa7d0a0248a1c21258805b59f, type: 3}
       propertyPath: type
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5616954094506374569, guid: 0ea27abaa7d0a0248a1c21258805b59f, type: 3}
       propertyPath: colour
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="clickedSquare"> The chess tile the player has clicked on </param>
     public void HighLightSquare(Square clickedSquare)
     {
-        var tile = Instantiate(tileHighlight, clickedSquare.ScreenPosition, tileHighlight.transform.rotation);
+        Instantiate(tileHighlight, clickedSquare.ScreenPosition, tileHighlight.transform.rotation);
     }
 
     /// <summary>
@@ -40,20 +40,22 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void HightLightLegalMoves(List<Move> legalMoves)
     {
-        //// Loops through all legal moves and highlights them
-        //foreach (Move move in moves)
-        //{
-        //    Collider2D pieceOnSquare = Board.FindPieceOnSquare(move.Square);
+        // Loops through all legal moves and highlights them
+        foreach (Move move in legalMoves)
+        {
+            Piece pieceOnSquare = board.FindPieceOnSquare(move.EndSquare);
 
-        //    // Highlight differently if there's a takeable enemy piece
-        //    if (Board.FindPieceOnSquare(move.Square) != null)
-        //    {
-        //        if (Board.IsEnemyPiece(GameController.playerTurn, pieceOnSquare.gameObject))
-        //            Instantiate(takeablePieceHighlight, move.Square.Location, circleHighlight.transform.rotation);
-        //    }
-        //    else
-        //        Instantiate(circleHighlight, move.Square.Location, circleHighlight.transform.rotation);
-        //}
+            if (pieceOnSquare == null)
+            {
+                Instantiate(circleHighlight, move.EndSquare.ScreenPosition, circleHighlight.transform.rotation);
+            }
+
+            // Highlight differently if there's a takeable enemy piece
+            else if (board.IsEnemyPiece(pieceOnSquare))
+            {
+                Instantiate(takeablePieceHighlight, move.EndSquare.ScreenPosition, circleHighlight.transform.rotation);
+            }
+        }
     }
 
     public void OnEnable()
@@ -75,8 +77,9 @@ public class PlayerController : MonoBehaviour
 
         if (GameObject.FindGameObjectWithTag("Highlight") == null)
         {
-            HighLightSquare(new Square(piece.transform.position));
-            //HightLightLegalMoves(board.GetLegalMoves());
+            Square square = new Square(piece.transform.position);
+            HighLightSquare(square);
+            HightLightLegalMoves(board.FindLegalMoves(square));
         }
     }
 

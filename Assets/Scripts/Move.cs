@@ -19,4 +19,9 @@ public class Move
     {
         (StartSquare, EndSquare) = (new Square(startSquare), new Square(endSquare));
     }
+
+    public override string ToString()
+    {
+        return StartSquare.ToString() + EndSquare.ToString();
+    }
 }

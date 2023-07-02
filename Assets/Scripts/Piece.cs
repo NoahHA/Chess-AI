@@ -7,7 +7,6 @@ using UnityEngine;
 /// </summary>
 public enum PieceType
 {
-    None, // Default value
     Pawn,
     Knight,
     Bishop,
@@ -21,7 +20,6 @@ public enum PieceType
 /// </summary>
 public enum PieceColour
 {
-    None, // Default value
     White,
     Black
 }
@@ -29,7 +27,7 @@ public enum PieceColour
 /// <summary>
 /// Represents a Chess piece.
 /// </summary>
-public struct Piece
+public class Piece
 {
     public PieceType Type;
     public PieceColour Colour;
@@ -56,19 +54,11 @@ public struct Piece
             { PieceType.King, 'k' },
         };
 
-    public Piece(PieceType type = PieceType.None, PieceColour colour = PieceColour.None)
+    public Piece(PieceType type, PieceColour colour)
     {
         (Type, Colour, Letter) = (type, colour, '1');
 
-        if (type != PieceType.None)
-        {
-            Letter = LetterDict[type];
-
-            if (Colour == PieceColour.Black)
-            {
-                Letter = Char.ToUpper(Letter);
-            }
-        }
+        Letter = (Colour == PieceColour.Black) ? Char.ToUpper(LetterDict[type]) : LetterDict[type];
     }
 
     public string GetPrefabName()
@@ -84,26 +74,46 @@ public struct Piece
     /// <exception cref="ArgumentException"></exception>
     public Piece(char letter)
     {
-        (Type, Colour, Letter) = (PieceType.Pawn, PieceColour.None, letter);
+        (Type, Colour, Letter) = (PieceType.Pawn, PieceColour.White, letter);
 
         if (!PieceDict.ContainsKey(Char.ToLower(letter)))
             throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
 
-        (Type, Colour) = (PieceDict[Char.ToLower(letter)], PieceColour.White);
+        Type = PieceDict[Char.ToLower(letter)];
+        Colour = Char.IsUpper(letter) ? PieceColour.Black : PieceColour.White;
+    }
 
-        if (Char.IsUpper(letter))
+    public override bool Equals(object obj)
+    {
+        //Check for null and compare run-time types.
+        if ((obj == null) || !this.GetType().Equals(obj.GetType()))
         {
-            Colour = PieceColour.Black;
+            return false;
         }
+        else
+        {
+            Piece piece = (Piece)obj;
+            return (Colour, Type) == (piece?.Colour, piece?.Type);
+        }
+    }
+
+    public static bool operator ==(Piece obj1, Piece obj2)
+    {
+        return (obj1?.Colour, obj1?.Type) == (obj2?.Colour, obj2?.Type);
+    }
+
+    public static bool operator !=(Piece obj1, Piece obj2)
+    {
+        return (obj1?.Colour, obj1?.Type) != (obj2?.Colour, obj2?.Type);
+    }
+
+    public override int GetHashCode()
+    {
+        return Colour.GetHashCode() ^ Type.GetHashCode();
     }
 
     public override string ToString()
     {
-        if (Type == PieceType.None || Colour == PieceColour.None)
-        {
-            return "Empty Square";
-        }
-
         return Colour.ToString() + " " + Type.ToString();
     }
 }
