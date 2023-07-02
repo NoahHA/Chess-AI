@@ -194,7 +194,7 @@ public class Board
                 return FindLegalPawnMoves(square);
 
             case PieceType.Knight:
-                return FindLegalPawnMoves(square);
+                return FindLegalKnightMoves(square);
 
             case PieceType.Bishop:
                 return FindLegalPawnMoves(square);
@@ -225,7 +225,7 @@ public class Board
 
     public bool IsEnemyPiece(Piece piece)
     {
-        return piece.Colour == Turn ? false : true;
+        return piece.Colour != Turn;
     }
 
     private List<Move> FindLegalPawnMoves(Square startSquare)
@@ -242,7 +242,7 @@ public class Board
         int maxMoves = ((startSquare.Row == 2 && direction == 1) || (startSquare.Row == 7 && direction == -1)) ? 2 : 1;
 
         // Checks for forward moves
-        for (int i = 1; i < maxMoves + 1; i++)
+        for (int i = 1; i <= maxMoves; i++)
         {
             // Prevents invalid moves
             if (!Square.IsValidSquare(startSquare.Col, startSquare.Row + i * direction))
@@ -263,7 +263,7 @@ public class Board
         }
 
         // Checks for diagonal moves
-        for (int j = -1; j < 2; j += 2)
+        for (int j = -1; j <= 1; j += 2)
         {
             // Prevents invalid moves
             if (!Square.IsValidSquare(startSquare.Col + j, startSquare.Row + direction))
@@ -290,9 +290,9 @@ public class Board
         List<Move> moves = new();
         bool isBlocked = false;
 
-        for (int rowDir = -1; rowDir < 2; rowDir++)
+        for (int rowDir = -1; rowDir <= 1; rowDir++)
         {
-            for (int colDir = -1; colDir < 2; colDir++)
+            for (int colDir = -1; colDir <= 1; colDir++)
             {
                 for (int i = 1; i < 8; i++)
                 {
@@ -331,6 +331,40 @@ public class Board
             }
         }
         return moves;
+    }
+
+    private List<Move> FindLegalKnightMoves(Square startSquare)
+    {
+        List<Move> knightMoves = new();
+
+        for (int i = -2; i <= 2; i += 4)
+        {
+            for (int j = -1; j <= 1; j += 2)
+            {
+                if (Square.IsValidSquare(startSquare.Col + j, startSquare.Row + i))
+                {
+                    var s1 = new Square(startSquare.Col + j, startSquare.Row + i);
+
+                    // If s1 is empty or occupied by an enemy piece
+                    if (FindPieceOnSquare(s1) == null || IsEnemyPiece(FindPieceOnSquare(s1)))
+                    {
+                        knightMoves.Add(new Move(startSquare, s1));
+                    }
+                }
+
+                if (Square.IsValidSquare(startSquare.Col + i, startSquare.Row + j))
+                {
+                    var s2 = new Square(startSquare.Col + i, startSquare.Row + j);
+
+                    // If s2 is empty or occupied by an enemy piece
+                    if (FindPieceOnSquare(s2) == null || IsEnemyPiece(FindPieceOnSquare(s2)))
+                    {
+                        knightMoves.Add(new Move(startSquare, s2));
+                    }
+                }
+            }
+        }
+        return knightMoves;
     }
 
     public override int GetHashCode()
