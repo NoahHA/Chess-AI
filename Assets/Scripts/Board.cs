@@ -206,7 +206,7 @@ public class Board
                 return FindLegalPawnMoves(square);
 
             case PieceType.King:
-                return FindLegalPawnMoves(square);
+                return FindLegalKingMoves(square);
 
             default:
                 return null;
@@ -365,6 +365,32 @@ public class Board
             }
         }
         return knightMoves;
+    }
+
+    private List<Move> FindLegalKingMoves(Square startSquare)
+    {
+        List<Move> kingMoves = new();
+
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (!Square.IsValidSquare(startSquare.Col + j, startSquare.Row + i))
+                {
+                    continue;
+                }
+
+                var newSquare = new Square(startSquare.Col + j, startSquare.Row + i);
+                Piece newSquarePiece = FindPieceOnSquare(newSquare);
+
+                // If square is empty or is occupied by an enemy piece
+                if (newSquarePiece == null || IsEnemyPiece(newSquarePiece))
+                {
+                    kingMoves.Add(new Move(startSquare, newSquare));
+                }
+            }
+        }
+        return kingMoves;
     }
 
     public override int GetHashCode()
