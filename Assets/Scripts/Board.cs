@@ -32,6 +32,41 @@ public class Board
         _state[stateIndex] = piece;
     }
 
+    /// <summary>
+    /// Makes a move.
+    /// </summary>
+    /// <param name="move"></param>
+    /// <returns>The piece taken by the move, or null if no piece was taken.</returns>
+    /// <exception cref="InvalidOperationException">Indicates an invalid move.</exception>
+    public Piece MakeMove(Move move)
+    {
+        if (FindLegalMoves(move.StartSquare).Contains(move))
+        {
+            Piece piece = FindPieceOnSquare(move.StartSquare);
+            Piece takenPiece = _state[move.StartSquare.Index];
+            _state[move.StartSquare.Index] = null;
+            PlacePiece(piece, move.EndSquare);
+
+            return takenPiece;
+        }
+        else
+        {
+            throw new InvalidOperationException("Invalid Move.");
+        }
+    }
+
+    /// <summary>
+    /// Reverses a given move, returning any taken pieces to their original position.
+    /// </summary>
+    /// <param name="move">The move to undo.</param>
+    /// <param name="takenPiece">The piece that was taken, defaults to null.</param>
+    public void UndoMove(Move move, Piece takenPiece = null)
+    {
+        Piece piece = FindPieceOnSquare(move.EndSquare);
+        PlacePiece(piece, move.StartSquare);
+        PlacePiece(takenPiece, move.EndSquare);
+    }
+
     public static string GenerateFenFromState(Piece[] state)
     {
         int counter = 0;
@@ -175,18 +210,41 @@ public class Board
 
             if (piece != null)
             {
-                GameObject pieceGameObject = (GameObject)GameObject.Instantiate(
-                    Resources.Load("Pieces/" + piece.GetPrefabName()), position.ScreenPosition, Quaternion.identity
-                );
-
-                pieceGameObject.transform.parent = GameObject.Find("Board/Pieces").transform;
+                InstantiatePiece(piece, position);
             }
         }
     }
 
+    /// <summary>
+    /// Instantiates a piece prefab on a given square.
+    /// </summary>
+    /// <param name="piece">The piece to create.</param>
+    /// <param name="square">The square on which to create the piece.</param>
+    /// <returns>The created game object.</returns>
+    public GameObject InstantiatePiece(Piece piece, Square square)
+    {
+        GameObject pieceGameObject = (GameObject)GameObject.Instantiate(
+            Resources.Load("Pieces/" + piece.GetPrefabName()), square.ScreenPosition, Quaternion.identity
+        );
+
+        pieceGameObject.transform.parent = GameObject.Find("Board/Pieces").transform;
+
+        return pieceGameObject;
+    }
+
+    /// <summary>
+    /// Finds all legal moves for a given square.
+    /// </summary>
+    /// <param name="square"></param>
+    /// <returns>A list of moves.</returns>
     public List<Move> FindLegalMoves(Square square)
     {
         Piece piece = FindPieceOnSquare(square);
+
+        if (piece == null)
+        {
+            return null;
+        }
 
         switch (piece.Type)
         {
@@ -211,6 +269,27 @@ public class Board
             default:
                 return null;
         }
+    }
+
+    /// <summary>
+    /// Find every legal move available on the board for a given colour.
+    /// </summary>
+    /// <returns>A list of all legal moves.</returns>
+    public List<Move> FindAllLegalMoves()
+    {
+        List<Move> moves = new List<Move>();
+
+        for (int i = 0; i < 64; i++)
+        {
+            var square = new Square(i);
+
+            if (FindPieceOnSquare(square) != null)
+            {
+                moves.AddRange(FindLegalMoves(square));
+            }
+        }
+
+        return moves;
     }
 
     /// <summary>
@@ -444,6 +523,11 @@ public class Board
         moves.AddRange(FindLegalRookMoves(startSquare));
 
         return moves;
+    }
+
+    public void ChangeTurn()
+    {
+        Turn = (Turn == PieceColour.White) ? PieceColour.Black : PieceColour.White;
     }
 
     public override int GetHashCode()
