@@ -20,15 +20,28 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public Board Board = new Board(turn: PieceColour.White);
+    public Board MainBoard = new Board(turn: PieceColour.White);
 
     public void Start()
     {
-        Board.SetBoardToStartingPosition();
-        Board.UpdateScreenFromBoard();
+        MainBoard.SetBoardToStartingPosition();
+        MainBoard.UpdateScreenFromBoard();
     }
 
-    public void Update()
+    public void HandleMoveMade(Move move)
     {
+        MainBoard.MakeMove(move);
+        MainBoard.UpdateScreenFromBoard();
+        MainBoard.ChangeTurn();
+    }
+
+    private void OnEnable()
+    {
+        PlayerInputManager.onMoveMade += HandleMoveMade;
+    }
+
+    private void OnDisable()
+    {
+        PlayerInputManager.onMoveMade -= HandleMoveMade;
     }
 }

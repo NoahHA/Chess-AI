@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -7,7 +8,7 @@ public class ClickPiece : MonoBehaviour
     private PieceID pieceID;
     private Square curSquare;
     private SortingGroup rend;
-    private Square startingSquare;
+    private Square startSquare;
 
     public void Start()
     {
@@ -18,30 +19,30 @@ public class ClickPiece : MonoBehaviour
     public void OnMouseDown()
     {
         // Checks if the clicked piece is the right colour
-        if (GameController.Instance.Board.Turn == pieceID.Piece.Colour)
+        if (GameController.Instance.MainBoard.Turn == pieceID.Piece.Colour)
         {
             // Puts selected piece on top of all other pieces
             rend.sortingOrder++;
 
-            startingSquare = new Square(transform.position);
+            startSquare = new Square(transform.position);
 
             // Trigger a piece clicked event
-            PlayerController.onPieceClicked?.Invoke(gameObject);
+            PlayerInputManager.onPieceClicked?.Invoke(gameObject);
         }
     }
 
     public void OnMouseDrag()
     {
         // Checks if the clicked piece is the right colour
-        if (GameController.Instance.Board.Turn == pieceID.Piece.Colour)
+        if (GameController.Instance.MainBoard.Turn == pieceID.Piece.Colour)
         {
             SnapPieceToSquare(gameObject);
 
             // If piece has moved to a new square
-            if (transform.position != startingSquare.ScreenPosition)
+            if (transform.position != startSquare.ScreenPosition)
             {
                 // Trigger a piece dragged event
-                PlayerController.onPieceMoved?.Invoke(gameObject);
+                PlayerInputManager.onPieceMoved?.Invoke(gameObject);
             }
         }
     }
@@ -49,13 +50,17 @@ public class ClickPiece : MonoBehaviour
     public void OnMouseUp()
     {
         // Checks if the clicked piece is the right colour
-        if (GameController.Instance.Board.Turn == pieceID.Piece.Colour)
+        if (GameController.Instance.MainBoard.Turn == pieceID.Piece.Colour)
         {
             // Reset sorting order
             rend.sortingOrder = 0;
 
-            // Trigger a piece placed event
-            PlayerController.onPiecePlaced?.Invoke(gameObject);
+            // If piece has moved to a new square
+            if (transform.position != startSquare.ScreenPosition)
+            {
+                // Trigger a piece placed event
+                PlayerInputManager.onPiecePlaced?.Invoke(gameObject);
+            }
         }
     }
 
@@ -63,9 +68,13 @@ public class ClickPiece : MonoBehaviour
     {
         // Finds the square the piece has been dragged to
         Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
-        curSquare = new Square(Camera.main.ScreenToWorldPoint(curScreenPoint));
+        try
+        {
+            curSquare = new Square(Camera.main.ScreenToWorldPoint(curScreenPoint));
 
-        // Snaps piece into the centre of the square
-        piece.transform.position = curSquare.ScreenPosition;
+            // Snaps piece into the centre of the square
+            piece.transform.position = curSquare.ScreenPosition;
+        }
+        catch (ArgumentOutOfRangeException) { }
     }
 }

@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// Handles player inputs.
 /// </summary>
-public class PlayerController : MonoBehaviour
+public class PlayerInputManager : MonoBehaviour
 {
     [Tooltip("Highlight for currently selected piece")]
     public GameObject tileHighlight;
@@ -15,7 +16,11 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Highlight for enemy pieces that can be taken")]
     public GameObject takeablePieceHighlight;
 
-    private Board board = new Board();
+    // The legal moves on click
+    private List<Move> legalMoves = new();
+
+    // The initial position of the clicked piece
+    private Square startSquare;
 
     public delegate void OnPieceClicked(GameObject piece);
     public static OnPieceClicked onPieceClicked;
@@ -25,6 +30,9 @@ public class PlayerController : MonoBehaviour
 
     public delegate void OnPiecePlaced(GameObject piece);
     public static OnPieceClicked onPiecePlaced;
+
+    public delegate void OnMoveMade(Move move);
+    public static OnMoveMade onMoveMade;
 
     /// <summary>
     /// Highlights the square the player has clicked on.
@@ -43,7 +51,7 @@ public class PlayerController : MonoBehaviour
         // Loops through all legal moves and highlights them
         foreach (Move move in legalMoves)
         {
-            Piece pieceOnSquare = board.FindPieceOnSquare(move.EndSquare);
+            Piece pieceOnSquare = GameController.Instance.MainBoard.FindPieceOnSquare(move.EndSquare);
 
             if (pieceOnSquare == null)
             {
@@ -51,7 +59,7 @@ public class PlayerController : MonoBehaviour
             }
 
             // Highlight differently if there's a takeable enemy piece
-            else if (board.IsEnemyPiece(pieceOnSquare))
+            else if (GameController.Instance.MainBoard.IsEnemyPiece(pieceOnSquare))
             {
                 Instantiate(takeablePieceHighlight, move.EndSquare.ScreenPosition, circleHighlight.transform.rotation);
             }
@@ -62,25 +70,48 @@ public class PlayerController : MonoBehaviour
     {
         onPieceClicked += HandlePieceClick;
         onPieceMoved += HandlePieceMoved;
+        onPiecePlaced += HandlePiecePlaced;
     }
 
     public void OnDisable()
     {
         onPieceClicked -= HandlePieceClick;
         onPieceMoved -= HandlePieceMoved;
+        onPiecePlaced -= HandlePiecePlaced;
     }
 
     public void HandlePieceClick(GameObject piece)
     {
         BoardHelper.ClearTiles();
-        board.UpdateBoardFromScreen();
 
         if (GameObject.FindGameObjectWithTag("Highlight") == null)
         {
-            Square square = new Square(piece.transform.position);
-            HighLightSquare(square);
-            HightLightLegalMoves(board.FindLegalMoves(square));
+            startSquare = new Square(piece.transform.position);
+            legalMoves = GameController.Instance.MainBoard.FindLegalMoves(startSquare);
+            HighLightSquare(startSquare);
+            HightLightLegalMoves(legalMoves);
         }
+    }
+
+    public void HandlePiecePlaced(GameObject piece)
+    {
+        // Make sure move is valid
+        try
+        {
+            var endSquare = new Square(piece.transform.position);
+            var moveMade = new Move(startSquare, endSquare);
+
+            // Reset the piece if move was not legal
+            if (!legalMoves.Contains(moveMade))
+            {
+                piece.transform.position = startSquare.ScreenPosition;
+            }
+            else
+            {
+                onMoveMade?.Invoke(moveMade);
+            }
+        }
+        catch (ArgumentOutOfRangeException) { }
     }
 
     public void HandlePieceMoved(GameObject piece)
