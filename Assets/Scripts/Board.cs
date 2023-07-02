@@ -197,7 +197,7 @@ public class Board
                 return FindLegalKnightMoves(square);
 
             case PieceType.Bishop:
-                return FindLegalPawnMoves(square);
+                return FindLegalBishopMoves(square);
 
             case PieceType.Rook:
                 return FindLegalRookMoves(square);
@@ -391,6 +391,51 @@ public class Board
             }
         }
         return kingMoves;
+    }
+
+    private List<Move> FindLegalBishopMoves(Square startSquare)
+    {
+        List<Move> moves = new();
+        bool isBlocked = false;
+
+        for (int rowDir = -1; rowDir <= 1; rowDir += 2)
+        {
+            for (int colDir = -1; colDir <= 1; colDir += 2)
+            {
+                for (int i = 1; i < 8; i++)
+                {
+                    if (!Square.IsValidSquare(startSquare.Col + (i * colDir), startSquare.Row + (i * rowDir)))
+                    {
+                        continue;
+                    }
+
+                    var newSquare = new Square(startSquare.Col + (i * colDir), startSquare.Row + (i * rowDir));
+
+                    if (!isBlocked)
+                    {
+                        // If square is empty
+                        if (FindPieceOnSquare(newSquare) == null)
+                        {
+                            moves.Add(new Move(startSquare, newSquare));
+                        }
+
+                        // If square is occupied by piece
+                        else
+                        {
+                            // If square is occupied by an enemy piece
+                            if (IsEnemyPiece(FindPieceOnSquare(newSquare)))
+                            {
+                                moves.Add(new Move(startSquare, newSquare));
+                            }
+
+                            isBlocked = true;
+                        }
+                    }
+                }
+                isBlocked = false;
+            }
+        }
+        return moves;
     }
 
     public override int GetHashCode()
