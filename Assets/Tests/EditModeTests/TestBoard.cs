@@ -8,16 +8,14 @@ namespace Tests.EditModeTests
         [Test]
         public void TestGenerateEmptyBoard()
         {
-            string Fen = "8/8/8/8/8/8/8/8";
+            string Fen = "8/8/8/8/8/8/8/8 w KQkq -";
             Assert.AreEqual(new Board(), new Board(fen: Fen));
         }
 
         [Test]
         public void TestGenerateSimplePosition()
         {
-            string Fen = "8/p7/8/8/8/7P/8/8";
-
-            var board = new Board(fen: Fen);
+            var board = new Board("8/p7/8/8/8/7P/8/8 w KQkq -");
 
             var expectedBoard = new Board();
             expectedBoard.PlacePiece(new Piece('p'), new Square("a2"));
@@ -29,7 +27,7 @@ namespace Tests.EditModeTests
         [Test]
         public void TestSetBoardToStartingPosition()
         {
-            string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+            string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
             var board = new Board(fen: Fen);
 
             var expectedBoard = new Board();
@@ -40,7 +38,7 @@ namespace Tests.EditModeTests
         [Test]
         public void TestGenerateBoardFenTooLong()
         {
-            string Fen = "8/8/8/8/9/8/8/8";
+            string Fen = "8/8/8/8/9/8/8/8 w KQkq -";
 
             Assert.Throws<ArgumentException>(() => new Board(fen: Fen));
         }
@@ -48,7 +46,7 @@ namespace Tests.EditModeTests
         [Test]
         public void TestGenerateBoardInvalidFen()
         {
-            string Fen = "8/7T/8/8/8/8/8/8";
+            string Fen = "8/7T/8/8/8/8/8/8 w KQkq -";
 
             Assert.Throws<ArgumentException>(() => new Board(fen: Fen));
         }
@@ -56,11 +54,12 @@ namespace Tests.EditModeTests
         [Test]
         public void TestBoardValueEquality()
         {
-            string Fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+            string whiteFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
+            string blackFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq -";
 
-            var boardState1 = new Board(PieceColour.Black, Fen);
-            var boardState2 = new Board(PieceColour.Black, Fen);
-            var boardState3 = new Board(PieceColour.White, Fen);
+            var boardState1 = new Board(blackFen);
+            var boardState2 = new Board(blackFen);
+            var boardState3 = new Board(whiteFen);
 
             Assert.AreEqual(boardState1, boardState2);
             Assert.AreNotEqual(boardState1, boardState3);
@@ -80,8 +79,8 @@ namespace Tests.EditModeTests
         public void TestMakeValidPawnMove(PieceColour colour, string startSquare, string endSquare)
         {
             var board = new Board();
-            board.Turn = colour;
             board.SetBoardToStartingPosition();
+            board.Turn = colour;
             board.MakeMove(new Move(startSquare, endSquare));
 
             Assert.IsNull(board.FindPieceOnSquare(new Square(startSquare)));
@@ -95,25 +94,49 @@ namespace Tests.EditModeTests
         [TestCase(PieceColour.Black, "d7", "d8")] // Backwards move
         public void TestMakeInvalidPawnMove(PieceColour colour, string startSquare, string endSquare)
         {
-            var board = new Board(turn: colour);
+            var board = new Board();
             board.SetBoardToStartingPosition();
-
-            Assert.Throws<InvalidOperationException>(() => board.MakeMove(new Move(startSquare, endSquare)));
+            board.Turn = colour;
+            Assert.IsFalse(board.IsLegalMove(new Move(startSquare, endSquare)));
         }
 
         [Test]
-        [TestCase("a1", "b3")] // →↑↑
-        [TestCase("f3", "e5")] // ←↑↑
-        [TestCase("d4", "c2")] // ←↓↓
-        [TestCase("g3", "h1")] // →↓↓
-        [TestCase("a1", "c2")] // →→↑
-        [TestCase("e5", "g4")] // →→↓
-        [TestCase("e1", "c2")] // ←←↑
-        [TestCase("e5", "c4")] // ←←↓
-        public void TestMakeValidKnightMove(string startSquare, string endSquare)
+        [TestCase(PieceType.Knight, "a1", "b3")] // →↑↑
+        [TestCase(PieceType.Knight, "f3", "e5")] // ←↑↑
+        [TestCase(PieceType.Knight, "d4", "c2")] // ←↓↓
+        [TestCase(PieceType.Knight, "g3", "h1")] // →↓↓
+        [TestCase(PieceType.Knight, "a1", "c2")] // →→↑
+        [TestCase(PieceType.Knight, "e5", "g4")] // →→↓
+        [TestCase(PieceType.Knight, "e1", "c2")] // ←←↑
+        [TestCase(PieceType.Knight, "e5", "c4")] // ←←↓
+        [TestCase(PieceType.Bishop, "a1", "h8")] // ↗
+        [TestCase(PieceType.Bishop, "e4", "g2")] // ↘
+        [TestCase(PieceType.Bishop, "h6", "c1")] // ↙
+        [TestCase(PieceType.Bishop, "d1", "b3")] // ↖
+        [TestCase(PieceType.Rook, "a1", "h1")] // →
+        [TestCase(PieceType.Rook, "b3", "b8")] // ↑
+        [TestCase(PieceType.Rook, "g6", "d6")] // ←
+        [TestCase(PieceType.Rook, "c5", "c2")] // ↓
+        [TestCase(PieceType.Queen, "a1", "h1")] // →
+        [TestCase(PieceType.Queen, "b3", "b8")] // ↑
+        [TestCase(PieceType.Queen, "g6", "d6")] // ←
+        [TestCase(PieceType.Queen, "c5", "c2")] // ↓
+        [TestCase(PieceType.Queen, "a1", "h8")] // ↗
+        [TestCase(PieceType.Queen, "e4", "g2")] // ↘
+        [TestCase(PieceType.Queen, "h6", "c1")] // ↙
+        [TestCase(PieceType.Queen, "d1", "b3")] // ↖
+        [TestCase(PieceType.King, "a1", "b1")] // →
+        [TestCase(PieceType.King, "b3", "b4")] // ↑
+        [TestCase(PieceType.King, "g6", "f6")] // ←
+        [TestCase(PieceType.King, "c5", "c4")] // ↓
+        [TestCase(PieceType.King, "a1", "b2")] // ↗
+        [TestCase(PieceType.King, "e4", "f3")] // ↘
+        [TestCase(PieceType.King, "d2", "c1")] // ↙
+        [TestCase(PieceType.King, "d1", "c2")] // ↖
+        public void TestMakeValidNonPawnMove(PieceType type, string startSquare, string endSquare)
         {
             var board = new Board();
-            var piece = new Piece(PieceType.Knight, board.Turn);
+            var piece = new Piece(type, board.Turn);
 
             board.PlacePiece(piece, new Square(startSquare));
             board.MakeMove(new Move(startSquare, endSquare));
@@ -123,143 +146,27 @@ namespace Tests.EditModeTests
         }
 
         [Test]
-        [TestCase("a1", "b4")] // →↑↑↑
-        [TestCase("f3", "e4")] // ←↑
-        [TestCase("d4", "c1")] // ←↓↓↓
-        [TestCase("g3", "h2")] // →↓
-        public void TestMakeInvalidKnightMove(string startSquare, string endSquare)
+        [TestCase(PieceType.Knight, "a1", "b4")] // →↑↑↑
+        [TestCase(PieceType.Knight, "f3", "e4")] // ←↑
+        [TestCase(PieceType.Knight, "d4", "c1")] // ←↓↓↓
+        [TestCase(PieceType.Knight, "g3", "h2")] // →↓
+        [TestCase(PieceType.Bishop, "a2", "h8")]
+        [TestCase(PieceType.Bishop, "e4", "h2")]
+        [TestCase(PieceType.Rook, "a1", "b2")]
+        [TestCase(PieceType.Rook, "e7", "g3")]
+        [TestCase(PieceType.Queen, "e7", "g3")]
+        [TestCase(PieceType.Queen, "a2", "h8")]
+        [TestCase(PieceType.Queen, "e4", "h2")]
+        [TestCase(PieceType.King, "e7", "g3")]
+        [TestCase(PieceType.King, "a2", "h8")]
+        [TestCase(PieceType.King, "e4", "h2")]
+        public void TestMakeInvalidNonPawnMove(PieceType type, string startSquare, string endSquare)
         {
             var board = new Board();
-            var piece = new Piece(PieceType.Knight, board.Turn);
+            var piece = new Piece(type, board.Turn);
 
             board.PlacePiece(piece, new Square(startSquare));
-            Assert.Throws<InvalidOperationException>(() => board.MakeMove(new Move(startSquare, endSquare)));
-        }
-
-        [Test]
-        [TestCase("a1", "h8")] // ↗
-        [TestCase("e4", "g2")] // ↘
-        [TestCase("h6", "c1")] // ↙
-        [TestCase("d1", "b3")] // ↖
-        public void TestMakeValidBishopMove(string startSquare, string endSquare)
-        {
-            var board = new Board();
-            var piece = new Piece(PieceType.Bishop, board.Turn);
-
-            board.PlacePiece(piece, new Square(startSquare));
-            board.MakeMove(new Move(startSquare, endSquare));
-
-            Assert.IsNull(board.FindPieceOnSquare(new Square(startSquare)));
-            Assert.AreEqual(board.FindPieceOnSquare(new Square(endSquare)), piece);
-        }
-
-        [Test]
-        [TestCase("a2", "h8")]
-        [TestCase("e4", "h2")]
-        public void TestMakeInvalidBishopMove(string startSquare, string endSquare)
-        {
-            var board = new Board();
-            var piece = new Piece(PieceType.Bishop, board.Turn);
-
-            board.PlacePiece(piece, new Square(startSquare));
-            Assert.Throws<InvalidOperationException>(() => board.MakeMove(new Move(startSquare, endSquare)));
-        }
-
-        [Test]
-        [TestCase("a1", "h1")] // →
-        [TestCase("b3", "b8")] // ↑
-        [TestCase("g6", "d6")] // ←
-        [TestCase("c5", "c2")] // ↓
-        public void TestMakeValidRookMove(string startSquare, string endSquare)
-        {
-            var board = new Board();
-            var piece = new Piece(PieceType.Rook, board.Turn);
-
-            board.PlacePiece(piece, new Square(startSquare));
-            board.MakeMove(new Move(startSquare, endSquare));
-
-            Assert.IsNull(board.FindPieceOnSquare(new Square(startSquare)));
-            Assert.AreEqual(board.FindPieceOnSquare(new Square(endSquare)), piece);
-        }
-
-        [Test]
-        [TestCase("a1", "b2")]
-        [TestCase("e7", "g3")]
-        public void TestMakeInvalidRookMove(string startSquare, string endSquare)
-        {
-            var board = new Board();
-            var piece = new Piece(PieceType.Rook, board.Turn);
-
-            board.PlacePiece(piece, new Square(startSquare));
-            Assert.Throws<InvalidOperationException>(() => board.MakeMove(new Move(startSquare, endSquare)));
-        }
-
-        [Test]
-        [TestCase("a1", "h1")] // →
-        [TestCase("b3", "b8")] // ↑
-        [TestCase("g6", "d6")] // ←
-        [TestCase("c5", "c2")] // ↓
-        [TestCase("a1", "h8")] // ↗
-        [TestCase("e4", "g2")] // ↘
-        [TestCase("h6", "c1")] // ↙
-        [TestCase("d1", "b3")] // ↖
-        public void TestMakeValidQueenMove(string startSquare, string endSquare)
-        {
-            var board = new Board();
-            var piece = new Piece(PieceType.Queen, board.Turn);
-
-            board.PlacePiece(piece, new Square(startSquare));
-            board.MakeMove(new Move(startSquare, endSquare));
-
-            Assert.IsNull(board.FindPieceOnSquare(new Square(startSquare)));
-            Assert.AreEqual(board.FindPieceOnSquare(new Square(endSquare)), piece);
-        }
-
-        [Test]
-        [TestCase("e7", "g3")]
-        [TestCase("a2", "h8")]
-        [TestCase("e4", "h2")]
-        public void TestMakeInvalidQueenMove(string startSquare, string endSquare)
-        {
-            var board = new Board();
-            var piece = new Piece(PieceType.Queen, board.Turn);
-
-            board.PlacePiece(piece, new Square(startSquare));
-            Assert.Throws<InvalidOperationException>(() => board.MakeMove(new Move(startSquare, endSquare)));
-        }
-
-        [Test]
-        [TestCase("a1", "b1")] // →
-        [TestCase("b3", "b4")] // ↑
-        [TestCase("g6", "f6")] // ←
-        [TestCase("c5", "c4")] // ↓
-        [TestCase("a1", "b2")] // ↗
-        [TestCase("e4", "f3")] // ↘
-        [TestCase("d2", "c1")] // ↙
-        [TestCase("d1", "c2")] // ↖
-        public void TestMakeValidKingMove(string startSquare, string endSquare)
-        {
-            var board = new Board();
-            var piece = new Piece(PieceType.King, board.Turn);
-
-            board.PlacePiece(piece, new Square(startSquare));
-            board.MakeMove(new Move(startSquare, endSquare));
-
-            Assert.IsNull(board.FindPieceOnSquare(new Square(startSquare)));
-            Assert.AreEqual(board.FindPieceOnSquare(new Square(endSquare)), piece);
-        }
-
-        [Test]
-        [TestCase("e7", "g3")]
-        [TestCase("a2", "h8")]
-        [TestCase("e4", "h2")]
-        public void TestMakeInvalidKingMove(string startSquare, string endSquare)
-        {
-            var board = new Board();
-            var piece = new Piece(PieceType.King, board.Turn);
-
-            board.PlacePiece(piece, new Square(startSquare));
-            Assert.Throws<InvalidOperationException>(() => board.MakeMove(new Move(startSquare, endSquare)));
+            Assert.IsFalse(board.IsLegalMove(new Move(startSquare, endSquare)));
         }
     }
 }
