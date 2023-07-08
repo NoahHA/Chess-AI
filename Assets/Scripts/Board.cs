@@ -23,7 +23,7 @@ public class Board
     public string FEN
     {
         get => _fen;
-        set { _fen = value; _state = GenerateStateFromFen(value); }
+        set { _fen = value; _state = GenerateStateFromFen(value); _turn = GenerateTurnFromFen(value); }
     }
 
     [Tooltip("An enum representing who's turn it is currently.")]
@@ -65,6 +65,7 @@ public class Board
     {
         State[position.Index] = piece;
         FEN = GenerateFenFromState(State);
+        Turn = GenerateTurnFromFen(FEN);
     }
 
     /// <summary>
@@ -135,6 +136,11 @@ public class Board
         Piece piece = FindPieceOnSquare(move.EndSquare);
         PlacePiece(piece, move.StartSquare);
         PlacePiece(takenPiece, move.EndSquare);
+    }
+
+    public PieceColour GenerateTurnFromFen(string Fen)
+    {
+        return (FEN[Fen.IndexOf(' ') + 1] == 'w') ? PieceColour.White : PieceColour.Black;
     }
 
     public string GenerateFenFromState(Piece[] state)
