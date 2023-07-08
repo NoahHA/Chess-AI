@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// Defines the state of a board, including the positions of every piece and who's turn it is.
@@ -43,6 +43,36 @@ public class Board
     }
 
     /// <summary>
+    /// Finds whether or not the player is in check.
+    /// </summary>
+    public bool IsInCheck()
+    {
+        var opponentBoard = new Board(Turn, FEN);
+        opponentBoard.ChangeTurn();
+        List<Move> opponentMoves = opponentBoard.FindAllMoves();
+        Square kingPosition = FindKing();
+
+        // Find any opponent move that will take the player's king
+        return opponentMoves.Any(move => move.EndSquare == kingPosition);
+    }
+
+    /// <summary>
+    /// Finds the square your king is in.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    private Square FindKing()
+    {
+        for (int i = 0; i <= 63; i++)
+        {
+            if (_state[i]?.Type == PieceType.King && _state[i]?.Colour == Turn)
+            {
+                return new Square(i);
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Makes a move.
     /// </summary>
     /// <param name="move"></param>
@@ -52,17 +82,27 @@ public class Board
     {
         if (IsLegalMove(move))
         {
-            Piece piece = FindPieceOnSquare(move.StartSquare);
-            Piece takenPiece = _state[move.StartSquare.Index];
-            _state[move.StartSquare.Index] = null;
-            PlacePiece(piece, move.EndSquare);
-
-            return takenPiece;
+            return MakeUnsafeMove(move);
         }
         else
         {
             throw new InvalidOperationException("Invalid Move.");
         }
+    }
+
+    /// <summary>
+    /// Makes a move without first checking whether it's valid.
+    /// </summary>
+    /// <param name="move"></param>
+    /// <returns>The piece taken by the move, or null if no piece was taken.</returns>
+    public Piece MakeUnsafeMove(Move move)
+    {
+        Piece piece = FindPieceOnSquare(move.StartSquare);
+        Piece takenPiece = _state[move.StartSquare.Index];
+        _state[move.StartSquare.Index] = null;
+        PlacePiece(piece, move.EndSquare);
+
+        return takenPiece;
     }
 
     /// <summary>
@@ -200,46 +240,9 @@ public class Board
         }
     }
 
-    private void ClearBoard()
+    public void ClearBoard()
     {
         _state = new Piece[64];
-    }
-
-    /// <summary>
-    /// Updates the screen based on the given board state.
-    /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public void UpdateScreenFromBoard()
-    {
-        BoardHelper.ClearScreen();
-
-        for (int i = 0; i < 64; i++)
-        {
-            var position = new Square(i);
-            Piece piece = FindPieceOnSquare(position);
-
-            if (piece != null)
-            {
-                InstantiatePiece(piece, position);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Instantiates a piece prefab on a given square.
-    /// </summary>
-    /// <param name="piece">The piece to create.</param>
-    /// <param name="square">The square on which to create the piece.</param>
-    /// <returns>The created game object.</returns>
-    public GameObject InstantiatePiece(Piece piece, Square square)
-    {
-        GameObject pieceGameObject = (GameObject)GameObject.Instantiate(
-            Resources.Load("Pieces/" + piece.GetPrefabName()), square.ScreenPosition, Quaternion.identity
-        );
-
-        pieceGameObject.transform.parent = GameObject.Find("Board/Pieces").transform;
-
-        return pieceGameObject;
     }
 
     /// <summary>
@@ -249,6 +252,18 @@ public class Board
     /// <returns>A list of moves.</returns>
     public List<Move> FindLegalMoves(Square square)
     {
+        List<Move> moves = FindMoves(square);
+        FilterForChecks(moves);
+        return moves;
+    }
+
+    /// <summary>
+    /// Finds all moves for a given square, regardless of whether they put you in check.
+    /// </summary>
+    /// <param name="square"></param>
+    /// <returns>A list of moves.</returns>
+    public List<Move> FindMoves(Square square)
+    {
         Piece piece = FindPieceOnSquare(square);
 
         if (piece == null)
@@ -256,29 +271,16 @@ public class Board
             return null;
         }
 
-        switch (piece.Type)
+        return piece.Type switch
         {
-            case PieceType.Pawn:
-                return FindLegalPawnMoves(square);
-
-            case PieceType.Knight:
-                return FindLegalKnightMoves(square);
-
-            case PieceType.Bishop:
-                return FindLegalBishopMoves(square);
-
-            case PieceType.Rook:
-                return FindLegalRookMoves(square);
-
-            case PieceType.Queen:
-                return FindLegalQueenMoves(square);
-
-            case PieceType.King:
-                return FindLegalKingMoves(square);
-
-            default:
-                return null;
-        }
+            PieceType.Pawn => FindPawnMoves(square),
+            PieceType.Knight => FindKnightMoves(square),
+            PieceType.Bishop => FindBishopMoves(square),
+            PieceType.Rook => FindRookMoves(square),
+            PieceType.Queen => FindQueenMoves(square),
+            PieceType.King => FindKingMoves(square),
+            _ => null,
+        };
     }
 
     /// <summary>
@@ -287,15 +289,26 @@ public class Board
     /// <returns>A list of all legal moves.</returns>
     public List<Move> FindAllLegalMoves()
     {
+        List<Move> moves = FindAllMoves();
+        FilterForChecks(moves);
+        return moves;
+    }
+
+    /// <summary>
+    /// Find every move available on the board for a given colour, regardless of whether it puts them in check.
+    /// </summary>
+    /// <returns>A list of all moves.</returns>
+    public List<Move> FindAllMoves()
+    {
         List<Move> moves = new List<Move>();
 
         for (int i = 0; i < 64; i++)
         {
             var square = new Square(i);
 
-            if (FindPieceOnSquare(square) != null)
+            if (FindPieceOnSquare(square) != null && FindPieceOnSquare(square).Colour == Turn)
             {
-                moves.AddRange(FindLegalMoves(square));
+                moves.AddRange(FindMoves(square));
             }
         }
 
@@ -317,7 +330,28 @@ public class Board
         return piece.Colour != Turn;
     }
 
-    private List<Move> FindLegalPawnMoves(Square startSquare)
+    /// <summary>
+    /// Removes all moves that result in the player being in check.
+    /// </summary>
+    /// <param name="moves"></param>
+    private void FilterForChecks(List<Move> moves)
+    {
+        // Iterates through moves backwards so you can remove items
+        for (int i = moves.Count - 1; i >= 0; i--)
+        {
+            Move moveCopy = moves[i]; // Copy the move so you can undo after its deleted
+            MakeUnsafeMove(moves[i]);
+
+            if (IsInCheck())
+            {
+                moves.RemoveAt(i);
+            }
+
+            UndoMove(moveCopy);
+        }
+    }
+
+    private List<Move> FindPawnMoves(Square startSquare)
     {
         List<Move> moves = new();
 
@@ -373,7 +407,7 @@ public class Board
         return moves;
     }
 
-    private List<Move> FindLegalRookMoves(Square startSquare)
+    private List<Move> FindRookMoves(Square startSquare)
     {
         // loop over both directions, then loop from start col to
         List<Move> moves = new();
@@ -419,12 +453,13 @@ public class Board
                 isBlocked = false;
             }
         }
+
         return moves;
     }
 
-    private List<Move> FindLegalKnightMoves(Square startSquare)
+    private List<Move> FindKnightMoves(Square startSquare)
     {
-        List<Move> knightMoves = new();
+        List<Move> moves = new();
 
         for (int i = -2; i <= 2; i += 4)
         {
@@ -437,7 +472,7 @@ public class Board
                     // If s1 is empty or occupied by an enemy piece
                     if (FindPieceOnSquare(s1) == null || IsEnemyPiece(FindPieceOnSquare(s1)))
                     {
-                        knightMoves.Add(new Move(startSquare, s1));
+                        moves.Add(new Move(startSquare, s1));
                     }
                 }
 
@@ -448,17 +483,18 @@ public class Board
                     // If s2 is empty or occupied by an enemy piece
                     if (FindPieceOnSquare(s2) == null || IsEnemyPiece(FindPieceOnSquare(s2)))
                     {
-                        knightMoves.Add(new Move(startSquare, s2));
+                        moves.Add(new Move(startSquare, s2));
                     }
                 }
             }
         }
-        return knightMoves;
+
+        return moves;
     }
 
-    private List<Move> FindLegalKingMoves(Square startSquare)
+    private List<Move> FindKingMoves(Square startSquare)
     {
-        List<Move> kingMoves = new();
+        List<Move> moves = new();
 
         for (int i = -1; i <= 1; i++)
         {
@@ -475,14 +511,15 @@ public class Board
                 // If square is empty or is occupied by an enemy piece
                 if (newSquarePiece == null || IsEnemyPiece(newSquarePiece))
                 {
-                    kingMoves.Add(new Move(startSquare, newSquare));
+                    moves.Add(new Move(startSquare, newSquare));
                 }
             }
         }
-        return kingMoves;
+
+        return moves;
     }
 
-    private List<Move> FindLegalBishopMoves(Square startSquare)
+    private List<Move> FindBishopMoves(Square startSquare)
     {
         List<Move> moves = new();
         bool isBlocked = false;
@@ -524,13 +561,14 @@ public class Board
                 isBlocked = false;
             }
         }
+
         return moves;
     }
 
-    private List<Move> FindLegalQueenMoves(Square startSquare)
+    private List<Move> FindQueenMoves(Square startSquare)
     {
-        List<Move> moves = FindLegalBishopMoves(startSquare);
-        moves.AddRange(FindLegalRookMoves(startSquare));
+        List<Move> moves = FindBishopMoves(startSquare);
+        moves.AddRange(FindRookMoves(startSquare));
 
         return moves;
     }

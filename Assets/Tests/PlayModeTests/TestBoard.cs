@@ -20,7 +20,7 @@ namespace Tests.PlayModeTests
         {
             var board = new Board();
             board.PlacePiece(new Piece('p'), new Square("e2"));
-            board.UpdateScreenFromBoard();
+            BoardHelper.UpdateScreenFromBoard(board);
             Assert.IsNotEmpty(BoardHelper.GetPieces());
 
             BoardHelper.ClearScreen();
@@ -38,7 +38,7 @@ namespace Tests.PlayModeTests
             var board = new Board();
             board.PlacePiece(new Piece(pieceName), new Square(piecePosition));
 
-            board.UpdateScreenFromBoard();
+            BoardHelper.UpdateScreenFromBoard(board);
             yield return null;
 
             var expectedBoard = new Board();

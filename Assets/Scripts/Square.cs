@@ -90,4 +90,33 @@ public class Square
     {
         return col >= 1 && col <= 8 && row >= 1 && row <= 8;
     }
+
+    public override bool Equals(object obj)
+    {
+        //Check for null and compare run-time types.
+        if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+        {
+            return false;
+        }
+        else
+        {
+            Square square = (Square)obj;
+            return Name == square.Name;
+        }
+    }
+
+    public static bool operator ==(Square obj1, Square obj2)
+    {
+        return obj1.Name == obj2.Name;
+    }
+
+    public static bool operator !=(Square obj1, Square obj2)
+    {
+        return obj1.Name != obj2.Name;
+    }
+
+    public override int GetHashCode()
+    {
+        return Col.GetHashCode() ^ Row.GetHashCode();
+    }
 }

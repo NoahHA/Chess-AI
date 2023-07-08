@@ -25,13 +25,13 @@ public class GameController : MonoBehaviour
     public void Start()
     {
         MainBoard.SetBoardToStartingPosition();
-        MainBoard.UpdateScreenFromBoard();
+        BoardHelper.UpdateScreenFromBoard(MainBoard);
     }
 
     public void HandleMoveMade(Move move)
     {
         MainBoard.MakeMove(move);
-        MainBoard.UpdateScreenFromBoard();
+        BoardHelper.UpdateScreenFromBoard(MainBoard);
         MainBoard.ChangeTurn();
     }
 
