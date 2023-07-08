@@ -28,8 +28,7 @@ public class Board
 
     public void PlacePiece(Piece piece, Square position)
     {
-        int stateIndex = (position.Row - 1) * 8 + (position.Col - 1);
-        _state[stateIndex] = piece;
+        _state[position.Index] = piece;
     }
 
     /// <summary>
@@ -98,7 +97,7 @@ public class Board
     public Piece MakeUnsafeMove(Move move)
     {
         Piece piece = FindPieceOnSquare(move.StartSquare);
-        Piece takenPiece = _state[move.StartSquare.Index];
+        Piece takenPiece = _state[move.EndSquare.Index];
         _state[move.StartSquare.Index] = null;
         PlacePiece(piece, move.EndSquare);
 
@@ -109,8 +108,8 @@ public class Board
     /// Reverses a given move, returning any taken pieces to their original position.
     /// </summary>
     /// <param name="move">The move to undo.</param>
-    /// <param name="takenPiece">The piece that was taken, defaults to null.</param>
-    public void UndoMove(Move move, Piece takenPiece = null)
+    /// <param name="takenPiece">The piece that was taken (null if no piece was taken).</param>
+    public void UndoMove(Move move, Piece takenPiece)
     {
         Piece piece = FindPieceOnSquare(move.EndSquare);
         PlacePiece(piece, move.StartSquare);
@@ -339,15 +338,15 @@ public class Board
         // Iterates through moves backwards so you can remove items
         for (int i = moves.Count - 1; i >= 0; i--)
         {
-            Move moveCopy = moves[i]; // Copy the move so you can undo after its deleted
-            MakeUnsafeMove(moves[i]);
+            Move moveCopy = moves[i]; // Copy the move so you can undo after it's deleted
+            Piece takenPiece = MakeUnsafeMove(moves[i]);
 
             if (IsInCheck())
             {
                 moves.RemoveAt(i);
             }
 
-            UndoMove(moveCopy);
+            UndoMove(moveCopy, takenPiece);
         }
     }
 
