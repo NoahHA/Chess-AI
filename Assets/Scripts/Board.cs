@@ -16,38 +16,21 @@ public class Board
     public Piece[] State
     {
         get => _state;
-        private set { _state = value; _fen = GenerateFenFromState(value); }
+        private set { _state = value; _fen = GetFenFromState(value); }
     }
 
     // Always update the State when setting the FEN so state is always up to date
     public string FEN
     {
         get => _fen;
-        set { _fen = value; _state = GenerateStateFromFen(value); _turn = GenerateTurnFromFen(value); }
+        set { _fen = value; _state = value.GetStateFromFen(); _turn = value.GetTurnFromFen(); }
     }
 
     [Tooltip("An enum representing who's turn it is currently.")]
     public PieceColour Turn
     {
         get => _turn;
-
-        set
-        {
-            _turn = value;
-
-            if (value == PieceColour.White)
-            {
-                char[] charArrFen = _fen.ToCharArray();
-                charArrFen[_fen.IndexOf(' ') + 1] = 'w';
-                _fen = new string(charArrFen);
-            }
-            else
-            {
-                char[] charArrFen = _fen.ToCharArray();
-                charArrFen[_fen.IndexOf(' ') + 1] = 'b';
-                _fen = new string(charArrFen);
-            }
-        }
+        set { _turn = value; _fen.UpdateTurn(value); }
     }
 
     public Board(string fen = "8/8/8/8/8/8/8/8 w KQkq -")
@@ -64,8 +47,7 @@ public class Board
     public void PlacePiece(Piece piece, Square position)
     {
         State[position.Index] = piece;
-        FEN = GenerateFenFromState(State);
-        Turn = GenerateTurnFromFen(FEN);
+        FEN = GetFenFromState(State);
     }
 
     /// <summary>
@@ -112,18 +94,25 @@ public class Board
     }
 
     /// <summary>
-    /// Makes a move without first checking whether it's valid.
+    /// Makes a move (but does not check whether it's valid).
     /// </summary>
     /// <param name="move"></param>
     /// <returns>The piece taken by the move, or null if no piece was taken.</returns>
     public Piece MakeMove(Move move)
     {
-        Piece piece = FindPieceOnSquare(move.StartSquare);
-        Piece takenPiece = FindPieceOnSquare(move.EndSquare);
-        PlacePiece(null, move.StartSquare);
-        PlacePiece(piece, move.EndSquare);
+        if (!move.Castling)
+        {
+            Piece piece = FindPieceOnSquare(move.StartSquare);
+            Piece takenPiece = FindPieceOnSquare(move.EndSquare);
+            PlacePiece(null, move.StartSquare);
+            PlacePiece(piece, move.EndSquare);
 
-        return takenPiece;
+            return takenPiece;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -138,12 +127,7 @@ public class Board
         PlacePiece(takenPiece, move.EndSquare);
     }
 
-    public PieceColour GenerateTurnFromFen(string Fen)
-    {
-        return (FEN[Fen.IndexOf(' ') + 1] == 'w') ? PieceColour.White : PieceColour.Black;
-    }
-
-    public string GenerateFenFromState(Piece[] state)
+    public string GetFenFromState(Piece[] state)
     {
         int counter = 0;
         string tempFen = "";
@@ -195,44 +179,12 @@ public class Board
 
     public static bool operator ==(Board obj1, Board obj2)
     {
-        return (obj1.Turn, obj1.FEN) == (obj2.Turn, obj2.FEN);
+        return obj1.FEN == obj2.FEN;
     }
 
     public static bool operator !=(Board obj1, Board obj2)
     {
-        return !(obj1.Turn == obj2.Turn
-                    && obj1.FEN == obj2.FEN);
-    }
-
-    /// <summary>
-    /// Converts a chess FEN string to a board state.
-    /// </summary>
-    /// <param name="fen">FEN string</param>
-    public Piece[] GenerateStateFromFen(string fen)
-    {
-        int counter = 0;
-        Piece[] state = new Piece[64];
-        int spaceIndex = fen.IndexOf(' ');
-
-        foreach (char c in fen[0..spaceIndex])
-        {
-            if (char.IsDigit(c))
-            {
-                counter += (int)char.GetNumericValue(c);
-            }
-            else if (char.IsLetter(c))
-            {
-                state[counter] = new Piece(c);
-                counter++;
-            }
-        }
-
-        if (counter != 64)
-        {
-            throw new ArgumentException($"FEN string is incorrect length: should be 64 but was {counter}", nameof(FEN));
-        }
-
-        return state;
+        return obj1.FEN != obj2.FEN;
     }
 
     public void SetBoardToStartingPosition()
@@ -250,7 +202,7 @@ public class Board
         else
         {
             Board boardState = (Board)obj;
-            return (Turn, FEN) == (boardState.Turn, boardState.FEN);
+            return FEN == boardState.FEN;
         }
     }
 
@@ -546,80 +498,39 @@ public class Board
             }
         }
 
+        moves.AddRange(FindCastlingMoves());
+
         return moves;
     }
 
-    //private List<Move> GetCastlingMoves(Square startSquare)
-    //{
-    //    List<Move> moves = new();
-    //    Square kingPosition = FindKing();
-    //    var kingMoved = ;
+    private List<Move> FindCastlingMoves()
+    {
+        List<Move> moves = new();
+        Square kingPosition = FindKing();
 
-    //    // If the king has already moved, don't add any moves
-    //    if (kingMoved.hasMoved)
-    //        return moves;
+        // Contains all the squares on the king's row
+        List<Square> kingRow = new();
 
-    //    // If king is in the correct position
-    //    if (kingPosition.Col == 4 && ((turn && kingPosition.Row == 7) || (!turn && kingPosition.Row == 0)))
-    //    {
-    //        var closeCastlePosition = new Square(kingPosition.Row, kingPosition.Col + 3);
-    //        var farCastlePosition = new Square(kingPosition.Row, kingPosition.Col - 4);
+        // Populate kingRow
+        for (int i = 1; i <= 8; i++)
+        {
+            kingRow.Add(new Square(i, kingPosition.Row));
+        }
 
-    //        Collider2D closeCastlePiece = Board.FindPieceOnSquare(closeCastlePosition);
-    //        Collider2D farCastlePiece = Board.FindPieceOnSquare(farCastlePosition);
+        // If they can castle queen side (king and rook haven't moved and no pieces are between them)
+        if (FEN.CanCastle(Castling.QueenSide, Turn) && kingRow.GetRange(1, 3).All(s => FindPieceOnSquare(s) == null))
+        {
+            moves.Add(new Move(kingPosition, kingRow[1], castling: true));
+        }
 
-    //        // temporarily ignore piece for linecast
-    //        kingPiece.layer = LayerMask.NameToLayer("Ignore");
+        // If they can castle king side
+        if (FEN.CanCastle(Castling.KingSide, Turn) && kingRow.GetRange(4, 2).All(s => FindPieceOnSquare(s) == null))
+        {
+            moves.Add(new Move(kingPosition, kingRow[6], castling: true));
+        }
 
-    //        // If kingside castle is in its starting position
-    //        if (closeCastlePiece != null)
-    //        {
-    //            if (closeCastlePiece.gameObject.name.Contains("rook"))
-    //            {
-    //                bool closeCastleMoved = closeCastlePiece.gameObject.GetComponent<HasPieceMoved>().hasMoved;
-
-    //                // temporarily ignore piece for linecast
-    //                closeCastlePiece.gameObject.layer = LayerMask.NameToLayer("Ignore");
-
-    //                // If nothing between king and castle and castle hasn't moved
-    //                if (!closeCastleMoved && !Physics2D.Linecast(kingPosition.Location, closeCastlePiece.gameObject.transform.position, LayerMask.GetMask("Default")))
-    //                {
-    //                    var square = new ChessSquare(kingPosition.Row, kingPosition.Col + 2);
-    //                    moves.Add(new Move(piece, square));
-    //                }
-
-    //                // Unignore piece
-    //                closeCastlePiece.gameObject.layer = LayerMask.NameToLayer("Default");
-    //            }
-    //        }
-
-    //        // If queenside castle is in its starting position
-    //        if (farCastlePiece != null)
-    //        {
-    //            if (farCastlePiece.gameObject.name.Contains("rook"))
-    //            {
-    //                bool farCastleMoved = farCastlePiece.GetComponent<HasPieceMoved>().hasMoved;
-
-    //                // temporarily ignore piece for linecast
-    //                farCastlePiece.gameObject.layer = LayerMask.NameToLayer("Ignore");
-
-    //                // If nothing between king and castle and castle hasn't moved
-    //                if (!farCastleMoved && !Physics2D.Linecast(kingPosition.Location, farCastlePiece.gameObject.transform.position, LayerMask.GetMask("Default")))
-    //                {
-    //                    var square = new ChessSquare(kingPosition.Row, kingPosition.Col - 2);
-    //                    moves.Add(new Move(piece, square));
-    //                }
-
-    //                // Unignore piece
-    //                farCastlePiece.gameObject.layer = LayerMask.NameToLayer("Default");
-    //            }
-    //        }
-
-    //        // Unignore piece
-    //        kingPiece.layer = LayerMask.NameToLayer("Default");
-    //    }
-    //    return moves;
-    //}
+        return moves;
+    }
 
     private List<Move> FindBishopMoves(Square startSquare)
     {
