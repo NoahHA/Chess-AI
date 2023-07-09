@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
+/// Defines the types of castling.
+/// </summary>
+public enum Castling
+{
+    KingSide,
+    QueenSide
+}
+
+/// <summary>
 /// Represents a chess move.
 /// </summary>
 public class Move
@@ -10,14 +19,19 @@ public class Move
     public Square StartSquare;
     public Square EndSquare;
 
-    public Move(Square startSquare, Square endSquare)
+    /// <summary>
+    /// Whether the move is to castle.
+    /// </summary>
+    public bool Castling = false;
+
+    public Move(Square startSquare, Square endSquare, bool castling = false)
     {
-        (StartSquare, EndSquare) = (startSquare, endSquare);
+        (StartSquare, EndSquare, Castling) = (startSquare, endSquare, castling);
     }
 
-    public Move(string startSquare, string endSquare)
+    public Move(string startSquare, string endSquare, bool castling = false)
     {
-        (StartSquare, EndSquare) = (new Square(startSquare), new Square(endSquare));
+        (StartSquare, EndSquare, Castling) = (new Square(startSquare), new Square(endSquare), castling);
     }
 
     public override string ToString()
