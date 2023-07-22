@@ -510,15 +510,7 @@ public class Board
     {
         List<Move> moves = new();
         Square kingPosition = FindKing();
-
-        // Contains all the squares on the king's row
-        List<Square> kingRow = new();
-
-        // Populate kingRow
-        for (int i = 1; i <= 8; i++)
-        {
-            kingRow.Add(new Square(i, kingPosition.Row));
-        }
+        List<Square> kingRow = Enumerable.Range(1, 8).Select(i => new Square(i, kingPosition.Row)).ToList();
 
         // If they can castle queen side (king and rook haven't moved and no pieces are between them)
         if (FEN.CanCastle(Castling.QueenSide, Turn) && kingRow.GetRange(1, 3).All(s => FindPieceOnSquare(s) == null))

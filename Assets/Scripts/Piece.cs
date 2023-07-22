@@ -27,7 +27,7 @@ public enum PieceColour
 /// <summary>
 /// Represents a Chess piece.
 /// </summary>
-public class Piece
+public record Piece
 {
     public PieceType Type;
     public PieceColour Colour;
@@ -81,35 +81,6 @@ public class Piece
 
         Type = PieceDict[Char.ToLower(letter)];
         Colour = Char.IsUpper(letter) ? PieceColour.Black : PieceColour.White;
-    }
-
-    public override bool Equals(object obj)
-    {
-        //Check for null and compare run-time types.
-        if ((obj == null) || !this.GetType().Equals(obj.GetType()))
-        {
-            return false;
-        }
-        else
-        {
-            Piece piece = (Piece)obj;
-            return (Colour, Type) == (piece?.Colour, piece?.Type);
-        }
-    }
-
-    public static bool operator ==(Piece obj1, Piece obj2)
-    {
-        return (obj1?.Colour, obj1?.Type) == (obj2?.Colour, obj2?.Type);
-    }
-
-    public static bool operator !=(Piece obj1, Piece obj2)
-    {
-        return (obj1?.Colour, obj1?.Type) != (obj2?.Colour, obj2?.Type);
-    }
-
-    public override int GetHashCode()
-    {
-        return Colour.GetHashCode() ^ Type.GetHashCode();
     }
 
     public override string ToString()

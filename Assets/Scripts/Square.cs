@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 /// <summary>
 /// Represents a chess square.
 /// </summary>
-public class Square
+public record Square
 {
     private int _col;
     private int _row;
@@ -62,10 +62,10 @@ public class Square
         Row = (int)Math.Ceiling((index + 1) / 8f);
     }
 
-    public Square(String square)
+    public Square(String squareName)
     {
-        Col = (int)square[0] - 96;
-        Row = (int)Char.GetNumericValue(square[1]);
+        Col = (int)squareName[0] - 96;
+        Row = (int)Char.GetNumericValue(squareName[1]);
     }
 
     public Square(Vector3 screenPosition)
@@ -103,34 +103,5 @@ public class Square
         }
 
         return false;
-    }
-
-    public override bool Equals(object obj)
-    {
-        //Check for null and compare run-time types.
-        if ((obj == null) || !this.GetType().Equals(obj.GetType()))
-        {
-            return false;
-        }
-        else
-        {
-            Square square = (Square)obj;
-            return Name == square.Name;
-        }
-    }
-
-    public static bool operator ==(Square obj1, Square obj2)
-    {
-        return obj1.Name == obj2.Name;
-    }
-
-    public static bool operator !=(Square obj1, Square obj2)
-    {
-        return obj1.Name != obj2.Name;
-    }
-
-    public override int GetHashCode()
-    {
-        return Col.GetHashCode() ^ Row.GetHashCode();
     }
 }
