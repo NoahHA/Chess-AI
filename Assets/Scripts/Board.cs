@@ -100,19 +100,22 @@ public class Board
     /// <returns>The piece taken by the move, or null if no piece was taken.</returns>
     public Piece MakeMove(Move move)
     {
-        if (!move.Castling)
-        {
-            Piece piece = FindPieceOnSquare(move.StartSquare);
-            Piece takenPiece = FindPieceOnSquare(move.EndSquare);
-            PlacePiece(null, move.StartSquare);
-            PlacePiece(piece, move.EndSquare);
+        Piece piece = FindPieceOnSquare(move.StartSquare);
+        Piece takenPiece = FindPieceOnSquare(move.EndSquare);
+        PlacePiece(piece, move.EndSquare);
+        PlacePiece(null, move.StartSquare);
 
-            return takenPiece;
-        }
-        else
+        // If castling also move the castle
+        if (move.Castling)
         {
-            return null;
+            int castleCol = (move.StartSquare.Col > move.EndSquare.Col) ? 4 : 6;
+            Square castleSquare = new Square(castleCol, move.StartSquare.Row);
+            Piece castle = FindPieceOnSquare(castleSquare);
+            PlacePiece(castle, move.EndSquare);
+            PlacePiece(null, castleSquare);
         }
+
+        return takenPiece;
     }
 
     /// <summary>

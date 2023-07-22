@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Represents a chess square.
@@ -89,6 +90,19 @@ public class Square
     public static bool IsValidSquare(int col, int row)
     {
         return col >= 1 && col <= 8 && row >= 1 && row <= 8;
+    }
+
+    public bool IsHighlighted()
+    {
+        foreach (GameObject tile in BoardHelper.GetTiles())
+        {
+            if (new Square(tile.transform.position) == this)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public override bool Equals(object obj)

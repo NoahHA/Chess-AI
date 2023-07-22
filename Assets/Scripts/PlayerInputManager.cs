@@ -83,11 +83,12 @@ public class PlayerInputManager : MonoBehaviour
     public void HandlePieceClick(GameObject piece)
     {
         BoardHelper.ClearTiles();
+        startSquare = new Square(piece.transform.position);
+        legalMoves = GameController.Instance.MainBoard.FindLegalMoves(startSquare);
 
-        if (GameObject.FindGameObjectWithTag("Highlight") == null)
+        // Only highlight if the piece wasn't already highlighted
+        if (!startSquare.IsHighlighted())
         {
-            startSquare = new Square(piece.transform.position);
-            legalMoves = GameController.Instance.MainBoard.FindLegalMoves(startSquare);
             HighLightSquare(startSquare);
             HightLightLegalMoves(legalMoves);
         }
