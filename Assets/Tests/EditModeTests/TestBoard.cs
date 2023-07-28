@@ -168,5 +168,16 @@ namespace Tests.EditModeTests
             board.PlacePiece(piece, new Square(startSquare));
             Assert.IsFalse(board.IsLegalMove(new Move(startSquare, endSquare)));
         }
+
+        [TestCase("d1", "d7", true)]
+        [TestCase("d1", "d6", true)]
+        [TestCase("f1", "c6", true)]
+        public void TestIsInCheck(string startSquare, string endSquare, bool IsCheck)
+        {
+            var board = new Board();
+            board.SetBoardToStartingPosition();
+            board.MakeMove(new Move(startSquare, endSquare));
+            Assert.AreEqual(IsCheck, board.IsInCheck());
+        }
     }
 }
