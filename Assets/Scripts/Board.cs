@@ -1,3 +1,4 @@
+using Codice.CM.Client.Differences;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,14 +34,9 @@ public class Board
         set { _turn = value; _fen.UpdateTurn(value); }
     }
 
-    public Board(string fen = "8/8/8/8/8/8/8/8 w KQkq -")
+    public Board(string fen = "8/8/8/8/8/8/8/8 w KQkq -", PieceColour turn = PieceColour.White)
     {
         FEN = fen;
-    }
-
-    public Board(PieceColour turn)
-    {
-        FEN = "8/8/8/8/8/8/8/8 w KQkq -";
         Turn = turn;
     }
 
@@ -65,13 +61,12 @@ public class Board
     /// </summary>
     public bool IsInCheck()
     {
-        var opponentBoard = new Board(FEN);
+        var opponentBoard = new Board(FEN, Turn);
         opponentBoard.ChangeTurn();
-        List<Move> opponentMoves = opponentBoard.FindAllMoves();
         Square kingPosition = FindKing();
 
         // Find any opponent move that will take the player's king
-        return opponentMoves.Any(move => move.EndSquare == kingPosition);
+        return opponentBoard.FindAllMoves().Any(move => move.EndSquare == kingPosition);
     }
 
     /// <summary>
@@ -80,17 +75,11 @@ public class Board
     /// <exception cref="NotImplementedException"></exception>
     private Square FindKing()
     {
-        for (int i = 0; i <= 63; i++)
-        {
-            var square = new Square(i);
-            Piece pieceOnSquare = FindPieceOnSquare(square);
-
-            if (pieceOnSquare?.Type == PieceType.King && pieceOnSquare?.Colour == Turn)
-            {
-                return new Square(i);
-            }
-        }
-        return null;
+        return new Square(
+            Array.IndexOf(
+                _state, _state.FirstOrDefault(piece => piece?.Type == PieceType.King && piece?.Colour == Turn)
+            )
+        );
     }
 
     /// <summary>

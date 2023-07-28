@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using UnityEngine;
 
 namespace Tests.EditModeTests
 {
@@ -170,13 +171,15 @@ namespace Tests.EditModeTests
         }
 
         [TestCase("d1", "d7", true)]
-        [TestCase("d1", "d6", true)]
-        [TestCase("f1", "c6", true)]
+        [TestCase("d1", "d6", false)]
+        [TestCase("f1", "f7", true)]
+        [TestCase("f1", "c2", false)]
         public void TestIsInCheck(string startSquare, string endSquare, bool IsCheck)
         {
             var board = new Board();
             board.SetBoardToStartingPosition();
             board.MakeMove(new Move(startSquare, endSquare));
+            board.ChangeTurn();
             Assert.AreEqual(IsCheck, board.IsInCheck());
         }
     }
