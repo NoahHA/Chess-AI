@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Represents a chess square.
