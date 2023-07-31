@@ -1,4 +1,3 @@
-using Codice.CM.Client.Differences;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +11,13 @@ public class Board
     private Piece[] _state = new Piece[64];
     private string _fen;
     private PieceColour _turn;
+    private bool[] _canCastle = new bool[4] { true, true, true, true };
 
     // Always update the FEN when setting the state so FEN is always up to date
     public Piece[] State
     {
         get => _state;
-        private set { _state = value; _fen = GetFenFromState(value); }
+        private set { _state = value; _fen = UpdateFen(); }
     }
 
     // Always update the State when setting the FEN so state is always up to date
@@ -31,7 +31,13 @@ public class Board
     public PieceColour Turn
     {
         get => _turn;
-        set { _turn = value; _fen.UpdateTurn(value); }
+        set { _turn = value; _fen = UpdateFen(); }
+    }
+
+    public bool[] CanCastle
+    {
+        get => _canCastle;
+        set { _canCastle = value; _fen = UpdateFen(); }
     }
 
     public Board(string fen = "8/8/8/8/8/8/8/8 w KQkq -", PieceColour turn = PieceColour.White)
@@ -43,7 +49,7 @@ public class Board
     public void PlacePiece(Piece piece, Square position)
     {
         State[position.Index] = piece;
-        FEN = GetFenFromState(State);
+        FEN = UpdateFen();
     }
 
     /// <summary>
@@ -77,7 +83,7 @@ public class Board
     {
         return new Square(
             Array.IndexOf(
-                _state, _state.FirstOrDefault(piece => piece?.Type == PieceType.King && piece?.Colour == Turn)
+                _state, _state.First(piece => piece?.Type == PieceType.King && piece?.Colour == Turn)
             )
         );
     }
@@ -87,46 +93,58 @@ public class Board
     /// </summary>
     /// <param name="move"></param>
     /// <returns>The piece taken by the move, or null if no piece was taken.</returns>
-    public Piece MakeMove(Move move)
+    public void MakeMove(Move move)
     {
         Piece piece = FindPieceOnSquare(move.StartSquare);
-        Piece takenPiece = FindPieceOnSquare(move.EndSquare);
         PlacePiece(piece, move.EndSquare);
         PlacePiece(null, move.StartSquare);
 
         // If castling also move the rook
         if (move.Castling)
         {
-            Square rookStartSquare = new((move.StartSquare.Col > move.EndSquare.Col) ? 1 : 8, move.StartSquare.Row);
-            Square rookEndSquare = new((move.StartSquare.Col > move.EndSquare.Col) ? 4 : 6, move.StartSquare.Row);
+            Castling castlingType = (move.StartSquare.Col > move.EndSquare.Col) ? Castling.QueenSide : Castling.KingSide;
+            DisableCastling(piece.Colour);
+
+            Square rookStartSquare = new((castlingType == Castling.QueenSide) ? 1 : 8, move.StartSquare.Row);
+            Square rookEndSquare = new((castlingType == Castling.QueenSide) ? 4 : 6, move.StartSquare.Row);
 
             MakeMove(new Move(rookStartSquare, rookEndSquare));
         }
-        return takenPiece;
-    }
 
-    /// <summary>
-    /// Reverses a given move, returning any taken pieces to their original position.
-    /// </summary>
-    /// <param name="move">The move to undo.</param>
-    /// <param name="takenPiece">The piece that was taken (null if no piece was taken).</param>
-    public void UndoMove(Move move, Piece takenPiece)
-    {
-        Piece piece = FindPieceOnSquare(move.EndSquare);
-        PlacePiece(piece, move.StartSquare);
-        PlacePiece(takenPiece, move.EndSquare);
-
-        // If castling also move back the rook
-        if (move.Castling)
+        if (piece.Type == PieceType.King)
         {
-            Square rookStartSquare = new((move.StartSquare.Col > move.EndSquare.Col) ? 1 : 8, move.StartSquare.Row);
-            Square rookEndSquare = new((move.StartSquare.Col > move.EndSquare.Col) ? 4 : 6, move.StartSquare.Row);
-
-            UndoMove(new Move(rookStartSquare, rookEndSquare), null);
+            DisableCastling(piece.Colour);
+        }
+        else if (piece.Type == PieceType.Rook && (move.StartSquare.Col == 1 || move.StartSquare.Col == 8))
+        {
+            Castling castlingType = (move.StartSquare.Col == 1) ? Castling.QueenSide : Castling.KingSide;
+            DisableCastling(castlingType, piece.Colour);
         }
     }
 
-    public string GetFenFromState(Piece[] state)
+    private void DisableCastling(Castling castlingType, PieceColour colour)
+    {
+        int idx = (castlingType == Castling.KingSide) ? (colour == PieceColour.White) ? 0 : 2 : (colour == PieceColour.White) ? 1 : 3;
+        CanCastle[idx] = false;
+        UpdateFen();
+    }
+
+    private void DisableCastling(PieceColour colour)
+    {
+        if (colour == PieceColour.White)
+        {
+            CanCastle[0] = false;
+            CanCastle[1] = false;
+        }
+        else
+        {
+            CanCastle[2] = false;
+            CanCastle[3] = false;
+        }
+        UpdateFen();
+    }
+
+    public string UpdateFen()
     {
         int counter = 0;
         string tempFen = "";
@@ -146,7 +164,7 @@ public class Board
             }
 
             // Empty square
-            if (state[i] == null)
+            if (State[i] == null)
             {
                 counter++;
             }
@@ -160,7 +178,7 @@ public class Board
                     counter = 0;
                 }
 
-                tempFen += state[i].Letter;
+                tempFen += State[i].Letter;
             }
 
             // End of board
@@ -170,8 +188,15 @@ public class Board
             }
         }
 
-        tempFen += (_turn == PieceColour.White) ? " w" : " b";
-        tempFen += " KQkq -"; // TODO: Implement this properly
+        tempFen += (_turn == PieceColour.White) ? " w " : " b ";
+
+        if (CanCastle[0]) tempFen += 'K';
+        if (CanCastle[1]) tempFen += 'Q';
+        if (CanCastle[2]) tempFen += 'k';
+        if (CanCastle[3]) tempFen += 'q';
+        if (CanCastle.All(castle => castle == false)) tempFen += "-";
+
+        tempFen += " -"; // TODO: Implement this properly
 
         return tempFen;
     }
@@ -317,18 +342,19 @@ public class Board
     /// <param name="moves"></param>
     private void FilterForChecks(List<Move> moves)
     {
+        string initialFen = string.Copy(FEN);
+
         // Iterates through moves backwards so you can remove items
         for (int i = moves.Count - 1; i >= 0; i--)
         {
-            Move moveCopy = moves[i]; // Copy the move so you can undo after it's deleted
-            Piece takenPiece = MakeMove(moves[i]);
+            MakeMove(moves[i]);
 
             if (IsInCheck())
             {
                 moves.RemoveAt(i);
             }
 
-            UndoMove(moveCopy, takenPiece);
+            FEN = initialFen;
         }
     }
 

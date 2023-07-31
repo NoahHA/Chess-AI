@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// Extension methods for FEN strings.
@@ -24,11 +26,11 @@ public static class FenExtensions
         }
     }
 
-    public static void UpdateTurn(this string fen, PieceColour turn)
+    public static string UpdateTurn(this string fen, PieceColour turn)
     {
         char[] charArrFen = fen.ToCharArray();
         charArrFen[fen.IndexOf(' ') + 1] = (turn == PieceColour.White) ? 'w' : 'b';
-        fen = new string(charArrFen);
+        return new string(charArrFen);
     }
 
     public static PieceColour GetTurnFromFen(this string fen)

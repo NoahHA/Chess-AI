@@ -13,7 +13,7 @@ public class GameController : MonoBehaviour
         {
             if (_instance == null)
             {
-                _instance = GameObject.FindObjectOfType<GameController>();
+                _instance = FindObjectOfType<GameController>();
             }
 
             return _instance;
@@ -25,7 +25,6 @@ public class GameController : MonoBehaviour
     public void Start()
     {
         MainBoard.SetBoardToStartingPosition();
-        MainBoard.FEN = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq -";
         BoardHelper.UpdateScreenFromBoard(MainBoard);
     }
 
