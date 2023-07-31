@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
     public void Start()
     {
         MainBoard.SetBoardToStartingPosition();
+        MainBoard.FEN = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq -";
         BoardHelper.UpdateScreenFromBoard(MainBoard);
     }
 

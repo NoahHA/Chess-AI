@@ -1,3 +1,4 @@
+using MacFsWatcher;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,15 +24,19 @@ public class PlayerInputManager : MonoBehaviour
     private Square startSquare;
 
     public delegate void OnPieceClicked(GameObject piece);
+
     public static OnPieceClicked onPieceClicked;
 
     public delegate void OnPieceDragged(GameObject piece);
+
     public static OnPieceClicked onPieceMoved;
 
     public delegate void OnPiecePlaced(GameObject piece);
+
     public static OnPieceClicked onPiecePlaced;
 
     public delegate void OnMoveMade(Move move);
+
     public static OnMoveMade onMoveMade;
 
     /// <summary>
@@ -101,6 +106,7 @@ public class PlayerInputManager : MonoBehaviour
         {
             var endSquare = new Square(piece.transform.position);
             var moveMade = new Move(startSquare, endSquare);
+            moveMade.Castling = GameController.Instance.MainBoard.IsCastleMove(moveMade);
 
             // Reset the piece if move was not legal
             if (!legalMoves.Contains(moveMade))

@@ -94,16 +94,14 @@ public class Board
         PlacePiece(piece, move.EndSquare);
         PlacePiece(null, move.StartSquare);
 
-        // If castling also move the castle
+        // If castling also move the rook
         if (move.Castling)
         {
-            int castleCol = (move.StartSquare.Col > move.EndSquare.Col) ? 4 : 6;
-            Square castleSquare = new Square(castleCol, move.StartSquare.Row);
-            Piece castle = FindPieceOnSquare(castleSquare);
-            PlacePiece(castle, move.EndSquare);
-            PlacePiece(null, castleSquare);
-        }
+            Square rookStartSquare = new((move.StartSquare.Col > move.EndSquare.Col) ? 1 : 8, move.StartSquare.Row);
+            Square rookEndSquare = new((move.StartSquare.Col > move.EndSquare.Col) ? 4 : 6, move.StartSquare.Row);
 
+            MakeMove(new Move(rookStartSquare, rookEndSquare));
+        }
         return takenPiece;
     }
 
@@ -117,6 +115,15 @@ public class Board
         Piece piece = FindPieceOnSquare(move.EndSquare);
         PlacePiece(piece, move.StartSquare);
         PlacePiece(takenPiece, move.EndSquare);
+
+        // If castling also move back the rook
+        if (move.Castling)
+        {
+            Square rookStartSquare = new((move.StartSquare.Col > move.EndSquare.Col) ? 1 : 8, move.StartSquare.Row);
+            Square rookEndSquare = new((move.StartSquare.Col > move.EndSquare.Col) ? 4 : 6, move.StartSquare.Row);
+
+            UndoMove(new Move(rookStartSquare, rookEndSquare), null);
+        }
     }
 
     public string GetFenFromState(Piece[] state)
@@ -504,11 +511,11 @@ public class Board
         // If they can castle queen side (king and rook haven't moved and no pieces are between them)
         if (FEN.CanCastle(Castling.QueenSide, Turn) && kingRow.GetRange(1, 3).All(s => FindPieceOnSquare(s) == null))
         {
-            moves.Add(new Move(kingPosition, kingRow[1], castling: true));
+            moves.Add(new Move(kingPosition, kingRow[2], castling: true));
         }
 
         // If they can castle king side
-        if (FEN.CanCastle(Castling.KingSide, Turn) && kingRow.GetRange(4, 2).All(s => FindPieceOnSquare(s) == null))
+        if (FEN.CanCastle(Castling.KingSide, Turn) && kingRow.GetRange(5, 2).All(s => FindPieceOnSquare(s) == null))
         {
             moves.Add(new Move(kingPosition, kingRow[6], castling: true));
         }
@@ -568,6 +575,12 @@ public class Board
         moves.AddRange(FindRookMoves(startSquare));
 
         return moves;
+    }
+
+    public bool IsCastleMove(Move move)
+    {
+        return (FindPieceOnSquare(move.StartSquare)?.Type == PieceType.King
+            && Math.Abs(move.EndSquare.Col - move.StartSquare.Col) > 1);
     }
 
     public void ChangeTurn()
