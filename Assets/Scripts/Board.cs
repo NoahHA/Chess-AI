@@ -110,14 +110,21 @@ public class Board
             MakeMove(new Move(rookStartSquare, rookEndSquare));
         }
 
+        // If king moves, disable castling for that colour
         if (piece?.Type == PieceType.King)
         {
             DisableCastling(piece.Colour);
         }
+        // If rook moves, disable castling for that rook
         else if (piece?.Type == PieceType.Rook && (move.StartSquare.Col == 1 || move.StartSquare.Col == 8))
         {
             Castling castlingType = (move.StartSquare.Col == 1) ? Castling.QueenSide : Castling.KingSide;
             DisableCastling(castlingType, piece.Colour);
+        }
+        // If pawn gets to the end, upgrade it
+        else if (piece?.Type == PieceType.Pawn && move.EndSquare.Row == 1 || move.EndSquare.Row == 8)
+        {
+            State[move.EndSquare.Index] = new Piece(PieceType.Queen, piece.Colour);
         }
     }
 
