@@ -36,6 +36,7 @@ public class GameController : MonoBehaviour
     private void HandleMoveMade(Move move)
     {
         MainBoard.MakeMove(move);
+        Debug.Log(MainBoard.FEN);
         MainBoard.ChangeTurn();
         BoardHelper.UpdateScreenFromBoard(MainBoard);
 

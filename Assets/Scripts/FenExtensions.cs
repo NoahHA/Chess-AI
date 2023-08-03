@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using UnityEngine;
 
 /// <summary>
 /// Extension methods for FEN strings.
@@ -67,5 +65,35 @@ public static class FenExtensions
         }
 
         return state;
+    }
+
+    public static Square GetEnPassantSquareFromFen(this string fen)
+    {
+        string enPassantString = fen.Split(' ')[3];
+        return (enPassantString == "-") ? null : new Square(enPassantString);
+    }
+
+    public static bool[] GetCanCastleFromFen(this string fen)
+    {
+        bool[] canCastle = new bool[4] { false, false, false, false };
+
+        if (fen.CanCastle(Castling.KingSide, PieceColour.White))
+        {
+            canCastle[0] = true;
+        }
+        if (fen.CanCastle(Castling.QueenSide, PieceColour.White))
+        {
+            canCastle[1] = true;
+        }
+        if (fen.CanCastle(Castling.KingSide, PieceColour.Black))
+        {
+            canCastle[2] = true;
+        }
+        if (fen.CanCastle(Castling.QueenSide, PieceColour.Black))
+        {
+            canCastle[3] = true;
+        }
+
+        return canCastle;
     }
 }

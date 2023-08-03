@@ -143,7 +143,7 @@ namespace Tests.EditModeTests
             board.MakeMove(new Move(startSquare, endSquare));
 
             Assert.IsNull(board.FindPieceOnSquare(new Square(startSquare)));
-            Assert.AreEqual(board.FindPieceOnSquare(new Square(endSquare)), piece);
+            Assert.AreEqual(piece, board.FindPieceOnSquare(new Square(endSquare)));
         }
 
         [Test]

@@ -12,6 +12,7 @@ public class Board
     private string _fen;
     private PieceColour _turn;
     private bool[] _canCastle = new bool[4] { true, true, true, true };
+    private Square _enPassantSquare;
 
     // Always update the FEN when setting the state so FEN is always up to date
     public Piece[] State
@@ -24,7 +25,14 @@ public class Board
     public string FEN
     {
         get => _fen;
-        set { _fen = value; _state = value.GetStateFromFen(); _turn = value.GetTurnFromFen(); }
+        set
+        {
+            _fen = value;
+            _state = value.GetStateFromFen();
+            _turn = value.GetTurnFromFen();
+            _enPassantSquare = value.GetEnPassantSquareFromFen();
+            _canCastle = value.GetCanCastleFromFen();
+        }
     }
 
     [Tooltip("An enum representing who's turn it is currently.")]
@@ -38,6 +46,12 @@ public class Board
     {
         get => _canCastle;
         set { _canCastle = value; _fen = UpdateFen(); }
+    }
+
+    public Square EnPassantSquare
+    {
+        get => _enPassantSquare;
+        set { _enPassantSquare = value; _fen = UpdateFen(); }
     }
 
     public Board(string fen = "8/8/8/8/8/8/8/8 w KQkq -")
@@ -122,9 +136,20 @@ public class Board
             DisableCastling(castlingType, piece.Colour);
         }
         // If pawn gets to the end, upgrade it
-        else if (piece?.Type == PieceType.Pawn && move.EndSquare.Row == 1 || move.EndSquare.Row == 8)
+        else if (piece?.Type == PieceType.Pawn && (move.EndSquare.Row == 1 || move.EndSquare.Row == 8))
         {
             State[move.EndSquare.Index] = new Piece(PieceType.Queen, piece.Colour);
+        }
+
+        // If pawn makes a double move, make en passant available
+        if (piece?.Type == PieceType.Pawn && Math.Abs(move.EndSquare.Row - move.StartSquare.Row) == 2)
+        {
+            int dir = piece.Colour == PieceColour.White ? 1 : -1;
+            EnPassantSquare = new Square(move.EndSquare.Col, move.EndSquare.Row - dir);
+        }
+        else
+        {
+            EnPassantSquare = null;
         }
     }
 
@@ -203,7 +228,8 @@ public class Board
         if (CanCastle[3]) tempFen += 'q';
         if (CanCastle.All(castle => castle == false)) tempFen += "-";
 
-        tempFen += " -"; // TODO: Implement this properly
+        string enPassantString = (EnPassantSquare == null) ? "-" : EnPassantSquare.ToString();
+        tempFen += " " + enPassantString;
 
         return tempFen;
     }
