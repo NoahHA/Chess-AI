@@ -107,6 +107,7 @@ public class PlayerInputManager : MonoBehaviour
             var endSquare = new Square(piece.transform.position);
             var moveMade = new Move(startSquare, endSquare);
             moveMade.Castling = GameController.Instance.MainBoard.IsCastleMove(moveMade);
+            moveMade.EnPassant = GameController.Instance.MainBoard.IsEnPassantMove(moveMade);
 
             // Reset the piece if move was not legal
             if (!legalMoves.Contains(moveMade))

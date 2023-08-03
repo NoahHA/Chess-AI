@@ -24,14 +24,19 @@ public record Move
     /// </summary>
     public bool Castling = false;
 
-    public Move(Square startSquare, Square endSquare, bool castling = false)
+    /// <summary>
+    /// Whether the move is to en passant.
+    /// </summary>
+    public bool EnPassant = false;
+
+    public Move(Square startSquare, Square endSquare, bool castling = false, bool enPassant = false)
     {
-        (StartSquare, EndSquare, Castling) = (startSquare, endSquare, castling);
+        (StartSquare, EndSquare, Castling, EnPassant) = (startSquare, endSquare, castling, enPassant);
     }
 
-    public Move(string startSquare, string endSquare, bool castling = false)
+    public Move(string startSquare, string endSquare, bool castling = false, bool enPassant = false)
     {
-        (StartSquare, EndSquare, Castling) = (new Square(startSquare), new Square(endSquare), castling);
+        (StartSquare, EndSquare, Castling, EnPassant) = (new Square(startSquare), new Square(endSquare), castling, enPassant);
     }
 
     public override string ToString()

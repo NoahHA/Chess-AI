@@ -124,6 +124,13 @@ public class Board
             MakeMove(new Move(rookStartSquare, rookEndSquare));
         }
 
+        // If en passant then take the en-passanted pawn
+        if (move.EnPassant)
+        {
+            int dir = piece.Colour == PieceColour.White ? 1 : -1;
+            PlacePiece(null, new Square(move.EndSquare.Col, move.EndSquare.Row - dir));
+        }
+
         // If king moves, disable castling for that colour
         if (piece?.Type == PieceType.King)
         {
@@ -445,7 +452,12 @@ public class Board
             // Add diagonal square to moves if opponent's piece can be taken there
             Piece diagonalPiece = FindPieceOnSquare(newSquare);
 
-            if (diagonalPiece != null && (diagonalPiece.Colour != FindPieceOnSquare(startSquare).Colour))
+            // En passant
+            if (newSquare == EnPassantSquare)
+            {
+                moves.Add(new Move(startSquare, newSquare, enPassant: true));
+            }
+            else if (diagonalPiece != null && (diagonalPiece.Colour != FindPieceOnSquare(startSquare).Colour))
             {
                 moves.Add(new Move(startSquare, newSquare));
             }
@@ -647,6 +659,12 @@ public class Board
     {
         return (FindPieceOnSquare(move.StartSquare)?.Type == PieceType.King
             && Math.Abs(move.EndSquare.Col - move.StartSquare.Col) > 1);
+    }
+
+    public bool IsEnPassantMove(Move move)
+    {
+        return (move.EndSquare == EnPassantSquare
+            && FindPieceOnSquare(move.StartSquare)?.Type == PieceType.Pawn);
     }
 
     public void ChangeTurn()
