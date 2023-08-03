@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -35,13 +36,15 @@ public class GameController : MonoBehaviour
     private void HandleMoveMade(Move move)
     {
         MainBoard.MakeMove(move);
-        BoardHelper.UpdateScreenFromBoard(MainBoard);
         MainBoard.ChangeTurn();
+        BoardHelper.UpdateScreenFromBoard(MainBoard);
 
         if (MainBoard.IsInCheckmate())
         {
             onCheckmate?.Invoke(MainBoard.Turn);
         }
+
+        BoardHelper.FlipCamera();
     }
 
     public void HandleCheckmate(PieceColour turn)

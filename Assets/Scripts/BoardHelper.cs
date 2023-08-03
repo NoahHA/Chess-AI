@@ -5,15 +5,11 @@ using UnityEngine;
 /// </summary>
 public static class BoardHelper
 {
-    public static GameObject[] GetPieces()
-    {
-        return GameObject.FindGameObjectsWithTag("Piece");
-    }
+    public static GameObject[] GetPieces() => GameObject.FindGameObjectsWithTag("Piece");
 
-    public static GameObject[] GetTiles()
-    {
-        return GameObject.FindGameObjectsWithTag("Highlight");
-    }
+    public static GameObject[] GetTiles() => GameObject.FindGameObjectsWithTag("Highlight");
+
+    public static GameObject GetCamera() => GameObject.FindGameObjectWithTag("MainCamera");
 
     public static void ClearScreen()
     {
@@ -38,7 +34,7 @@ public static class BoardHelper
 
             if (piece != null)
             {
-                InstantiatePiece(piece, position);
+                InstantiatePiece(piece, position, board.Turn);
             }
         }
     }
@@ -49,10 +45,11 @@ public static class BoardHelper
     /// <param name="piece">The piece to create.</param>
     /// <param name="square">The square on which to create the piece.</param>
     /// <returns>The created game object.</returns>
-    public static GameObject InstantiatePiece(Piece piece, Square square)
+    public static GameObject InstantiatePiece(Piece piece, Square square, PieceColour turn)
     {
+        Quaternion rotation = turn == PieceColour.White ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, 180);
         GameObject pieceGameObject = (GameObject)GameObject.Instantiate(
-            Resources.Load("Pieces/" + piece.GetPrefabName()), square.ScreenPosition, Quaternion.identity
+            Resources.Load("Pieces/" + piece.GetPrefabName()), square.ScreenPosition, rotation
         );
 
         pieceGameObject.transform.parent = GameObject.Find("Board/Pieces").transform;
@@ -69,5 +66,14 @@ public static class BoardHelper
         {
             GameObject.Destroy(tile);
         }
+    }
+
+    /// <summary>
+    /// Flips the board perspective.
+    /// </summary>
+    public static void FlipCamera()
+    {
+        GameObject camera = GetCamera();
+        camera.transform.Rotate(0, 0, 180);
     }
 }
