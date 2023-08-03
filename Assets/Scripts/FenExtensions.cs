@@ -46,9 +46,9 @@ public static class FenExtensions
     {
         int counter = 0;
         Piece[] state = new Piece[64];
-        int spaceIndex = fen.IndexOf(' ');
+        int spaceIdx = fen.IndexOf(' ');
 
-        foreach (char c in fen[0..spaceIndex])
+        foreach (char c in fen[0..spaceIdx])
         {
             if (char.IsDigit(c))
             {

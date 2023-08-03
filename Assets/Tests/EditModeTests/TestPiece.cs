@@ -12,13 +12,13 @@ namespace Tests.EditModeTests
         [TestCase('r', PieceType.Rook)]
         [TestCase('q', PieceType.Queen)]
         [TestCase('k', PieceType.King)]
-        public void TestGetWhitePieceFromLetter(char letter, PieceType expectedPieceType)
+        public void TestGetBlackPieceFromLetter(char letter, PieceType expectedPieceType)
         {
             // Act
             var piece = new Piece(letter);
 
             // Assert
-            Piece expectedPiece = new Piece(expectedPieceType, PieceColour.White);
+            Piece expectedPiece = new Piece(expectedPieceType, PieceColour.Black);
             Assert.AreEqual(expectedPiece, piece);
         }
 
@@ -29,13 +29,13 @@ namespace Tests.EditModeTests
         [TestCase('R', PieceType.Rook)]
         [TestCase('Q', PieceType.Queen)]
         [TestCase('K', PieceType.King)]
-        public void TestGetBlackPieceFromLetter(char letter, PieceType expectedPieceType)
+        public void TestGetWhitePieceFromLetter(char letter, PieceType expectedPieceType)
         {
             // Act
             var piece = new Piece(letter);
 
             // Assert
-            Piece expectedPiece = new Piece(expectedPieceType, PieceColour.Black);
+            Piece expectedPiece = new Piece(expectedPieceType, PieceColour.White);
             Assert.AreEqual(expectedPiece, piece);
         }
 

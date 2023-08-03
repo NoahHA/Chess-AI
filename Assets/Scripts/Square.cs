@@ -14,7 +14,7 @@ public record Square
     public String Name => ((Char)(Col + 96)).ToString() + Row.ToString();
 
     [Tooltip("The index of the board square, ranges from 0-63")]
-    public int Index => (Col - 1) + (Row - 1) * 8;
+    public int Index => (Col - 1) + (8 - Row) * 8;
 
     public int Col
     {
@@ -59,12 +59,12 @@ public record Square
     public Square(int index)
     {
         Col = (index + 1) % 8 != 0 ? (index + 1) % 8 : 8;
-        Row = (int)Math.Ceiling((index + 1) / 8f);
+        Row = 9 - (int)Math.Ceiling((index + 1) / 8f);
     }
 
     public Square(String squareName)
     {
-        Col = (int)squareName[0] - 96;
+        Col = squareName[0] - 96;
         Row = (int)Char.GetNumericValue(squareName[1]);
     }
 

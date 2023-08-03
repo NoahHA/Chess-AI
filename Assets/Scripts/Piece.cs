@@ -58,7 +58,7 @@ public record Piece
     {
         (Type, Colour, Letter) = (type, colour, '1');
 
-        Letter = (Colour == PieceColour.Black) ? Char.ToUpper(LetterDict[type]) : LetterDict[type];
+        Letter = (Colour == PieceColour.White) ? Char.ToUpper(LetterDict[type]) : LetterDict[type];
     }
 
     public string GetPrefabName()
@@ -80,7 +80,7 @@ public record Piece
             throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
 
         Type = PieceDict[Char.ToLower(letter)];
-        Colour = Char.IsUpper(letter) ? PieceColour.Black : PieceColour.White;
+        Colour = Char.IsUpper(letter) ? PieceColour.White : PieceColour.Black;
     }
 
     public override string ToString()

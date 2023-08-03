@@ -20,7 +20,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public Board MainBoard = new Board(turn: PieceColour.White);
+    public Board MainBoard = new Board();
 
     public void Start()
     {

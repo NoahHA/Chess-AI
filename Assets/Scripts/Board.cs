@@ -40,10 +40,9 @@ public class Board
         set { _canCastle = value; _fen = UpdateFen(); }
     }
 
-    public Board(string fen = "8/8/8/8/8/8/8/8 w KQkq -", PieceColour turn = PieceColour.White)
+    public Board(string fen = "8/8/8/8/8/8/8/8 w KQkq -")
     {
         FEN = fen;
-        Turn = turn;
     }
 
     public void PlacePiece(Piece piece, Square position)
@@ -67,7 +66,7 @@ public class Board
     /// </summary>
     public bool IsInCheck()
     {
-        var opponentBoard = new Board(FEN, Turn);
+        var opponentBoard = new Board(FEN);
         opponentBoard.ChangeTurn();
         Square kingPosition = FindKing();
 
@@ -83,7 +82,7 @@ public class Board
     {
         return new Square(
             Array.IndexOf(
-                _state, _state.First(piece => piece?.Type == PieceType.King && piece?.Colour == Turn)
+                _state, _state.FirstOrDefault(piece => piece?.Type == PieceType.King && piece?.Colour == Turn)
             )
         );
     }
@@ -111,11 +110,11 @@ public class Board
             MakeMove(new Move(rookStartSquare, rookEndSquare));
         }
 
-        if (piece.Type == PieceType.King)
+        if (piece?.Type == PieceType.King)
         {
             DisableCastling(piece.Colour);
         }
-        else if (piece.Type == PieceType.Rook && (move.StartSquare.Col == 1 || move.StartSquare.Col == 8))
+        else if (piece?.Type == PieceType.Rook && (move.StartSquare.Col == 1 || move.StartSquare.Col == 8))
         {
             Castling castlingType = (move.StartSquare.Col == 1) ? Castling.QueenSide : Castling.KingSide;
             DisableCastling(castlingType, piece.Colour);
@@ -149,6 +148,7 @@ public class Board
         int counter = 0;
         string tempFen = "";
 
+        // Start from top left and go across each column and down each row
         for (int i = 0; i < 64; i++)
         {
             // End of row

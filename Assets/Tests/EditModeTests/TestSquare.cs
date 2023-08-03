@@ -52,10 +52,10 @@ namespace Tests.EditModeTests
         }
 
         [Test]
-        [TestCase(0, 1, 1)]
-        [TestCase(7, 8, 1)]
-        [TestCase(23, 8, 3)]
-        [TestCase(50, 3, 7)]
+        [TestCase(0, 1, 8)]
+        [TestCase(7, 8, 8)]
+        [TestCase(23, 8, 6)]
+        [TestCase(50, 3, 2)]
         public void TestCreateChessSquareFromIndex(int index, int expectedCol, int expectedRow)
         {
             var square = new Square(index);

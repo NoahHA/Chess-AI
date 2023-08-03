@@ -16,7 +16,7 @@ namespace Tests.EditModeTests
         [Test]
         public void TestGenerateSimplePosition()
         {
-            var board = new Board("8/p7/8/8/8/7P/8/8 w KQkq -");
+            var board = new Board("8/8/7P/8/8/8/p7/8 w KQkq -");
 
             var expectedBoard = new Board();
             expectedBoard.PlacePiece(new Piece('p'), new Square("a2"));
