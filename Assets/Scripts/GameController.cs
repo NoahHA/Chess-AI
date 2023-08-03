@@ -46,7 +46,8 @@ public class GameController : MonoBehaviour
 
     public void HandleCheckmate(PieceColour turn)
     {
-        Debug.Log("Checkmate!");
+        MainBoard.ChangeTurn();
+        Debug.Log($"Checkmate: {MainBoard.Turn} wins!");
     }
 
     private void OnEnable()
