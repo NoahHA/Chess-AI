@@ -5,6 +5,10 @@ using UnityEngine;
 /// </summary>
 public class GameController : MonoBehaviour
 {
+    public delegate void OnCheckmate(PieceColour turn);
+
+    public static OnCheckmate onCheckmate;
+
     private static GameController _instance;
 
     public static GameController Instance
@@ -28,20 +32,32 @@ public class GameController : MonoBehaviour
         BoardHelper.UpdateScreenFromBoard(MainBoard);
     }
 
-    public void HandleMoveMade(Move move)
+    private void HandleMoveMade(Move move)
     {
         MainBoard.MakeMove(move);
         BoardHelper.UpdateScreenFromBoard(MainBoard);
         MainBoard.ChangeTurn();
+
+        if (MainBoard.IsInCheckmate())
+        {
+            onCheckmate?.Invoke(MainBoard.Turn);
+        }
+    }
+
+    public void HandleCheckmate(PieceColour turn)
+    {
+        Debug.Log("Checkmate!");
     }
 
     private void OnEnable()
     {
         PlayerInputManager.onMoveMade += HandleMoveMade;
+        onCheckmate += HandleCheckmate;
     }
 
     private void OnDisable()
     {
         PlayerInputManager.onMoveMade -= HandleMoveMade;
+        onCheckmate -= HandleCheckmate;
     }
 }

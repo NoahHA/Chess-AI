@@ -358,6 +358,13 @@ public class Board
         }
     }
 
+    public bool IsInCheckmate()
+    {
+        List<Move> legalMoves = FindAllLegalMoves();
+        FilterForChecks(legalMoves);
+        return legalMoves.Count == 0;
+    }
+
     private List<Move> FindPawnMoves(Square startSquare)
     {
         List<Move> moves = new();
