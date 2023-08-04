@@ -6,6 +6,8 @@ using UnityEngine;
 /// </summary>
 public class GameController : MonoBehaviour
 {
+    public bool AiMode { get; set; }
+
     public delegate void OnCheckmate(PieceColour turn);
 
     public static OnCheckmate onCheckmate;
