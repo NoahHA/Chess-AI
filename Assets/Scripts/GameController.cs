@@ -8,6 +8,8 @@ public class GameController : MonoBehaviour
 {
     public bool AiMode { get; set; }
 
+    [SerializeField] private int depth;
+
     public delegate void OnCheckmate(PieceColour turn);
 
     public static OnCheckmate onCheckmate;
@@ -41,12 +43,22 @@ public class GameController : MonoBehaviour
         MainBoard.ChangeTurn();
         BoardHelper.UpdateScreenFromBoard(MainBoard);
 
-        if (MainBoard.IsInCheckmate())
+        if (MainBoard.IsInCheckmate(MainBoard.Turn))
         {
             onCheckmate?.Invoke(MainBoard.Turn);
         }
 
-        BoardHelper.FlipCamera();
+        if (AiMode)
+        {
+            Move computerMove = AIController.GetBestMove(MainBoard, depth);
+            MainBoard.MakeMove(computerMove);
+            MainBoard.ChangeTurn();
+            BoardHelper.UpdateScreenFromBoard(MainBoard);
+        }
+        else
+        {
+            BoardHelper.FlipCamera();
+        }
     }
 
     public void HandleCheckmate(PieceColour turn)

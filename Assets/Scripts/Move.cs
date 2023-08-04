@@ -39,6 +39,11 @@ public record Move
         (StartSquare, EndSquare, Castling, EnPassant) = (new Square(startSquare), new Square(endSquare), castling, enPassant);
     }
 
+    public Move()
+    {
+        (StartSquare, EndSquare, Castling, EnPassant) = (null, null, false, false);
+    }
+
     public override string ToString()
     {
         return StartSquare.ToString() + EndSquare.ToString();

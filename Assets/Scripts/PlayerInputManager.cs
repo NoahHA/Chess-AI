@@ -64,7 +64,7 @@ public class PlayerInputManager : MonoBehaviour
             }
 
             // Highlight differently if there's a takeable enemy piece
-            else if (GameController.Instance.MainBoard.IsEnemyPiece(pieceOnSquare))
+            else if (GameController.Instance.MainBoard.IsEnemyPiece(pieceOnSquare, GameController.Instance.MainBoard.Turn))
             {
                 Instantiate(takeablePieceHighlight, move.EndSquare.ScreenPosition, circleHighlight.transform.rotation);
             }
@@ -89,7 +89,7 @@ public class PlayerInputManager : MonoBehaviour
     {
         BoardHelper.ClearTiles();
         startSquare = new Square(piece.transform.position);
-        legalMoves = GameController.Instance.MainBoard.FindLegalMoves(startSquare);
+        legalMoves = GameController.Instance.MainBoard.FindLegalMoves(startSquare, GameController.Instance.MainBoard.Turn);
 
         // Only highlight if the piece wasn't already highlighted
         if (!startSquare.IsHighlighted())

@@ -98,7 +98,8 @@ namespace Tests.EditModeTests
             var board = new Board();
             board.SetBoardToStartingPosition();
             board.Turn = colour;
-            Assert.IsFalse(board.IsLegalMove(new Move(startSquare, endSquare)));
+            Debug.Log(board.Turn);
+            Assert.IsFalse(board.IsLegalMove(new Move(startSquare, endSquare), board.Turn));
         }
 
         [Test]
@@ -167,7 +168,7 @@ namespace Tests.EditModeTests
             var piece = new Piece(type, board.Turn);
 
             board.PlacePiece(piece, new Square(startSquare));
-            Assert.IsFalse(board.IsLegalMove(new Move(startSquare, endSquare)));
+            Assert.IsFalse(board.IsLegalMove(new Move(startSquare, endSquare), board.Turn));
         }
 
         [TestCase("d1", "d7", true)]
@@ -180,7 +181,7 @@ namespace Tests.EditModeTests
             board.SetBoardToStartingPosition();
             board.MakeMove(new Move(startSquare, endSquare));
             board.ChangeTurn();
-            Assert.AreEqual(IsCheck, board.IsInCheck());
+            Assert.AreEqual(IsCheck, board.IsInCheck(board.Turn));
         }
     }
 }
