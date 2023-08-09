@@ -444,7 +444,6 @@ public class Board
     public bool IsInCheckmate(PieceColour turn)
     {
         List<Move> legalMoves = FindAllLegalMoves(turn);
-        FilterForChecks(legalMoves, turn);
         return legalMoves.Count == 0;
     }
 
