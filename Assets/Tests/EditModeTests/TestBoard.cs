@@ -41,7 +41,7 @@ namespace Tests.EditModeTests
         {
             string Fen = "8/8/8/8/9/8/8/8 w KQkq -";
 
-            Assert.Throws<ArgumentException>(() => new Board(fen: Fen));
+            Assert.Throws<IndexOutOfRangeException>(() => new Board(fen: Fen));
         }
 
         [Test]

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Plastic.Antlr3.Runtime;
 using UnityEngine;
 
 /// <summary>
@@ -29,7 +28,7 @@ public class Board
         set
         {
             _fen = value;
-            _state = value.GetStateFromFen();
+            _state = UpdateStateFromFen(value);
             _turn = value.GetTurnFromFen();
             _enPassantSquare = value.GetEnPassantSquareFromFen();
             _canCastle = value.GetCanCastleFromFen();
@@ -79,21 +78,24 @@ public class Board
         {
             if (char.IsDigit(c))
             {
-                counter += (int)char.GetNumericValue(c);
+                for (int i = 0; i < (int)char.GetNumericValue(c); i++)
+                {
+                    _state[counter] = null;
+                    counter++;
+                }
             }
             else if (char.IsLetter(c))
             {
-                if (_state[counter].Letter != c)
+                if (_state[counter] is null)
+                {
+                    _state[counter] = new Piece(c);
+                }
+                else if (_state[counter].Letter != c)
                 {
                     _state[counter].Letter = c;
                 }
                 counter++;
             }
-        }
-
-        if (counter != 64)
-        {
-            throw new ArgumentException($"FEN string is incorrect length: should be 64 but was {counter}", nameof(fen));
         }
 
         return _state;
