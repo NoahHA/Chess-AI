@@ -41,9 +41,6 @@ public record Piece
 
     private void UpdatePieceFromLetter(char letter)
     {
-        if (!PieceDict.ContainsKey(Char.ToLower(letter)))
-            throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
-
         Type = PieceDict[Char.ToLower(letter)];
         Colour = Char.IsUpper(letter) ? PieceColour.White : PieceColour.Black;
     }
