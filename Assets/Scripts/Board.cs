@@ -19,7 +19,7 @@ public class Board
     public Piece[] State
     {
         get => _state;
-        private set { _state = value; _fen = UpdateFen(); }
+        private set { _state = value; _fen = ResetFen(); }
     }
 
     // Always update the State when setting the FEN so state is always up to date
@@ -40,19 +40,19 @@ public class Board
     public PieceColour Turn
     {
         get => _turn;
-        set { _turn = value; _fen = UpdateFen(); }
+        set { _turn = value; _fen = ResetFen(); }
     }
 
     public bool[] CanCastle
     {
         get => _canCastle;
-        set { _canCastle = value; _fen = UpdateFen(); }
+        set { _canCastle = value; _fen = ResetFen(); }
     }
 
     public Square EnPassantSquare
     {
         get => _enPassantSquare;
-        set { _enPassantSquare = value; _fen = UpdateFen(); }
+        set { _enPassantSquare = value; _fen = ResetFen(); }
     }
 
     public Board(string fen = "8/8/8/8/8/8/8/8 w KQkq -")
@@ -69,7 +69,7 @@ public class Board
     public void PlacePiece(Piece piece, Square position)
     {
         State[position.Index] = piece;
-        FEN = UpdateFen();
+        FEN = ResetFen();
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public class Board
     {
         int idx = (castlingType == Castling.KingSide) ? (colour == PieceColour.White) ? 0 : 2 : (colour == PieceColour.White) ? 1 : 3;
         CanCastle[idx] = false;
-        UpdateFen();
+        ResetFen();
     }
 
     private void DisableCastling(PieceColour colour)
@@ -187,10 +187,10 @@ public class Board
             CanCastle[2] = false;
             CanCastle[3] = false;
         }
-        UpdateFen();
+        ResetFen();
     }
 
-    public string UpdateFen()
+    public string ResetFen()
     {
         int counter = 0;
         string tempFen = "";
