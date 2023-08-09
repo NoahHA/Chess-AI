@@ -29,9 +29,24 @@ public enum PieceColour
 /// </summary>
 public record Piece
 {
+    private char _letter;
+
     public PieceType Type;
     public PieceColour Colour;
-    public char Letter;
+    public char Letter
+    {
+        get => _letter;
+        set { _letter = value; UpdatePieceFromLetter(value); }
+    }
+
+    private void UpdatePieceFromLetter(char letter)
+    {
+        if (!PieceDict.ContainsKey(Char.ToLower(letter)))
+            throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
+
+        Type = PieceDict[Char.ToLower(letter)];
+        Colour = Char.IsUpper(letter) ? PieceColour.White : PieceColour.Black;
+    }
 
     // Dictionary connecting piece names to their type
     private Dictionary<char, PieceType> PieceDict => new()
@@ -56,7 +71,7 @@ public record Piece
 
     public Piece(PieceType type, PieceColour colour)
     {
-        (Type, Colour, Letter) = (type, colour, '1');
+        (Type, Colour) = (type, colour);
 
         Letter = (Colour == PieceColour.White) ? Char.ToUpper(LetterDict[type]) : LetterDict[type];
     }
@@ -74,13 +89,7 @@ public record Piece
     /// <exception cref="ArgumentException"></exception>
     public Piece(char letter)
     {
-        (Type, Colour, Letter) = (PieceType.Pawn, PieceColour.White, letter);
-
-        if (!PieceDict.ContainsKey(Char.ToLower(letter)))
-            throw new ArgumentException($"Letter not recognized: {letter}", nameof(letter));
-
-        Type = PieceDict[Char.ToLower(letter)];
-        Colour = Char.IsUpper(letter) ? PieceColour.White : PieceColour.Black;
+        Letter = letter;
     }
 
     public override string ToString()
