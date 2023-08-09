@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace Tests.EditModeTests
 {
@@ -47,7 +48,7 @@ namespace Tests.EditModeTests
         public void TestGetPieceFromLetterInvalidPiece(char letter)
         {
             // Assert
-            Assert.Throws<ArgumentException>(() => new Piece(letter));
+            Assert.Throws<KeyNotFoundException>(() => new Piece(letter));
         }
     }
 }
