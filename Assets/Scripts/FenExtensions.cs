@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 /// <summary>
 /// Extension methods for FEN strings.
@@ -34,37 +34,6 @@ public static class FenExtensions
     public static PieceColour GetTurnFromFen(this string fen)
     {
         return (fen[fen.IndexOf(' ') + 1] == 'w') ? PieceColour.White : PieceColour.Black;
-    }
-
-    /// <summary>
-    /// Converts a chess FEN string to a board state.
-    /// </summary>
-    /// <param name="fen">FEN string</param>
-    public static Piece[] GetStateFromFen(this string fen)
-    {
-        int counter = 0;
-        Piece[] state = new Piece[64];
-        int spaceIdx = fen.IndexOf(' ');
-
-        foreach (char c in fen[0..spaceIdx])
-        {
-            if (char.IsDigit(c))
-            {
-                counter += (int)char.GetNumericValue(c);
-            }
-            else if (char.IsLetter(c))
-            {
-                state[counter] = new Piece(c);
-                counter++;
-            }
-        }
-
-        if (counter != 64)
-        {
-            throw new ArgumentException($"FEN string is incorrect length: should be 64 but was {counter}", nameof(fen));
-        }
-
-        return state;
     }
 
     public static Square GetEnPassantSquareFromFen(this string fen)
