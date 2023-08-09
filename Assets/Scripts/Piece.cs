@@ -72,7 +72,6 @@ public record Piece
     public Piece(PieceType type, PieceColour colour)
     {
         (Type, Colour) = (type, colour);
-
         Letter = (Colour == PieceColour.White) ? Char.ToUpper(LetterDict[type]) : LetterDict[type];
     }
 
