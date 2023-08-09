@@ -98,7 +98,6 @@ namespace Tests.EditModeTests
             var board = new Board();
             board.SetBoardToStartingPosition();
             board.Turn = colour;
-            Debug.Log(board.Turn);
             Assert.IsFalse(board.IsLegalMove(new Move(startSquare, endSquare), board.Turn));
         }
 
