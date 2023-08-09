@@ -40,7 +40,7 @@ public class Board
     public PieceColour Turn
     {
         get => _turn;
-        set { _turn = value; _fen = ResetFen(); }
+        set { _turn = value; _fen = _fen.UpdateTurn(value); }
     }
 
     public bool[] CanCastle
@@ -64,6 +64,39 @@ public class Board
     {
         FEN = "8/8/8/8/8/8/8/8 w KQkq -";
         Turn = turn;
+    }
+
+    /// <summary>
+    /// Updates the board state based on a chess FEN string.
+    /// </summary>
+    /// <param name="fen">FEN string</param>
+    public Piece[] UpdateStateFromFen(string fen)
+    {
+        int counter = 0;
+        int spaceIdx = fen.IndexOf(' ');
+
+        foreach (char c in fen[0..spaceIdx])
+        {
+            if (char.IsDigit(c))
+            {
+                counter += (int)char.GetNumericValue(c);
+            }
+            else if (char.IsLetter(c))
+            {
+                if (_state[counter].Letter != c)
+                {
+                    _state[counter].Letter = c;
+                }
+                counter++;
+            }
+        }
+
+        if (counter != 64)
+        {
+            throw new ArgumentException($"FEN string is incorrect length: should be 64 but was {counter}", nameof(fen));
+        }
+
+        return _state;
     }
 
     public void PlacePiece(Piece piece, Square position)
