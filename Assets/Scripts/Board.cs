@@ -123,12 +123,22 @@ public class Board
     public bool IsInCheck(PieceColour turn)
     {
         Square kingPosition = FindKing(turn);
-        ChangeTurn();
+        PieceColour opponentTurn = turn.ChangeTurn();
 
+        // Find which pieces could take the king by finding which pieces the king could take if it were all other pieces
+        List<Move> movesFromKingPosition = FindQueenMoves(kingPosition);
+        movesFromKingPosition.AddRange(FindKnightMoves(kingPosition));
+        bool kingCanBeTaken = movesFromKingPosition.Any(move => FindPieceOnSquare(move.EndSquare)?.Colour == opponentTurn);
+
+        if (!kingCanBeTaken)
+        {
+            return false;
+        }
+
+        ChangeTurn();
         // Find any opponent move that will take the player's king
         bool isInCheck = FindAllMoves(Turn).Any(move => move.EndSquare == kingPosition);
         ChangeTurn();
-
         return isInCheck;
     }
 
@@ -444,6 +454,11 @@ public class Board
 
     public bool IsInCheckmate(PieceColour turn)
     {
+        if (!IsInCheck(turn))
+        {
+            return false;
+        }
+
         List<Move> legalMoves = FindAllLegalMoves(turn);
         return legalMoves.Count == 0;
     }
