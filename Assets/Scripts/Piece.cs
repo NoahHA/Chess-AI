@@ -24,6 +24,14 @@ public enum PieceColour
     Black
 }
 
+public static class PieceExtensions
+{
+    public static PieceColour ChangeTurn(this PieceColour turn)
+    {
+        return (turn == PieceColour.White) ? PieceColour.Black : PieceColour.White;
+    }
+}
+
 /// <summary>
 /// Represents a Chess piece.
 /// </summary>
