@@ -123,12 +123,13 @@ public class Board
     public bool IsInCheck(PieceColour turn)
     {
         Square kingPosition = FindKing(turn);
-        var opponentBoard = new Board(FEN);
-        opponentBoard.Turn = turn;
-        opponentBoard.ChangeTurn();
+        ChangeTurn();
 
         // Find any opponent move that will take the player's king
-        return opponentBoard.FindAllMoves(opponentBoard.Turn).Any(move => move.EndSquare == kingPosition);
+        bool isInCheck = FindAllMoves(Turn).Any(move => move.EndSquare == kingPosition);
+        ChangeTurn();
+
+        return isInCheck;
     }
 
     /// <summary>
