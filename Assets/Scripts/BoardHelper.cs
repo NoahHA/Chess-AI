@@ -49,7 +49,7 @@ public static class BoardHelper
     /// <returns>The created game object.</returns>
     public static GameObject InstantiatePiece(Piece piece, Square square, PieceColour turn)
     {
-        Quaternion rotation = turn == PieceColour.White ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, 180);
+        Quaternion rotation = (turn == PieceColour.White) ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, 180);
         GameObject pieceGameObject = (GameObject)Object.Instantiate(
             Resources.Load("Pieces/" + piece.GetPrefabName()), square.ScreenPosition, rotation
         );

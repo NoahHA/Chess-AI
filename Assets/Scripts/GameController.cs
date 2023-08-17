@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -38,7 +39,7 @@ public class GameController : MonoBehaviour
         _playerInputManager = GetComponent<PlayerInputManager>();
     }
 
-    private void HandleMoveMade(Move move, bool stop = false)
+    private IEnumerator HandleMoveMade(Move move, bool stop = false)
     {
         BoardHelper.ClearTiles(removeAll: true);
         MainBoard.MakeMove(move);
@@ -52,8 +53,14 @@ public class GameController : MonoBehaviour
 
         if (AiMode && !stop)
         {
+            // Update screen before finding AI move
+            MainBoard.ChangeTurn();
+            BoardHelper.UpdateScreenFromBoard(MainBoard);
+            MainBoard.ChangeTurn();
+            yield return null;
+
             Move computerMove = AIController.GetBestMove(MainBoard, depth);
-            HandleMoveMade(computerMove, stop: true);
+            StartCoroutine(HandleMoveMade(computerMove, stop: true));
         }
         else if (!AiMode)
         {
@@ -71,11 +78,11 @@ public class GameController : MonoBehaviour
     {
         if (AiMode)
         {
-            HandleMoveMade(move, false);
+            StartCoroutine(HandleMoveMade(move, false));
         }
         else
         {
-            HandleMoveMade(move, true);
+            StartCoroutine(HandleMoveMade(move, true));
         }
     }
 
