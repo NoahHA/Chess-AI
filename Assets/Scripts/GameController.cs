@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
     public static OnCheckmate onCheckmate;
 
     private static GameController _instance;
+    private PlayerInputManager _playerInputManager;
 
     public static GameController Instance
     {
@@ -34,10 +35,12 @@ public class GameController : MonoBehaviour
     {
         MainBoard.SetBoardToStartingPosition();
         BoardHelper.UpdateScreenFromBoard(MainBoard);
+        _playerInputManager = GetComponent<PlayerInputManager>();
     }
 
-    private void HandleMoveMade(Move move)
+    private void HandleMoveMade(Move move, bool stop = false)
     {
+        BoardHelper.ClearTiles(removeAll: true);
         MainBoard.MakeMove(move);
         MainBoard.ChangeTurn();
         BoardHelper.UpdateScreenFromBoard(MainBoard);
@@ -47,26 +50,32 @@ public class GameController : MonoBehaviour
             onCheckmate?.Invoke(MainBoard.Turn);
         }
 
-        if (AiMode)
+        if (AiMode && !stop)
         {
-            HandleAIMove();
+            Move computerMove = AIController.GetBestMove(MainBoard, depth);
+            HandleMoveMade(computerMove, stop: true);
         }
-        else
+        else if (!AiMode)
         {
             BoardHelper.FlipCamera();
         }
+
+        if (stop)
+        {
+            _playerInputManager.HighLightSquare(move.StartSquare, TileType.MoveMadeTile);
+            _playerInputManager.HighLightSquare(move.EndSquare, TileType.MoveMadeTile);
+        }
     }
 
-    private void HandleAIMove()
+    private void HandleMoveMade(Move move)
     {
-        Move computerMove = AIController.GetBestMove(MainBoard, depth);
-        MainBoard.MakeMove(computerMove);
-        MainBoard.ChangeTurn();
-        BoardHelper.UpdateScreenFromBoard(MainBoard);
-
-        if (MainBoard.IsInCheckmate(MainBoard.Turn))
+        if (AiMode)
         {
-            onCheckmate?.Invoke(MainBoard.Turn);
+            HandleMoveMade(move, false);
+        }
+        else
+        {
+            HandleMoveMade(move, true);
         }
     }
 

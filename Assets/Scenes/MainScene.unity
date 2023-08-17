@@ -1348,7 +1348,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3146736653804480537, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
       propertyPath: depth
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3146736653804480538, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
       propertyPath: m_Name
@@ -1398,6 +1398,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3146736653804480542, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: moveMadeHighlight
+      value: 
+      objectReference: {fileID: 3348318481398810697, guid: d8e338c582a009e4185db6885c42f9e1, type: 3}
+    - target: {fileID: 3146736653804480542, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: legalMovesHighlight
+      value: 
+      objectReference: {fileID: 481863497604018407, guid: 46f2f0af683ea1847b77ef3bccc3c3f0, type: 3}
+    - target: {fileID: 3146736653804480542, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: selectedSquareHighlight
+      value: 
+      objectReference: {fileID: 3348318481398810697, guid: 4e3c18e417a6e1645840f531c58c126f, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

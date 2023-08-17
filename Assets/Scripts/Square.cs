@@ -94,7 +94,7 @@ public record Square
 
     public bool IsHighlighted()
     {
-        foreach (GameObject tile in BoardHelper.GetTiles())
+        foreach (GameObject tile in BoardHelper.GetShortTermTiles())
         {
             if (new Square(tile.transform.position) == this)
             {

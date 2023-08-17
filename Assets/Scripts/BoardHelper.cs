@@ -7,7 +7,9 @@ public static class BoardHelper
 {
     public static GameObject[] GetPieces() => GameObject.FindGameObjectsWithTag("Piece");
 
-    public static GameObject[] GetTiles() => GameObject.FindGameObjectsWithTag("Highlight");
+    public static GameObject[] GetLongTermTiles() => GameObject.FindGameObjectsWithTag("LongHighlight");
+
+    public static GameObject[] GetShortTermTiles() => GameObject.FindGameObjectsWithTag("ShortHighlight");
 
     public static GameObject GetCamera() => GameObject.FindGameObjectWithTag("MainCamera");
 
@@ -48,7 +50,7 @@ public static class BoardHelper
     public static GameObject InstantiatePiece(Piece piece, Square square, PieceColour turn)
     {
         Quaternion rotation = turn == PieceColour.White ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, 180);
-        GameObject pieceGameObject = (GameObject)GameObject.Instantiate(
+        GameObject pieceGameObject = (GameObject)Object.Instantiate(
             Resources.Load("Pieces/" + piece.GetPrefabName()), square.ScreenPosition, rotation
         );
 
@@ -60,11 +62,19 @@ public static class BoardHelper
     /// <summary>
     /// Removes all highlighted tiles to reset the board
     /// </summary>
-    public static void ClearTiles()
+    public static void ClearTiles(bool removeAll = false)
     {
-        foreach (var tile in GetTiles())
+        foreach (var tile in GetShortTermTiles())
         {
-            GameObject.Destroy(tile);
+            Object.Destroy(tile);
+        }
+
+        if (removeAll)
+        {
+            foreach (var tile in GetLongTermTiles())
+            {
+                Object.Destroy(tile);
+            }
         }
     }
 

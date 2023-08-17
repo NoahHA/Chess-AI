@@ -3,19 +3,30 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum TileType
+{
+    LegalMovesTile,
+    TakeablePieceTile,
+    SelectedPieceTile,
+    MoveMadeTile,
+}
+
 /// <summary>
 /// Handles player inputs.
 /// </summary>
 public class PlayerInputManager : MonoBehaviour
 {
     [Tooltip("Highlight for currently selected piece")]
-    public GameObject tileHighlight;
+    public GameObject selectedSquareHighlight;
 
     [Tooltip("Highlight for possible moves for currently selected piece")]
-    public GameObject circleHighlight;
+    public GameObject legalMovesHighlight;
 
     [Tooltip("Highlight for enemy pieces that can be taken")]
     public GameObject takeablePieceHighlight;
+
+    [Tooltip("Highlight for the move that was just made.")]
+    public GameObject moveMadeHighlight;
 
     // The legal moves on click
     private List<Move> legalMoves = new();
@@ -42,10 +53,27 @@ public class PlayerInputManager : MonoBehaviour
     /// <summary>
     /// Highlights the square the player has clicked on.
     /// </summary>
-    /// <param name="clickedSquare"> The chess tile the player has clicked on </param>
-    public void HighLightSquare(Square clickedSquare)
+    /// <param name="square"> The square to highlight.</param>
+    public void HighLightSquare(Square square, TileType tileType)
     {
-        Instantiate(tileHighlight, clickedSquare.ScreenPosition, tileHighlight.transform.rotation);
+        switch (tileType)
+        {
+            case TileType.LegalMovesTile:
+                Instantiate(legalMovesHighlight, square.ScreenPosition, Quaternion.identity);
+                break;
+
+            case TileType.TakeablePieceTile:
+                Instantiate(takeablePieceHighlight, square.ScreenPosition, Quaternion.identity);
+                break;
+
+            case TileType.SelectedPieceTile:
+                Instantiate(selectedSquareHighlight, square.ScreenPosition, Quaternion.identity);
+                break;
+
+            case TileType.MoveMadeTile:
+                Instantiate(moveMadeHighlight, square.ScreenPosition, Quaternion.identity);
+                break;
+        }
     }
 
     /// <summary>
@@ -60,13 +88,13 @@ public class PlayerInputManager : MonoBehaviour
 
             if (pieceOnSquare == null)
             {
-                Instantiate(circleHighlight, move.EndSquare.ScreenPosition, circleHighlight.transform.rotation);
+                HighLightSquare(move.EndSquare, TileType.LegalMovesTile);
             }
 
             // Highlight differently if there's a takeable enemy piece
             else if (GameController.Instance.MainBoard.IsEnemyPiece(pieceOnSquare, GameController.Instance.MainBoard.Turn))
             {
-                Instantiate(takeablePieceHighlight, move.EndSquare.ScreenPosition, circleHighlight.transform.rotation);
+                HighLightSquare(move.EndSquare, TileType.TakeablePieceTile);
             }
         }
     }
@@ -94,7 +122,7 @@ public class PlayerInputManager : MonoBehaviour
         // Only highlight if the piece wasn't already highlighted
         if (!startSquare.IsHighlighted())
         {
-            HighLightSquare(startSquare);
+            HighLightSquare(startSquare, TileType.SelectedPieceTile);
             HightLightLegalMoves(legalMoves);
         }
     }
