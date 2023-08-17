@@ -126,8 +126,8 @@ public class Board
         PieceColour opponentTurn = turn.ChangeTurn();
 
         // Find which pieces could take the king by finding which pieces the king could take if it were all other pieces
-        List<Move> movesFromKingPosition = FindQueenMoves(kingPosition);
-        movesFromKingPosition.AddRange(FindKnightMoves(kingPosition));
+        List<Move> movesFromKingPosition = FindQueenMoves(kingPosition, turn);
+        movesFromKingPosition.AddRange(FindKnightMoves(kingPosition, turn));
         bool kingCanBeTaken = movesFromKingPosition.Any(move => FindPieceOnSquare(move.EndSquare)?.Colour == opponentTurn);
 
         if (!kingCanBeTaken)
@@ -373,12 +373,12 @@ public class Board
 
         return piece.Type switch
         {
-            PieceType.Pawn => FindPawnMoves(square),
-            PieceType.Knight => FindKnightMoves(square),
-            PieceType.Bishop => FindBishopMoves(square),
-            PieceType.Rook => FindRookMoves(square),
-            PieceType.Queen => FindQueenMoves(square),
-            PieceType.King => FindKingMoves(square),
+            PieceType.Pawn => FindPawnMoves(square, turn),
+            PieceType.Knight => FindKnightMoves(square, turn),
+            PieceType.Bishop => FindBishopMoves(square, turn),
+            PieceType.Rook => FindRookMoves(square, turn),
+            PieceType.Queen => FindQueenMoves(square, turn),
+            PieceType.King => FindKingMoves(square, turn),
             _ => null,
         };
     }
@@ -463,10 +463,9 @@ public class Board
         return legalMoves.Count == 0;
     }
 
-    private List<Move> FindPawnMoves(Square startSquare)
+    private List<Move> FindPawnMoves(Square startSquare, PieceColour turn)
     {
         List<Move> moves = new();
-        PieceColour turn = FindPieceOnSquare(startSquare).Colour;
 
         // Flag to indicate something in the way of the pawn
         bool isBlocked = false;
@@ -525,11 +524,10 @@ public class Board
         return moves;
     }
 
-    private List<Move> FindRookMoves(Square startSquare)
+    private List<Move> FindRookMoves(Square startSquare, PieceColour turn)
     {
         // loop over both directions, then loop from start col to
         List<Move> moves = new();
-        PieceColour turn = FindPieceOnSquare(startSquare).Colour;
         bool isBlocked = false;
 
         for (int rowDir = -1; rowDir <= 1; rowDir++)
@@ -576,10 +574,9 @@ public class Board
         return moves;
     }
 
-    private List<Move> FindKnightMoves(Square startSquare)
+    private List<Move> FindKnightMoves(Square startSquare, PieceColour turn)
     {
         List<Move> moves = new();
-        PieceColour turn = FindPieceOnSquare(startSquare).Colour;
 
         for (int i = -2; i <= 2; i += 4)
         {
@@ -612,10 +609,9 @@ public class Board
         return moves;
     }
 
-    private List<Move> FindKingMoves(Square startSquare)
+    private List<Move> FindKingMoves(Square startSquare, PieceColour turn)
     {
         List<Move> moves = new();
-        PieceColour turn = FindPieceOnSquare(startSquare).Colour;
 
         for (int i = -1; i <= 1; i++)
         {
@@ -663,10 +659,9 @@ public class Board
         return moves;
     }
 
-    private List<Move> FindBishopMoves(Square startSquare)
+    private List<Move> FindBishopMoves(Square startSquare, PieceColour turn)
     {
         List<Move> moves = new();
-        PieceColour turn = FindPieceOnSquare(startSquare).Colour;
         bool isBlocked = false;
 
         for (int rowDir = -1; rowDir <= 1; rowDir += 2)
@@ -710,10 +705,10 @@ public class Board
         return moves;
     }
 
-    private List<Move> FindQueenMoves(Square startSquare)
+    private List<Move> FindQueenMoves(Square startSquare, PieceColour turn)
     {
-        List<Move> moves = FindBishopMoves(startSquare);
-        moves.AddRange(FindRookMoves(startSquare));
+        List<Move> moves = FindBishopMoves(startSquare, turn);
+        moves.AddRange(FindRookMoves(startSquare, turn));
 
         return moves;
     }

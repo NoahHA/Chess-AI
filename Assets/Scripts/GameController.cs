@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -50,14 +49,24 @@ public class GameController : MonoBehaviour
 
         if (AiMode)
         {
-            Move computerMove = AIController.GetBestMove(MainBoard, depth);
-            MainBoard.MakeMove(computerMove);
-            MainBoard.ChangeTurn();
-            BoardHelper.UpdateScreenFromBoard(MainBoard);
+            HandleAIMove();
         }
         else
         {
             BoardHelper.FlipCamera();
+        }
+    }
+
+    private void HandleAIMove()
+    {
+        Move computerMove = AIController.GetBestMove(MainBoard, depth);
+        MainBoard.MakeMove(computerMove);
+        MainBoard.ChangeTurn();
+        BoardHelper.UpdateScreenFromBoard(MainBoard);
+
+        if (MainBoard.IsInCheckmate(MainBoard.Turn))
+        {
+            onCheckmate?.Invoke(MainBoard.Turn);
         }
     }
 
