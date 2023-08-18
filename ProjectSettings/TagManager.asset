@@ -5,8 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Piece
-  - Highlight
-  - Checkmate
+  - ShortHighlight
+  - LongHighlight
   layers:
   - Default
   - TransparentFX
