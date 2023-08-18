@@ -10,16 +10,21 @@ public static class AIController
         float maxValue;
         Move bestMove = new Move();
 
-        // If white is in checkmate
         if (board.IsInCheckmate(PieceColour.White))
         {
             return Tuple.Create(bestMove, Mathf.Infinity);
         }
-
-        // If black is in checkmate
+        else if (board.IsInStalemate(PieceColour.White))
+        {
+            return Tuple.Create(bestMove, -Mathf.Infinity);
+        }
         else if (board.IsInCheckmate(PieceColour.Black))
         {
             return Tuple.Create(bestMove, -Mathf.Infinity);
+        }
+        else if (board.IsInStalemate(PieceColour.Black))
+        {
+            return Tuple.Create(bestMove, Mathf.Infinity);
         }
 
         // If max depth is reached

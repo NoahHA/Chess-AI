@@ -420,8 +420,48 @@ public class Board
             return false;
         }
 
-        List<Move> legalMoves = FindAllLegalMoves(turn);
-        return legalMoves.Count == 0;
+        ;
+        return FindAllLegalMoves(turn).Count == 0;
+    }
+
+    public bool IsInStalemate(PieceColour turn)
+    {
+        // If there's any non-king move that can be made then you're not in stalemate
+        if (HasNonKingMove(turn))
+        {
+            return false;
+        }
+
+        if (!IsInCheck(turn) && FindAllLegalMoves(turn).Count == 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Whether the player has any non-king moves available, used to calculate whether you're in stalemate.
+    /// </summary>
+    private bool HasNonKingMove(PieceColour turn)
+    {
+        for (int i = 0; i < 64; i++)
+        {
+            var square = new Square(i);
+            Piece piece = FindPieceOnSquare(square);
+
+            if (piece is null || piece.Colour != turn || piece.Type == PieceType.King)
+            {
+                continue;
+            }
+
+            if (MoveGenerator.GenerateMoves(this, square, turn).Count > 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public bool IsCastleMove(Move move)

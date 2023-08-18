@@ -34,9 +34,16 @@ public class GameController : MonoBehaviour
 
     public void Start()
     {
-        MainBoard.SetBoardToStartingPosition();
+        ResetGame();
+        MainBoard.FEN = "8/8/8/8/8/8/7Q/k1K5 w - - 0 1"; // Remove ####
         BoardHelper.UpdateScreenFromBoard(MainBoard);
         _playerInputManager = GetComponent<PlayerInputManager>();
+    }
+
+    private void ResetGame()
+    {
+        MainBoard.SetBoardToStartingPosition();
+        BoardHelper.UpdateScreenFromBoard(MainBoard);
     }
 
     private IEnumerator HandleMoveMade(Move move, bool stop = false)
@@ -49,6 +56,12 @@ public class GameController : MonoBehaviour
         if (MainBoard.IsInCheckmate(MainBoard.Turn))
         {
             onCheckmate?.Invoke(MainBoard.Turn);
+            yield break;
+        }
+        else if (MainBoard.IsInStalemate(MainBoard.Turn))
+        {
+            onCheckmate?.Invoke(MainBoard.Turn.ChangeTurn());
+            yield break;
         }
 
         if (AiMode && !stop)
@@ -90,6 +103,7 @@ public class GameController : MonoBehaviour
     {
         MainBoard.ChangeTurn();
         Debug.Log($"Checkmate: {MainBoard.Turn} wins!");
+        ResetGame();
     }
 
     private void OnEnable()
