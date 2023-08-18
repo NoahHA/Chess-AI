@@ -6,9 +6,18 @@ using UnityEngine;
 /// </summary>
 public class GameController : MonoBehaviour
 {
+    public enum AiLimitationMode
+    {
+        Time, Depth
+    }
+
     public bool AiMode { get; set; }
 
+    [Tooltip("Whether to limit the AI to a certain depth or a certain amount of search time.")]
+    [SerializeField] private AiLimitationMode AiLimitMode;
+
     [SerializeField] private int depth;
+    [SerializeField] private float timeLimit_ms;
 
     public delegate void OnCheckmate(PieceColour turn);
 
@@ -35,7 +44,6 @@ public class GameController : MonoBehaviour
     public void Start()
     {
         ResetGame();
-        MainBoard.FEN = "8/8/8/8/8/8/7Q/k1K5 w - - 0 1"; // Remove ####
         BoardHelper.UpdateScreenFromBoard(MainBoard);
         _playerInputManager = GetComponent<PlayerInputManager>();
     }
@@ -72,7 +80,7 @@ public class GameController : MonoBehaviour
             MainBoard.ChangeTurn();
             yield return null;
 
-            Move computerMove = AIController.GetBestMove(MainBoard, depth);
+            Move computerMove = (AiLimitMode == AiLimitationMode.Depth) ? AIController.GetBestMove(MainBoard, depth) : AIController.GetBestMove(MainBoard, timeLimit_ms);
             StartCoroutine(HandleMoveMade(computerMove, stop: true));
         }
         else if (!AiMode)

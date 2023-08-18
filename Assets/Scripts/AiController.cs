@@ -1,9 +1,13 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using UnityEngine;
 
 public static class AIController
 {
+    private static Stopwatch _stopWatch;
+    private static float _maxTime_ms = Mathf.Infinity;
+
     private static Tuple<Move, float> Minimax(Board board, int depth, float alpha = -Mathf.Infinity,
         float beta = Mathf.Infinity, PieceColour maximizingPlayer = PieceColour.White)
     {
@@ -27,8 +31,8 @@ public static class AIController
             return Tuple.Create(bestMove, Mathf.Infinity);
         }
 
-        // If max depth is reached
-        else if (depth == 0)
+        // If max depth or time limit is reached
+        else if (depth == 0 || _stopWatch.ElapsedMilliseconds > _maxTime_ms)
         {
             return Tuple.Create(bestMove, EvaluatePosition(board));
         }
@@ -90,6 +94,25 @@ public static class AIController
     public static Move GetBestMove(Board board, int depth)
     {
         return Minimax(board, depth).Item1;
+    }
+
+    public static Move GetBestMove(Board board, float maxTime_ms)
+    {
+        _stopWatch = Stopwatch.StartNew();
+        _maxTime_ms = maxTime_ms;
+
+        Move bestMove = new();
+        float maxValue = -Mathf.Infinity;
+        int depth = 1;
+
+        while (_stopWatch.ElapsedMilliseconds < _maxTime_ms)
+        {
+            (Move newBestMove, float newValue) = Minimax(board, depth);
+            bestMove = (newValue > maxValue) ? newBestMove : bestMove;
+            depth++;
+        }
+
+        return bestMove;
     }
 
     /// <summary>
