@@ -25,7 +25,7 @@ public static class BoardHelper
     /// Updates the screen based on the given board state.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public static void UpdateScreenFromBoard(Board board)
+    public static void UpdateScreenFromBoard(Board board, bool rotate = true)
     {
         ClearScreen();
 
@@ -36,7 +36,7 @@ public static class BoardHelper
 
             if (piece != null)
             {
-                InstantiatePiece(piece, position, board.Turn);
+                InstantiatePiece(piece, position, board.Turn, rotate);
             }
         }
     }
@@ -46,10 +46,12 @@ public static class BoardHelper
     /// </summary>
     /// <param name="piece">The piece to create.</param>
     /// <param name="square">The square on which to create the piece.</param>
+    /// <param name="rotate">Whether to rotate the pieces to match who's turn it is.</param>
     /// <returns>The created game object.</returns>
-    public static GameObject InstantiatePiece(Piece piece, Square square, PieceColour turn)
+    public static GameObject InstantiatePiece(Piece piece, Square square, PieceColour turn, bool rotate)
     {
-        Quaternion rotation = (turn == PieceColour.White) ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, 180);
+        Quaternion rotation = (turn == PieceColour.White || !rotate) ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, 180);
+
         GameObject pieceGameObject = (GameObject)Object.Instantiate(
             Resources.Load("Pieces/" + piece.GetPrefabName()), square.ScreenPosition, rotation
         );

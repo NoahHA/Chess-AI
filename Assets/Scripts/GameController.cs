@@ -13,11 +13,23 @@ public class GameController : MonoBehaviour
 
     public bool AiMode { get; set; }
 
+    [SerializeField] private GameObject startMenu;
+
+    [Header("AI Settings")]
+    [Space(5)]
     [Tooltip("Whether to limit the AI to a certain depth or a certain amount of search time.")]
     [SerializeField] private AiLimitationMode AiLimitMode;
 
     [SerializeField] private int depth;
     [SerializeField] private float timeLimit_ms;
+
+    [Header("Benchmarking Settings")]
+    [Space(5)]
+    [Tooltip("When true, the AI will play itself and record benchmarking data for analysis.")]
+    public bool BenchmarkingMode = false;
+
+    [Tooltip("Maximum number of computer vs computer turns, only used in benchmarking mode.")]
+    [SerializeField] private int maxComputerTurns = 10;
 
     public delegate void OnCheckmate(PieceColour turn);
 
@@ -39,19 +51,64 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public Board MainBoard = new Board();
+    public Board MainBoard = new();
 
     public void Start()
     {
         ResetGame();
         BoardHelper.UpdateScreenFromBoard(MainBoard);
         _playerInputManager = GetComponent<PlayerInputManager>();
+
+        if (BenchmarkingMode)
+        {
+            startMenu.SetActive(false);
+            StartCoroutine(PlayComputerVsComputer());
+        }
+    }
+
+    private IEnumerator PlayComputerVsComputer()
+    {
+        int turnsPlayed = 0;
+
+        while (turnsPlayed < maxComputerTurns)
+        {
+            Move whiteMove = (AiLimitMode == AiLimitationMode.Depth) ? AIController.GetBestMove(MainBoard, depth, PieceColour.White) : AIController.GetBestMove(MainBoard, timeLimit_ms, PieceColour.White);
+            MainBoard.MakeMove(whiteMove);
+
+            if (MainBoard.IsInCheckmate(PieceColour.White) || MainBoard.IsInStalemate(PieceColour.White))
+            {
+                break;
+            }
+
+            MainBoard.ChangeTurn();
+            BoardHelper.UpdateScreenFromBoard(MainBoard, rotate: false);
+            yield return null;
+
+            Move blackMove = (AiLimitMode == AiLimitationMode.Depth) ? AIController.GetBestMove(MainBoard, depth, PieceColour.Black) : AIController.GetBestMove(MainBoard, timeLimit_ms, PieceColour.Black);
+            MainBoard.MakeMove(blackMove);
+
+            if (MainBoard.IsInCheckmate(PieceColour.Black) || MainBoard.IsInStalemate(PieceColour.Black))
+            {
+                break;
+            }
+
+            MainBoard.ChangeTurn();
+            BoardHelper.UpdateScreenFromBoard(MainBoard, rotate: false);
+            yield return null;
+
+            turnsPlayed++;
+        }
+
+        Debug.Log("Game Over");
+        BenchmarkingMode = false;
+        ResetGame();
     }
 
     private void ResetGame()
     {
         MainBoard.SetBoardToStartingPosition();
         BoardHelper.UpdateScreenFromBoard(MainBoard);
+        startMenu.SetActive(true);
     }
 
     private IEnumerator HandleMoveMade(Move move, bool stop = false)

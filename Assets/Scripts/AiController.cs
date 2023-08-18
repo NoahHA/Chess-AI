@@ -8,8 +8,14 @@ public static class AIController
     private static Stopwatch _stopWatch;
     private static float _maxTime_ms = Mathf.Infinity;
 
-    private static Tuple<Move, float> Minimax(Board board, int depth, float alpha = -Mathf.Infinity,
-        float beta = Mathf.Infinity, bool maximizingPlayer = true, PieceColour computerSide = PieceColour.Black)
+    private static Tuple<Move, float> Minimax(
+        Board board,
+        int depth,
+        float alpha = -Mathf.Infinity,
+        float beta = Mathf.Infinity,
+        bool maximizingPlayer = true,
+        PieceColour computerSide = PieceColour.Black
+        )
     {
         float maxValue;
         Move bestMove = new();
