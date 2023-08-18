@@ -9,44 +9,36 @@ public static class AIController
     private static float _maxTime_ms = Mathf.Infinity;
 
     private static Tuple<Move, float> Minimax(Board board, int depth, float alpha = -Mathf.Infinity,
-        float beta = Mathf.Infinity, PieceColour maximizingPlayer = PieceColour.White)
+        float beta = Mathf.Infinity, bool maximizingPlayer = true, PieceColour computerSide = PieceColour.Black)
     {
         float maxValue;
-        Move bestMove = new Move();
+        Move bestMove = new();
 
-        if (board.IsInCheckmate(PieceColour.White))
+        if (board.IsInCheckmate(computerSide) || board.IsInStalemate(computerSide))
         {
             return Tuple.Create(bestMove, Mathf.Infinity);
         }
-        else if (board.IsInStalemate(PieceColour.White))
+        else if (board.IsInCheckmate(computerSide.ChangeTurn()) || board.IsInStalemate(computerSide.ChangeTurn()))
         {
             return Tuple.Create(bestMove, -Mathf.Infinity);
-        }
-        else if (board.IsInCheckmate(PieceColour.Black))
-        {
-            return Tuple.Create(bestMove, -Mathf.Infinity);
-        }
-        else if (board.IsInStalemate(PieceColour.Black))
-        {
-            return Tuple.Create(bestMove, Mathf.Infinity);
         }
 
         // If max depth or time limit is reached
         else if (depth == 0 || _stopWatch.ElapsedMilliseconds > _maxTime_ms)
         {
-            return Tuple.Create(bestMove, EvaluatePosition(board));
+            return Tuple.Create(bestMove, EvaluatePosition(board, computerSide));
         }
 
-        if (maximizingPlayer == PieceColour.White)
+        if (maximizingPlayer)
         {
             maxValue = -Mathf.Infinity;
-            List<Move> legalMoves = board.FindAllLegalMoves(PieceColour.Black);
+            List<Move> legalMoves = board.FindAllLegalMoves(computerSide);
 
             foreach (Move move in legalMoves)
             {
                 string initialFen = string.Copy(board.FEN);
                 board.MakeMove(move);
-                (Move _, float newValue) = Minimax(board, depth - 1, alpha, beta, PieceColour.Black);
+                (Move _, float newValue) = Minimax(board, depth - 1, alpha, beta, false, computerSide);
                 board.FEN = initialFen; // Undo move
 
                 if (newValue > maxValue)
@@ -66,13 +58,13 @@ public static class AIController
         else
         {
             maxValue = Mathf.Infinity;
-            List<Move> legalMoves = board.FindAllLegalMoves(PieceColour.White);
+            List<Move> legalMoves = board.FindAllLegalMoves(computerSide.ChangeTurn());
 
             foreach (Move move in legalMoves)
             {
                 string initialFen = string.Copy(board.FEN);
                 board.MakeMove(move);
-                (Move _, float newValue) = Minimax(board, depth - 1, alpha, beta, PieceColour.White);
+                (Move _, float newValue) = Minimax(board, depth - 1, alpha, beta, true, computerSide);
                 board.FEN = initialFen; // Undo move
 
                 if (newValue < maxValue)
@@ -91,12 +83,12 @@ public static class AIController
         }
     }
 
-    public static Move GetBestMove(Board board, int depth)
+    public static Move GetBestMove(Board board, int depth, PieceColour computerSide = PieceColour.Black)
     {
-        return Minimax(board, depth).Item1;
+        return Minimax(board, depth, computerSide: computerSide).Item1;
     }
 
-    public static Move GetBestMove(Board board, float maxTime_ms)
+    public static Move GetBestMove(Board board, float maxTime_ms, PieceColour computerSide = PieceColour.Black)
     {
         _stopWatch = Stopwatch.StartNew();
         _maxTime_ms = maxTime_ms;
@@ -107,7 +99,7 @@ public static class AIController
 
         while (_stopWatch.ElapsedMilliseconds < _maxTime_ms)
         {
-            (Move newBestMove, float newValue) = Minimax(board, depth);
+            (Move newBestMove, float newValue) = Minimax(board, depth, computerSide: computerSide);
             bestMove = (newValue > maxValue) ? newBestMove : bestMove;
             depth++;
         }
@@ -117,33 +109,33 @@ public static class AIController
 
     /// <summary>
     /// Returns a numerical evaluation of a given chess position,
-    /// where more positive numbers indicate black is winning and
-    /// more negative numbers indicate white.
+    /// where more negative numbers indicate black is winning and
+    /// more positive numbers indicate white.
     /// </summary>
     /// <param name="position"></param>
-    private static float EvaluatePosition(Board position)
+    private static float EvaluatePosition(Board position, PieceColour computerSide)
     {
         float positionValue = 0f;
-        //List<Move> blackLegalMoves = board.FindAllLegalMoves(PieceColour.Black);
-        //List<Move> whiteLegalMoves = board.FindAllLegalMoves(PieceColour.White);
+        //List<Move> computerLegalMoves = board.FindAllLegalMoves(computerSide);
+        //List<Move> otherSideLegalMoves = board.FindAllLegalMoves(computerSide.ChangeTurn());
 
         // Evaluates based on total piece value for each side
         foreach (Piece piece in position.State)
         {
-            // White piece = negative (because computer is always black)
-            if (piece?.Colour == PieceColour.White)
-            {
-                positionValue -= GetPieceValue(piece);
-            }
-            // Black piece = positive
-            else
+            // Computer piece = positive
+            if (piece?.Colour == computerSide)
             {
                 positionValue += GetPieceValue(piece);
+            }
+            // Opposite side piece = negative
+            else
+            {
+                positionValue -= GetPieceValue(piece);
             }
         }
 
         // Adds penality for lack of mobility
-        //positionValue += 0.1f * (blackLegalMoves.Count - whiteLegalMoves.Count);
+        //positionValue -= 0.1f * (computerLegalMoves.Count - otherSideLegalMoves.Count);
 
         return positionValue;
     }
