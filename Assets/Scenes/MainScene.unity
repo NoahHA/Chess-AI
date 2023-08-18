@@ -1350,6 +1350,26 @@ PrefabInstance:
       propertyPath: depth
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 3146736653804480537, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: startMenu
+      value: 
+      objectReference: {fileID: 695001771}
+    - target: {fileID: 3146736653804480537, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: timeLimit_ms
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 3146736653804480537, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: BenchmarkingMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3146736653804480537, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: maxComputerTurns
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3146736653804480537, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
+      propertyPath: versionDescription
+      value: v1
+      objectReference: {fileID: 0}
     - target: {fileID: 3146736653804480538, guid: b8721bacdd59bb54e9632341887b10b7, type: 3}
       propertyPath: m_Name
       value: Board

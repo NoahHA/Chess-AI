@@ -31,6 +31,9 @@ public class GameController : MonoBehaviour
     [Tooltip("Maximum number of computer vs computer turns, only used in benchmarking mode.")]
     [SerializeField] private int maxComputerTurns = 10;
 
+    [TextArea]
+    [SerializeField] private string versionDescription;
+
     public delegate void OnCheckmate(PieceColour turn);
 
     public static OnCheckmate onCheckmate;
@@ -69,10 +72,11 @@ public class GameController : MonoBehaviour
     private IEnumerator PlayComputerVsComputer()
     {
         int turnsPlayed = 0;
+        AIController.benchmarking.StartBenchmarking();
 
         while (turnsPlayed < maxComputerTurns)
         {
-            Move whiteMove = (AiLimitMode == AiLimitationMode.Depth) ? AIController.GetBestMove(MainBoard, depth, PieceColour.White) : AIController.GetBestMove(MainBoard, timeLimit_ms, PieceColour.White);
+            Move whiteMove = AIController.GetBestMove(MainBoard, timeLimit_ms, PieceColour.White, true);
             MainBoard.MakeMove(whiteMove);
 
             if (MainBoard.IsInCheckmate(PieceColour.White) || MainBoard.IsInStalemate(PieceColour.White))
@@ -84,7 +88,7 @@ public class GameController : MonoBehaviour
             BoardHelper.UpdateScreenFromBoard(MainBoard, rotate: false);
             yield return null;
 
-            Move blackMove = (AiLimitMode == AiLimitationMode.Depth) ? AIController.GetBestMove(MainBoard, depth, PieceColour.Black) : AIController.GetBestMove(MainBoard, timeLimit_ms, PieceColour.Black);
+            Move blackMove = AIController.GetBestMove(MainBoard, timeLimit_ms, PieceColour.Black, true);
             MainBoard.MakeMove(blackMove);
 
             if (MainBoard.IsInCheckmate(PieceColour.Black) || MainBoard.IsInStalemate(PieceColour.Black))
@@ -99,6 +103,7 @@ public class GameController : MonoBehaviour
             turnsPlayed++;
         }
 
+        AIController.benchmarking.WriteMetricsToCsv(versionDescription, timeLimit_ms);
         Debug.Log("Game Over");
         BenchmarkingMode = false;
         ResetGame();

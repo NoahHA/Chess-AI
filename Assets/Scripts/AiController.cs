@@ -8,6 +8,11 @@ public static class AIController
     private static Stopwatch _stopWatch;
     private static float _maxTime_ms = Mathf.Infinity;
 
+    // Benchmarking variables
+    public static Benchmarking benchmarking = new Benchmarking();
+
+    private static int _nodesSearched = 0;
+
     private static Tuple<Move, float> Minimax(
         Board board,
         int depth,
@@ -22,16 +27,19 @@ public static class AIController
 
         if (board.IsInCheckmate(computerSide) || board.IsInStalemate(computerSide))
         {
+            _nodesSearched++;
             return Tuple.Create(bestMove, Mathf.Infinity);
         }
         else if (board.IsInCheckmate(computerSide.ChangeTurn()) || board.IsInStalemate(computerSide.ChangeTurn()))
         {
+            _nodesSearched++;
             return Tuple.Create(bestMove, -Mathf.Infinity);
         }
 
         // If max depth or time limit is reached
         else if (depth == 0 || _stopWatch.ElapsedMilliseconds > _maxTime_ms)
         {
+            _nodesSearched++;
             return Tuple.Create(bestMove, EvaluatePosition(board, computerSide));
         }
 
@@ -91,23 +99,30 @@ public static class AIController
 
     public static Move GetBestMove(Board board, int depth, PieceColour computerSide = PieceColour.Black)
     {
+        _nodesSearched = 0;
         return Minimax(board, depth, computerSide: computerSide).Item1;
     }
 
-    public static Move GetBestMove(Board board, float maxTime_ms, PieceColour computerSide = PieceColour.Black)
+    public static Move GetBestMove(Board board, float maxTime_ms, PieceColour computerSide = PieceColour.Black, bool benchmarkMode = false)
     {
+        _nodesSearched = 0;
         _stopWatch = Stopwatch.StartNew();
         _maxTime_ms = maxTime_ms;
 
         Move bestMove = new();
         float maxValue = -Mathf.Infinity;
-        int depth = 1;
+        int depth = 0;
 
         while (_stopWatch.ElapsedMilliseconds < _maxTime_ms)
         {
+            depth++;
             (Move newBestMove, float newValue) = Minimax(board, depth, computerSide: computerSide);
             bestMove = (newValue > maxValue) ? newBestMove : bestMove;
-            depth++;
+        }
+
+        if (benchmarkMode)
+        {
+            benchmarking.RecordMetrics(_nodesSearched, depth, maxTime_ms);
         }
 
         return bestMove;
