@@ -181,7 +181,7 @@ public class Board
         // If en passant then take the en-passanted pawn
         if (move.EnPassant)
         {
-            int dir = piece.Colour == PieceColour.White ? 1 : -1;
+            int dir = (piece.Colour == PieceColour.White) ? 1 : -1;
             PlacePiece(null, new Square(move.EndSquare.Col, move.EndSquare.Row - dir));
         }
 
@@ -211,6 +211,30 @@ public class Board
         else
         {
             EnPassantSquare = null;
+        }
+    }
+
+    public bool CanTakeEnPassant()
+    {
+        if (EnPassantSquare is null)
+        {
+            return false;
+        }
+
+        if (EnPassantSquare.Row == 3)
+        {
+            Square firstTakeLocation = new Square(EnPassantSquare.Col + 1, EnPassantSquare.Row + 1);
+            Square secondTakeLocation = new Square(EnPassantSquare.Col - 1, EnPassantSquare.Row + 1);
+
+            return FindPieceOnSquare(firstTakeLocation)?.Letter == 'p' || FindPieceOnSquare(secondTakeLocation)?.Letter == 'p';
+        }
+
+        else
+        {
+            Square firstTakeLocation = new Square(EnPassantSquare.Col + 1, EnPassantSquare.Row - 1);
+            Square secondTakeLocation = new Square(EnPassantSquare.Col - 1, EnPassantSquare.Row - 1);
+
+            return FindPieceOnSquare(firstTakeLocation)?.Letter == 'P' || FindPieceOnSquare(secondTakeLocation)?.Letter == 'P';
         }
     }
 

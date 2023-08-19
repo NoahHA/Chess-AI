@@ -11,7 +11,8 @@ public static class FenExtensions
     /// <returns>Whether the specified type of castling is available.</returns>
     public static bool CanCastle(this string fen, Castling castleType, PieceColour turn)
     {
-        string castleFen = fen.Split(' ')[2];
+        string castleFen = fen.GetFenCastleSection();
+
         if (castleType == Castling.KingSide)
         {
             return (turn == PieceColour.White && castleFen.Contains('K')) ||
@@ -38,7 +39,7 @@ public static class FenExtensions
 
     public static Square GetEnPassantSquareFromFen(this string fen)
     {
-        string enPassantString = fen.Split(' ')[3];
+        string enPassantString = fen.GetFenEnPassantSection();
         return (enPassantString == "-") ? null : new Square(enPassantString);
     }
 
@@ -65,4 +66,24 @@ public static class FenExtensions
 
         return canCastle;
     }
+
+    /// <summary>
+    /// Gets just the section of the FEN representing piece positions.
+    /// </summary>
+    public static string GetFenPieceSection(this string fen) => fen.Split(' ')[0];
+
+    /// <summary>
+    /// Gets just the section of the FEN representing the current turn.
+    /// </summary>
+    public static string GetFenTurnsection(this string fen) => fen.Split(' ')[1];
+
+    /// <summary>
+    /// Gets just the section of the FEN representing castle options.
+    /// </summary>
+    public static string GetFenCastleSection(this string fen) => fen.Split(' ')[2];
+
+    /// <summary>
+    /// Gets just the section of the FEN representing en passant square.
+    /// </summary>
+    public static string GetFenEnPassantSection(this string fen) => fen.Split(' ')[3];
 }
