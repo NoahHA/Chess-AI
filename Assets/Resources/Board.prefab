@@ -132,6 +132,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28d177acb317ef14caecb8aa74b426ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startMenu: {fileID: 0}
+  AiLimitMode: 0
+  depth: 3
+  timeLimit_ms: 1000
+  BenchmarkingMode: 1
+  maxComputerTurns: 10
+  versionDescription: v1
 --- !u!114 &3146736653804480542
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,9 +151,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b75ada69cb5bf84d82f08b64e9386b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileHighlight: {fileID: 3348318481398810697, guid: 4e3c18e417a6e1645840f531c58c126f, type: 3}
-  circleHighlight: {fileID: 481863497604018407, guid: 46f2f0af683ea1847b77ef3bccc3c3f0, type: 3}
+  selectedSquareHighlight: {fileID: 3348318481398810697, guid: 4e3c18e417a6e1645840f531c58c126f, type: 3}
+  legalMovesHighlight: {fileID: 481863497604018407, guid: 46f2f0af683ea1847b77ef3bccc3c3f0, type: 3}
   takeablePieceHighlight: {fileID: 3348318481398810697, guid: 6c1952c6557bf7a43a98e3d2aa48975d, type: 3}
+  moveMadeHighlight: {fileID: 3348318481398810697, guid: d8e338c582a009e4185db6885c42f9e1, type: 3}
 --- !u!61 &3146736653804480543
 BoxCollider2D:
   m_ObjectHideFlags: 0

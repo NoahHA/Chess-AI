@@ -6,7 +6,6 @@ using UnityEngine;
 public static class AIController
 {
     private static Stopwatch _stopWatch;
-    private static float _maxTime_ms = Mathf.Infinity;
 
     // Benchmarking variables
     public static Benchmarking benchmarking = new Benchmarking();
@@ -37,7 +36,7 @@ public static class AIController
         }
 
         // If max depth or time limit is reached
-        else if (depth == 0 || _stopWatch.ElapsedMilliseconds > _maxTime_ms)
+        else if (depth == 0 || (AiSettings.SearchMode == AiSettings.Search.Time && _stopWatch.ElapsedMilliseconds > AiSettings.TimeLimit_ms))
         {
             _nodesSearched++;
             return Tuple.Create(bestMove, EvaluatePosition(board, computerSide));
@@ -96,36 +95,37 @@ public static class AIController
             return Tuple.Create(bestMove, maxValue);
         }
     }
-
-    public static Move GetBestMove(Board board, int depth, PieceColour computerSide = PieceColour.Black)
-    {
-        _nodesSearched = 0;
-        return Minimax(board, depth, computerSide: computerSide).Item1;
-    }
-
-    public static Move GetBestMove(Board board, float maxTime_ms, PieceColour computerSide = PieceColour.Black, bool benchmarkMode = false)
+    public static Move GetBestMove(Board board, PieceColour computerSide = PieceColour.Black)
     {
         _nodesSearched = 0;
         _stopWatch = Stopwatch.StartNew();
-        _maxTime_ms = maxTime_ms;
 
-        Move bestMove = new();
-        float maxValue = -Mathf.Infinity;
-        int depth = 0;
-
-        while (_stopWatch.ElapsedMilliseconds < _maxTime_ms)
+        if (AiSettings.SearchMode == AiSettings.Search.Time)
         {
-            depth++;
-            (Move newBestMove, float newValue) = Minimax(board, depth, computerSide: computerSide);
-            bestMove = (newValue > maxValue) ? newBestMove : bestMove;
+            Move bestMove = new();
+            float maxValue = -Mathf.Infinity;
+            int depth = 0;
+
+            while (_stopWatch.ElapsedMilliseconds < AiSettings.TimeLimit_ms)
+            {
+                depth++;
+                (Move newBestMove, float newValue) = Minimax(board, depth, computerSide: computerSide);
+                bestMove = (newValue > maxValue) ? newBestMove : bestMove;
+            }
+
+            if (AiSettings.Benchmarking)
+            {
+                benchmarking.RecordMetrics(_nodesSearched, depth, AiSettings.TimeLimit_ms);
+            }
+
+            return bestMove;
         }
 
-        if (benchmarkMode)
+        else
         {
-            benchmarking.RecordMetrics(_nodesSearched, depth, maxTime_ms);
+            return Minimax(board, AiSettings.SearchDepth, computerSide: computerSide).Item1;
         }
 
-        return bestMove;
     }
 
     /// <summary>
